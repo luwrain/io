@@ -1,4 +1,6 @@
 #!/bin/bash -e
+# Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+# This file is part of the LUWRAIN.
 
 THIS="${0##*/}"
 IFACE="$1"
