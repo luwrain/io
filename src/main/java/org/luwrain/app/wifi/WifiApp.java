@@ -41,7 +41,7 @@ public class WifiApp implements Application, Actions
 	    return false;
 	strings = (Strings)o;
 	this.luwrain = luwrain;
-	if (!base.init(luwrain))
+	if (!base.init(luwrain, this))
 	    return false;
 	createArea();
 	base.launchScanning();
@@ -50,6 +50,7 @@ public class WifiApp implements Application, Actions
 
     @Override public void onReady()
     {
+	area.refresh();
     }
 
     @Override public void doScanning()

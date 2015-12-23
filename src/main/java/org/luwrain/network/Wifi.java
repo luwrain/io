@@ -59,6 +59,7 @@ public class Wifi
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dir))) {
 		for (Path p : directoryStream) 
 		{
+		    Log.debug("network", "reading wifi network information from " + p.toString());
 		    final WifiNetwork n = readNetworkData(p);
 		    if (n != null)
 			networks.add(n);

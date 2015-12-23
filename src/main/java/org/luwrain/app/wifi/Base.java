@@ -30,10 +30,12 @@ class Base
     private Luwrain luwrain;
     private final FixedListModel listModel = new FixedListModel();
     private FutureTask task;
+    private Actions actions;
 
-    boolean init(Luwrain luwrain)
+    boolean init(Luwrain luwrain, Actions actions)
     {
 	this.luwrain = luwrain;
+	this.actions = actions;
 	final Object o = luwrain.getSharedObject("luwrain.network");
 	if (o == null || !(o instanceof Network))
 	    return false;
@@ -59,9 +61,12 @@ class Base
     {
     if (scanRes.type() != WifiScanResult.Type.SUCCESS)
     {
-	//FIXME:message;
+	listModel.clear();
+	actions.onReady();
 	return;
     }
+    listModel.setItems(scanRes.networks());
+    actions.onReady();
     }
 
     private FutureTask createScanTask()
