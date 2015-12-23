@@ -23,4 +23,6 @@ interface Actions
     void onReady();
     boolean onClick(Object obj);
     boolean isScanning();
+    void goToList();
+    void goToProgress();
 }

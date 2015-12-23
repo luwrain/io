@@ -67,7 +67,6 @@ class Base
 	return true;
     }
 
-
     private void acceptResult(WifiScanResult scanRes)
     {
     if (scanRes.type() != WifiScanResult.Type.SUCCESS)

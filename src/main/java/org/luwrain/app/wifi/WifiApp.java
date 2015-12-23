@@ -115,7 +115,32 @@ public class WifiApp implements Application, Actions
 		}
 	    };
 
-	progressArea = new ProgressArea(new DefaultControlEnvironment(luwrain), "Подключение");
+	progressArea = new ProgressArea(new DefaultControlEnvironment(luwrain), "Подключение"){
+		@Override public boolean onKeyboardEvent(KeyboardEvent event)
+		{
+		    NullCheck.notNull(event, "event");
+		    if (event.isCommand() && !event.isModified())
+			switch(event.getCommand())
+			{
+			case KeyboardEvent.TAB:
+			    actions.goToList();
+			    return false;
+			}
+		    return super.onKeyboardEvent(event);
+		}
+		@Override public boolean onEnvironmentEvent(EnvironmentEvent event)
+		{
+		    NullCheck.notNull(event, "event");
+		    switch(event.getCode())
+		    {
+case EnvironmentEvent.CLOSE:
+actions.closeApp();
+return true;
+default:
+return super.onEnvironmentEvent(event);
+ }
+		}
+	    };
     }
 
     @Override public String getAppName()
@@ -133,5 +158,20 @@ public class WifiApp implements Application, Actions
 	//FIXME:Checking threads;
 	luwrain.closeApp();
 	return true;
+    }
+
+    @Override public void goToList()
+    {
+	luwrain.setActiveArea(listArea);
+    }
+
+    @Override public void goToProgress()
+    {
+	if (layouts.getCurrentIndex() == 0)
+	{
+	    luwrain.setActiveArea(listArea);
+	    return;
+	}
+	luwrain.setActiveArea(progressArea);
     }
 }
