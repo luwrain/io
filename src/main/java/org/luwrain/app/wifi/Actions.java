@@ -22,4 +22,5 @@ interface Actions
     void doScanning();
     void onReady();
     boolean onClick(Object obj);
+    boolean isScanning();
 }

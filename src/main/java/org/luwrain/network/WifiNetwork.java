@@ -40,6 +40,11 @@ boolean hasPassword;
 	return hasPassword;
     }
 
+    public String password()
+    {
+	return "";
+    }
+
     @Override public String toString()
     {
 	return name;

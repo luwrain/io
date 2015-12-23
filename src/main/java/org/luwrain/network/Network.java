@@ -20,6 +20,11 @@ import org.luwrain.core.*;
 
 public class Network
 {
+    public interface ConnectionListener
+    {
+	void onConnectionProgressLine(String line);
+    }
+
     private Wifi wifi;
 
     Network(Luwrain luwrain)
@@ -28,8 +33,13 @@ public class Network
     }
 
     //May be called from any thread
-    public synchronized WifiScanResult wifiScan()
+    public WifiScanResult wifiScan()
     {
 	return wifi.scan();
+    }
+
+    public void wifiConnect(WifiNetwork connectTo, ConnectionListener listener)
+    {
+	wifi.connect(connectTo, listener);
     }
 }

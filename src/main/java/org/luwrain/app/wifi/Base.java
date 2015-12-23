@@ -19,7 +19,7 @@ package org.luwrain.app.wifi;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-//import org.luwrain.core.events.ThreadSyncEvent;
+import org.luwrain.core.events.ProgressLineEvent;
 import org.luwrain.controls.*;
 import org.luwrain.network.*;
 
@@ -29,7 +29,8 @@ class Base
     private Network network;
     private Luwrain luwrain;
     private final FixedListModel listModel = new FixedListModel();
-    private FutureTask task;
+    private FutureTask scanningTask;
+    private FutureTask connectionTask;
     private Actions actions;
 
     boolean init(Luwrain luwrain, Actions actions)
@@ -50,12 +51,22 @@ class Base
 
     boolean launchScanning()
     {
-	if (task != null && !task.isDone())
+	if (scanningTask != null && !scanningTask.isDone())
 	    return false;
-	task = createScanTask();
-	executor.execute(task);
+	scanningTask = createScanningTask();
+	executor.execute(scanningTask);
 	return true;
     }
+
+    boolean launchConnection(ProgressArea destArea, WifiNetwork connectTo)
+    {
+	if (connectionTask != null && !connectionTask.isDone())
+	    return false;
+	connectionTask = createConnectionTask(destArea, connectTo);
+	executor.execute(connectionTask);
+	return true;
+    }
+
 
     private void acceptResult(WifiScanResult scanRes)
     {
@@ -69,11 +80,24 @@ class Base
     actions.onReady();
     }
 
-    private FutureTask createScanTask()
+    private FutureTask createScanningTask()
     {
 	return new FutureTask(()->{
-final WifiScanResult res = network.wifiScan();
-luwrain.runInMainThread(()->acceptResult(res));
+		final WifiScanResult res = network.wifiScan();
+		luwrain.runInMainThread(()->acceptResult(res));
 	}, null);
+    }
+
+    private FutureTask createConnectionTask(final ProgressArea destArea, final WifiNetwork connectTo)
+    {
+	return new FutureTask(()->{
+		network.wifiConnect(connectTo, (line)->luwrain.enqueueEvent(new ProgressLineEvent(destArea, line)));
+	}, null);
+    }
+
+
+    boolean isScanning()
+    {
+	return scanningTask != null && !scanningTask.isDone();
     }
 }

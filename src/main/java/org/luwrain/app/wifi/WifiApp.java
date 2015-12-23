@@ -24,6 +24,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.popups.Popups;
+import org.luwrain.network.*;
 
 public class WifiApp implements Application, Actions
 {
@@ -32,7 +33,9 @@ public class WifiApp implements Application, Actions
     private Luwrain luwrain;
     private Strings strings;
     private final Base base = new Base();
-    private ListArea area;
+    private ListArea listArea;
+    private ProgressArea progressArea;
+    private AreaLayoutSwitch layouts;
 
     @Override public boolean onLaunch(Luwrain luwrain)
     {
@@ -44,26 +47,39 @@ public class WifiApp implements Application, Actions
 	if (!base.init(luwrain, this))
 	    return false;
 	createArea();
+	layouts = new AreaLayoutSwitch(luwrain);
+	layouts.add(new AreaLayout(listArea));
+	layouts.add(new AreaLayout(AreaLayout.TOP_BOTTOM, listArea, listArea));
 	base.launchScanning();
 	return true;
     }
 
     @Override public void onReady()
     {
-	area.refresh();
+	listArea.refresh();
     }
 
     @Override public void doScanning()
     {
 	if (!base.launchScanning())
 	    return;
-	area.refresh();
+	listArea.refresh();
     }
 
     @Override public boolean onClick(Object obj)
     {
-	//FIXME:
-	return false;
+	if (obj == null || !(obj instanceof WifiNetwork))
+	    return false;
+	progressArea.clear();
+	if (!base.launchConnection(progressArea, (WifiNetwork)obj))
+	    return false;
+	layouts.show(1);
+	return true;
+    }
+
+    @Override public boolean isScanning()
+    {
+	return base.isScanning();
     }
 
     private void createArea()
@@ -77,7 +93,7 @@ public class WifiApp implements Application, Actions
 	params.clickHandler = (area, index, obj)->actions.onClick(obj);
 	params.name = strings.appName();
 
-	area = new ListArea(params){
+	listArea = new ListArea(params){
 		@Override public boolean onEnvironmentEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -93,8 +109,13 @@ public class WifiApp implements Application, Actions
 			return super.onEnvironmentEvent(event);
 		    }
 		}
+		@Override protected String noContentStr()
+		{
+		    return actions.isScanning()?"Идёт поиск беспроводных сетей. Пожалуйста, подождите...":"Беспроводные сети отсутствуют";
+		}
 	    };
 
+	progressArea = new ProgressArea(new DefaultControlEnvironment(luwrain), "Подключение");
     }
 
     @Override public String getAppName()
@@ -104,7 +125,7 @@ public class WifiApp implements Application, Actions
 
     @Override public AreaLayout getAreasToShow()
     {
-	return new AreaLayout(area);
+	return layouts.getCurrentLayout();
     }
 
     @Override public boolean closeApp()
