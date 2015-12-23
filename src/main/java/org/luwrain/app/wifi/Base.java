@@ -19,7 +19,7 @@ package org.luwrain.app.wifi;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.ThreadSyncEvent;
+//import org.luwrain.core.events.ThreadSyncEvent;
 import org.luwrain.controls.*;
 import org.luwrain.network.*;
 
@@ -46,45 +46,29 @@ class Base
 	return listModel;
     }
 
-    boolean launchScanning(Area destArea)
+    boolean launchScanning()
     {
 	if (task != null && !task.isDone())
 	    return false;
-	task = createScanTask(destArea);
+	task = createScanTask();
 	executor.execute(task);
 	return true;
     }
 
-    void onReady()
+    private void acceptResult(WifiScanResult scanRes)
     {
-	Object res;
-	try {
-	    res = task.get();
-	task = null;
-	}
-	catch(Exception e)
-	{
-	    e.printStackTrace();
-	    luwrain.message(e.getMessage(), Luwrain.MESSAGE_ERROR);
-	    return;
-	}
-    if (res == null || !(res instanceof WifiScanResult))
-	//FIXME:message
-	return;
-    final WifiScanResult scanRes = (WifiScanResult)res;
-    if (scanRes.type() != WifiScanResult.Type.OK)
+    if (scanRes.type() != WifiScanResult.Type.SUCCESS)
+    {
 	//FIXME:message;
 	return;
     }
+    }
 
-    private FutureTask createScanTask(final Area destArea)
+    private FutureTask createScanTask()
     {
-	final Luwrain l = luwrain;
-	final Network n = network;
 	return new FutureTask(()->{
-		final Object res = n.wifiScan();
-		l.enqueueEvent(new ThreadSyncEvent(destArea));//FIXME:
-		return res;
-	});
+final WifiScanResult res = network.wifiScan();
+luwrain.runInMainThread(()->acceptResult(res));
+	}, null);
     }
 }

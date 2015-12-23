@@ -20,20 +20,20 @@ import org.luwrain.core.NullCheck;
 
 public class WifiScanResult
 {
-    public enum Type {OK, FAILED};
+    public enum Type {SUCCESS, FAILED};
 
     private Type type;
     private WifiNetwork[] networks;
 
-    WifiScanResult(Type type)
+    WifiScanResult()
     {
-	this.type = type;
+	this.type = Type.FAILED;
 	this.networks = new WifiNetwork[0];
     }
 
-    WifiScanResult(Type type, WifiNetwork[] networks)
+    WifiScanResult(WifiNetwork[] networks)
     {
-	this.type = type;
+	this.type = Type.SUCCESS;
 	this.networks = networks;
 	NullCheck.notNullItems(networks, "networks");
     }

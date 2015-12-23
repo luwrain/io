@@ -16,10 +16,111 @@
 
 package org.luwrain.network;
 
+import java.io.*;
+import java.util.*;
+import java.nio.file.*;
+import java.nio.charset.*;
+
+import org.luwrain.core.*;
+
 public class Wifi 
 {
-WifiScanResult scan()
+    static private final String INTERFACES_DIR = "/sys/class/net";
+
+    private Luwrain luwrain;
+
+    WifiScanResult scan()
     {
+	final String wlanInterface = getWlanInterface();
+	Log.debug("network", "wlan interface is " + wlanInterface);
+	if (wlanInterface == null || wlanInterface.trim().isEmpty())
+	    return new WifiScanResult();
+	String dir = "";
+	try {
+	    final Process p = new ProcessBuilder(luwrain.launchContext().scriptPath("lwr-wifi-scan").toString(), wlanInterface).start();
+	    p.getOutputStream().close();
+	    final BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	    dir = r.readLine();
+	    p.waitFor();
+	}
+	catch(InterruptedException e)
+	{
+	    Thread.currentThread().interrupt();
+	}
+	catch(IOException e)
+	{
+	    e.printStackTrace();
+	    return new WifiScanResult();
+	}
+	Log.debug("network", "wifi scan result directory is " + dir);
+	if (dir == null || dir.trim().isEmpty())
+	    return new WifiScanResult();
+	final LinkedList<WifiNetwork> networks = new LinkedList<WifiNetwork>();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dir))) {
+		for (Path p : directoryStream) 
+		{
+		    final WifiNetwork n = readNetworkData(p);
+		    if (n != null)
+			networks.add(n);
+		}
+	    } 
+	catch (IOException e) 
+	{
+	    e.printStackTrace();
+	    return new WifiScanResult();
+	}
+	return new WifiScanResult(networks.toArray(new WifiNetwork[networks.size()]));
+    }
+
+    private WifiNetwork readNetworkData(Path dir)
+    {
+	NullCheck.notNull(dir, "dir");
+	final String name = readFirstLine(dir.resolve("name"));
+	if (name == null || name.trim().isEmpty())
+	{
+	    Log.warning("network", "no name value in " + dir.toString());
+	    return null;
+	}
+	final String encryption = readFirstLine(dir.resolve("encryption"));
+	if (encryption == null || encryption.trim().isEmpty())
+	{
+	    Log.warning("network", "no encryption value in " + dir.toString());
+	    return null;
+	}
+	return new WifiNetwork(name, encryption.toLowerCase().trim().equals("on"));
+    }
+
+    private String getWlanInterface()
+    {
+	final LinkedList<Path> dirs = new LinkedList<Path>();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(INTERFACES_DIR))) {
+		for (Path p : directoryStream) 
+		    if (Files.isDirectory(p))
+			dirs.add(p);
+	    } 
+	catch (IOException e) 
+	{
+	    e.printStackTrace();
+	    return null;
+	}
+	for(Path p: dirs)
+	    if (Files.exists(p.resolve("wireless")))
+		return p.getFileName().toString();
 	return null;
+    }
+
+    private String readFirstLine(Path path)
+    {
+	NullCheck.notNull(path, "path");
+	try {
+	    List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+	    if (lines == null || lines.size() < 1)
+		return null;
+	    return lines.get(0);
+	}
+	catch(Exception e)
+	{e.printStackTrace();
+	    return null;
+	}
     }
 }

@@ -44,15 +44,19 @@ public class WifiApp implements Application, Actions
 	if (!base.init(luwrain))
 	    return false;
 	createArea();
-	base.launchScanning(area);
+	base.launchScanning();
 	return true;
     }
 
     @Override public void onReady()
     {
-	base.onReady();
+    }
+
+    @Override public void doScanning()
+    {
+	if (!base.launchScanning())
+	    return;
 	area.refresh();
-	area.resetHotPoint(false);
     }
 
     @Override public boolean onClick(Object obj)
@@ -63,14 +67,13 @@ public class WifiApp implements Application, Actions
 
     private void createArea()
     {
-	final Actions a = this;
-	final Strings s = strings;
+	final Actions actions = this;
 
 	final ListParams params = new ListParams();
 	params.environment = new DefaultControlEnvironment(luwrain);
 	params.model = base.getListModel();
 	params.appearance = new DefaultListItemAppearance(params.environment);
-	params.clickHandler = (area, index, obj)->a.onClick(obj);
+	params.clickHandler = (area, index, obj)->actions.onClick(obj);
 	params.name = strings.appName();
 
 	area = new ListArea(params){
@@ -80,10 +83,10 @@ public class WifiApp implements Application, Actions
 		    switch(event.getCode())
 		    {
 		    case EnvironmentEvent.CLOSE:
-			a.closeApp();
+			actions.closeApp();
 			return true;
-		    case EnvironmentEvent.THREAD_SYNC://FIXME:Change to something better
-			a.onReady();
+		    case EnvironmentEvent.REFRESH:
+			actions.doScanning();
 			return true;
 		    default:
 			return super.onEnvironmentEvent(event);

@@ -19,6 +19,7 @@ package org.luwrain.app.wifi;
 interface Actions
 {
     boolean closeApp();
+    void doScanning();
     void onReady();
     boolean onClick(Object obj);
 }
