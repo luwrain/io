@@ -24,7 +24,13 @@ import org.luwrain.app.wifi.WifiApp;
 
 public class Extension extends org.luwrain.core.extensions.EmptyExtension
 {
-    private final Network network = new Network();
+    private Network network;
+
+    @Override public String init(Luwrain luwrain)
+    {
+	network = new Network(luwrain);
+	return null;
+    }
 
     @Override public Command[] getCommands(Luwrain luwrain)
     {

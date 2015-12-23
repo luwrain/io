@@ -11,13 +11,16 @@ DEST_DIR="$(mktemp -d)"
 
 commit()
 {
-    [ -e "$DEST_DIR/.current" ] && 
+    [ -e "$DEST_DIR/.name" ] && 
     {
-	for i in encryption mode quality; do
-	    [ -r "$DEST_DIR/.$i" ] && cp "$DEST_DIR/.$i" "$DEST_DIR/.current"
+NAME="$(cat "$DEST_DIR/.name")"
+	    HASH="$(echo "$NAME" | md5sum | cut -f1 -d' ')"
+mkdir "$DEST_DIR/$HASH"
+	for i in name encryption mode quality; do
+	    [ -r "$DEST_DIR/.$i" ] && cp "$DEST_DIR/.$i" "$DEST_DIR/$HASH/$i"
 	done
     } 
-    for i in quality mode encryption current; do
+    for i in name quality mode encryption; do
 	rm -f "$DEST_DIR/.$i"
     done
 }
@@ -25,57 +28,36 @@ commit()
 # Preparing interface
 rfkill unblock all
 ifconfig "$IFACE" up
-iwlist "$IFACE" scan | egrep -i '(quality|encryption|essid|mode)' |
+iwlist "$IFACE" scan | egrep -i '(cell|quality|encryption|essid|mode)' |
 while read l; do
+
+    # Beginning new block
+    if echo "$l" | egrep -q '^ *Cell'; then
+	commit
+    fi
 
     # Reading name of the section
     if echo "$l" | grep -oi essid &> /dev/null; then 
 	k="${l#*\"}"
 	NAME="${k%\"*}" 
-	[ -z "$NAME" ] || 
-	{
-	    HASH="$(echo "$NAME" | md5sum | cut -f1 -d' ')"
-	    mkdir -p "$DEST_DIR/$HASH"
-	    echo "$NAME" > "$DEST_DIR/$HASH/name"
-	    for i in encryption mode quality; do
-		[ -r "$DEST_DIR/.$i" ] && mv "$DEST_DIR/.$i" "$DEST_DIR/$HASH/$i"
-	    done
-	    ln -s "$DEST_DIR/$HASH" "$DEST_DIR/.current"
-	}
+	echo "$NAME" > "$DEST_DIR/.name"
     fi 
-
-    # Beginning new block
-    if echo "$l" | egrep -q "^ *Cell"; then 
-	commit
-    fi
 
     # Reading encryption
     if echo "$l" | grep -q Encryption; then 
-	if [ -e "$DEST_DIR/.current" ]; then
-	    echo "${l##*:}" > "$DEST_DIR/.current/encryption"
-	else
 	    echo "${l##*:}" > "$DEST_DIR/.encryption"
-	fi
     fi
 
     # Reading mode
     if echo "$l" | grep -q Mode; then
-	if [ -e "$DEST_DIR/.current" ]; then
-	    echo "${l##*:}" > "$DEST_DIR/.current/mode"
-	else
 	    echo "${l##*:}" > "$DEST_DIR/.mode"
-	fi
     fi
 
     # Reading quality
     if echo "$l" | grep -q Quality; then
 	VALUE="${l#*=}"
 	VALUE="${VALUE%% *}"
-	if [ -e "$DEST_DIR/.current" ]; then
-	    echo "$VALUE" > "$DEST_DIR/.current/quality"
-	else
 	    echo "$VALUE" > "$DEST_DIR/.quality"
-	fi
     fi
 
 done  

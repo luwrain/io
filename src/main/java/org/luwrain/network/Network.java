@@ -16,9 +16,16 @@
 
 package org.luwrain.network ;
 
+import org.luwrain.core.*;
+
 public class Network
 {
-    private final Wifi wifi = new Wifi();
+    private Wifi wifi;
+
+    Network(Luwrain luwrain)
+    {
+	wifi = new Wifi(luwrain);
+    }
 
     //May be called from any thread
     public synchronized WifiScanResult wifiScan()

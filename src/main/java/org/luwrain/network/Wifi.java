@@ -29,6 +29,11 @@ public class Wifi
 
     private Luwrain luwrain;
 
+    Wifi(Luwrain luwrain)
+    {
+	this.luwrain = luwrain;
+    }
+
     WifiScanResult scan()
     {
 	final String wlanInterface = getWlanInterface();
@@ -37,7 +42,7 @@ public class Wifi
 	    return new WifiScanResult();
 	String dir = "";
 	try {
-	    final Process p = new ProcessBuilder(luwrain.launchContext().scriptPath("lwr-wifi-scan").toString(), wlanInterface).start();
+	    final Process p = new ProcessBuilder("sudo", luwrain.launchContext().scriptPath("lwr-wifi-scan").toString(), wlanInterface).start();
 	    p.getOutputStream().close();
 	    final BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 	    dir = r.readLine();
