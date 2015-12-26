@@ -159,9 +159,4 @@ class Wifi
 	    return null;
 	}
     }
-
-    private String makeRegistryName(String value)
-    {
-	return value.replaceAll("/", "_").replaceAll("\n", "_").replaceAll(" ", "_");
-    }
 }

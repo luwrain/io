@@ -21,11 +21,20 @@ import java.util.concurrent.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.ProgressLineEvent;
 import org.luwrain.controls.*;
-import org.luwrain.popups.Popups;
+import org.luwrain.popups.*;
 import org.luwrain.network.*;
+import org.luwrain.util.RegistryPath;
 
 class Base
 {
+    static private final String REGISTRY_PATH_NETWORKS = "/org/luwrain/network/wifi-networks";
+
+    private interface NetworkSettings
+    {
+	String getPassword(String defValue);
+	void setPassword(String value);
+    }
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private Network network;
     private Luwrain luwrain;
@@ -64,13 +73,8 @@ class Base
 	if (connectionTask != null && !connectionTask.isDone())
 	    return false;
 
-	if (connectTo.hasPassword())
-	{
-	    final String password = Popups.simple(luwrain, "Подключение к wifi-сети", "Введите пароль для подключения:", "");
-	    if (password == null)
-		return false;
-	    connectTo.setPassword(password);
-	}
+	if (connectTo.hasPassword() && !askForPassword(connectTo))
+	    return false;
 	connectionTask = createConnectionTask(destArea, connectTo);
 	executor.execute(connectionTask);
 	return true;
@@ -109,5 +113,46 @@ class Base
     boolean isScanning()
     {
 	return scanningTask != null && !scanningTask.isDone();
+    }
+
+    private boolean askForPassword(WifiNetwork network)
+    {
+	NullCheck.notNull(network, "network");
+	final NetworkSettings settings = createNetworkSettings(network);
+	if (!settings.getPassword("").isEmpty())
+	{
+	    final YesNoPopup popup = new YesNoPopup(luwrain,
+						    "Подключение к сети", "Использовать сохранённый пароль для этой сети?", true);
+	    luwrain.popup(popup);
+	    if (popup.closing.cancelled())
+		return false;
+	    if (popup.result())
+	    {
+		network.setPassword(settings.getPassword(""));
+		return true;
+	    }
+	} //password from registry
+	final String password = Popups.simple(luwrain, "Подключение к wifi-сети", "Введите пароль для подключения:", "");
+	if (password == null)
+	    return false;
+	final YesNoPopup popup = new YesNoPopup(luwrain,
+						"Подключение к сети", "Сохранить пароль для будущих подключений?", true);
+	luwrain.popup(popup);
+	if (popup.closing.cancelled())
+	    return false;
+	if (popup.result())
+	    settings.setPassword(password);
+	network.setPassword(password);
+	return true;
+    }
+
+    private String makeRegistryName(String value)
+    {
+	return value.replaceAll("/", "_").replaceAll("\n", "_").replaceAll(" ", "_");
+    }
+
+    private NetworkSettings createNetworkSettings(WifiNetwork network)
+    {
+	return RegistryProxy.create(luwrain.getRegistry(), RegistryPath.join(REGISTRY_PATH_NETWORKS, makeRegistryName(network.name())), NetworkSettings.class);
     }
 }
