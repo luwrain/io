@@ -22,6 +22,7 @@ public class WifiNetwork
 {
 String name;
 boolean hasPassword;
+    String password = "";
 
     WifiNetwork(String name, boolean hasPassword)
     {
@@ -40,9 +41,15 @@ boolean hasPassword;
 	return hasPassword;
     }
 
+    public void setPassword(String password)
+    {
+	NullCheck.notNull(password, "password");
+	this.password = password;
+    }
+
     public String password()
     {
-	return "";
+	return password;
     }
 
     @Override public String toString()

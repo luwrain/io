@@ -21,6 +21,7 @@ import java.util.concurrent.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.ProgressLineEvent;
 import org.luwrain.controls.*;
+import org.luwrain.popups.Popups;
 import org.luwrain.network.*;
 
 class Base
@@ -62,6 +63,14 @@ class Base
     {
 	if (connectionTask != null && !connectionTask.isDone())
 	    return false;
+
+	if (connectTo.hasPassword())
+	{
+	    final String password = Popups.simple(luwrain, "Подключение к wifi-сети", "Введите пароль для подключения:", "");
+	    if (password == null)
+		return false;
+	    connectTo.setPassword(password);
+	}
 	connectionTask = createConnectionTask(destArea, connectTo);
 	executor.execute(connectionTask);
 	return true;
@@ -90,7 +99,9 @@ class Base
     private FutureTask createConnectionTask(final ProgressArea destArea, final WifiNetwork connectTo)
     {
 	return new FutureTask(()->{
-		network.wifiConnect(connectTo, (line)->luwrain.enqueueEvent(new ProgressLineEvent(destArea, line)));
+		if (network.wifiConnect(connectTo, (line)->luwrain.enqueueEvent(new ProgressLineEvent(destArea, line))))
+		    luwrain.runInMainThread(()->luwrain.message("Подключение к сети установлено", Luwrain.MESSAGE_DONE)); else
+		    luwrain.runInMainThread(()->luwrain.message("Подключиться к сети не удалось", Luwrain.MESSAGE_ERROR));
 	}, null);
     }
 

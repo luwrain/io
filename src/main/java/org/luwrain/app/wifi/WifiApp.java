@@ -49,7 +49,7 @@ public class WifiApp implements Application, Actions
 	createArea();
 	layouts = new AreaLayoutSwitch(luwrain);
 	layouts.add(new AreaLayout(listArea));
-	layouts.add(new AreaLayout(AreaLayout.TOP_BOTTOM, listArea, listArea));
+	layouts.add(new AreaLayout(AreaLayout.TOP_BOTTOM, listArea, progressArea));
 	base.launchScanning();
 	return true;
     }
@@ -71,9 +71,11 @@ public class WifiApp implements Application, Actions
 	if (obj == null || !(obj instanceof WifiNetwork))
 	    return false;
 	progressArea.clear();
+	System.out.println("here");
 	if (!base.launchConnection(progressArea, (WifiNetwork)obj))
 	    return false;
 	layouts.show(1);
+	goToProgress();
 	return true;
     }
 
@@ -94,6 +96,18 @@ public class WifiApp implements Application, Actions
 	params.name = strings.appName();
 
 	listArea = new ListArea(params){
+		@Override public boolean onKeyboardEvent(KeyboardEvent event)
+		{
+		    NullCheck.notNull(event, "event");
+		    if (event.isCommand() && !event.isModified())
+			switch(event.getCommand())
+			{
+			case KeyboardEvent.TAB:
+			    actions.goToProgress();
+			    return true;
+			}
+		    return super.onKeyboardEvent(event);
+		}
 		@Override public boolean onEnvironmentEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -111,7 +125,7 @@ public class WifiApp implements Application, Actions
 		}
 		@Override protected String noContentStr()
 		{
-		    return actions.isScanning()?"Идёт поиск беспроводных сетей. Пожалуйста, подождите...":"Беспроводные сети отсутствуют";
+		    return actions.isScanning()?"Идёт  поиск беспроводных сетей. Пожалуйста, подождите...":"Беспроводные сети отсутствуют";
 		}
 	    };
 
@@ -124,7 +138,7 @@ public class WifiApp implements Application, Actions
 			{
 			case KeyboardEvent.TAB:
 			    actions.goToList();
-			    return false;
+			    return true;
 			}
 		    return super.onKeyboardEvent(event);
 		}
@@ -167,6 +181,7 @@ return super.onEnvironmentEvent(event);
 
     @Override public void goToProgress()
     {
+	System.out.println(layouts.getCurrentIndex());
 	if (layouts.getCurrentIndex() == 0)
 	{
 	    luwrain.setActiveArea(listArea);

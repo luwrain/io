@@ -38,8 +38,8 @@ public class Network
 	return wifi.scan();
     }
 
-    public void wifiConnect(WifiNetwork connectTo, ConnectionListener listener)
+    public boolean wifiConnect(WifiNetwork connectTo, ConnectionListener listener)
     {
-	wifi.connect(connectTo, listener);
+	return wifi.connect(connectTo, listener);
     }
 }

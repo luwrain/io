@@ -34,14 +34,14 @@ class Wifi
 	this.luwrain = luwrain;
     }
 
-    synchronized void connect(WifiNetwork connectTo, Network.ConnectionListener listener)
+    synchronized boolean connect(WifiNetwork connectTo, Network.ConnectionListener listener)
     {
 	NullCheck.notNull(connectTo, "connectTo");
 	NullCheck.notNull(listener, "listener");
 	final String wlanInterface = getWlanInterface();
 	Log.debug("network", "wlan interface is " + wlanInterface);
 	if (wlanInterface == null || wlanInterface.trim().isEmpty())
-	    return;
+	    return false;
 	try {
 	    final Process p = new ProcessBuilder("sudo", luwrain.launchContext().scriptPath("lwr-wifi-connect").toString(), wlanInterface, connectTo.name(), connectTo.password()).start();
 	    p.getOutputStream().close();
@@ -50,14 +50,17 @@ class Wifi
 	    while( (line = r.readLine()) != null)
 		listener.onConnectionProgressLine(line);
 	    p.waitFor();
+	    return p.exitValue() == 0;
 	}
 	catch(InterruptedException e)
 	{
 	    Thread.currentThread().interrupt();
+	    return false;
 	}
 	catch(IOException e)
 	{
 	    e.printStackTrace();
+	    return false;
 	}
     }
 
@@ -155,5 +158,10 @@ class Wifi
 	{e.printStackTrace();
 	    return null;
 	}
+    }
+
+    private String makeRegistryName(String value)
+    {
+	return value.replaceAll("/", "_").replaceAll("\n", "_").replaceAll(" ", "_");
     }
 }
