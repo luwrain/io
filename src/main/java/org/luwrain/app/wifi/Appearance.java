@@ -36,13 +36,13 @@ Appearance(Luwrain luwrain, Strings strings)
     @Override public void introduceItem(Object item, int flags)
     {
 	NullCheck.notNull(item, "item");
-	if (item instanceof WifiNetwork)
-	{
+	if (!(item instanceof WifiNetwork))
+	    return;
 	    final WifiNetwork network = (WifiNetwork)item;
 	    luwrain.playSound(Sounds.NEW_LIST_ITEM);
+	    if (network.hasPassword() && ((flags & ListItemAppearance.BRIEF) == 0))
+	    luwrain.say("Защищённая сеть " + network.toString()); else
 	    luwrain.say(network.toString());
-	    return;
-	}
     }
 
     @Override public String getScreenAppearance(Object item, int flags)

@@ -91,7 +91,7 @@ public class WifiApp implements Application, Actions
 	final ListParams params = new ListParams();
 	params.environment = new DefaultControlEnvironment(luwrain);
 	params.model = base.getListModel();
-	params.appearance = new DefaultListItemAppearance(params.environment);
+	params.appearance = new Appearance(luwrain, strings);
 	params.clickHandler = (area, index, obj)->actions.onClick(obj);
 	params.name = strings.appName();
 
