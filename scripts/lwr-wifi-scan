@@ -15,7 +15,7 @@ commit()
     {
 	NAME="$(cat "$DEST_DIR/.name")"
 	HASH="$(echo "$NAME" | md5sum | cut -f1 -d' ')"
-	mkdir "$DEST_DIR/$HASH"
+	mkdir -p "$DEST_DIR/$HASH"
 	for i in name encryption mode quality; do
 	    [ -r "$DEST_DIR/.$i" ] && cp "$DEST_DIR/.$i" "$DEST_DIR/$HASH/$i"
 	done
