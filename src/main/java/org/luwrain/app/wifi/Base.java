@@ -122,7 +122,7 @@ class Base
 	if (!settings.getPassword("").isEmpty())
 	{
 	    final YesNoPopup popup = new YesNoPopup(luwrain,
-						    "Подключение к сети", "Использовать сохранённый пароль для этой сети?", true);
+						    "Подключение к сети", "Использовать сохранённый пароль для этой сети?", true, Popups.DEFAULT_POPUP_FLAGS);
 	    luwrain.popup(popup);
 	    if (popup.closing.cancelled())
 		return false;
@@ -136,7 +136,7 @@ class Base
 	if (password == null)
 	    return false;
 	final YesNoPopup popup = new YesNoPopup(luwrain,
-						"Подключение к сети", "Сохранить пароль для будущих подключений?", true);
+						"Подключение к сети", "Сохранить пароль для будущих подключений?", true, Popups.DEFAULT_POPUP_FLAGS);
 	luwrain.popup(popup);
 	if (popup.closing.cancelled())
 	    return false;

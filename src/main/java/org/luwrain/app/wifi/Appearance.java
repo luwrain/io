@@ -16,11 +16,13 @@
 
 package org.luwrain.app.wifi;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.network.*;
 
-class Appearance implements ListItemAppearance
+class Appearance implements ListArea.Appearance
 {
     private Luwrain luwrain;
     private Strings strings;
@@ -33,21 +35,23 @@ Appearance(Luwrain luwrain, Strings strings)
 	NullCheck.notNull(strings, "strings");
     }
 
-    @Override public void introduceItem(Object item, int flags)
+    @Override public void announceItem(Object item, Set<Flags> flags)
     {
 	NullCheck.notNull(item, "item");
+	NullCheck.notNull(flags, "flags");
 	if (!(item instanceof WifiNetwork))
 	    return;
 	    final WifiNetwork network = (WifiNetwork)item;
 	    luwrain.playSound(Sounds.NEW_LIST_ITEM);
-	    if (network.hasPassword() && ((flags & ListItemAppearance.BRIEF) == 0))
+	    if (network.hasPassword() && flags.contains(Flags.BRIEF))
 	    luwrain.say("Защищённая сеть " + network.toString()); else
 	    luwrain.say(network.toString());
     }
 
-    @Override public String getScreenAppearance(Object item, int flags)
+    @Override public String getScreenAppearance(Object item, Set<Flags> flags)
     {
 	NullCheck.notNull(item, "item");
+	NullCheck.notNull(flags, "flags");
 	return item.toString();
     }
 
@@ -58,6 +62,6 @@ Appearance(Luwrain luwrain, Strings strings)
 
     @Override public int getObservableRightBound(Object item)
     {
-	return getScreenAppearance(item, 0).length();
+	return getScreenAppearance(item, EnumSet.noneOf(Flags.class)).length();
     }
 }
