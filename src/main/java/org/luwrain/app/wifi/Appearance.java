@@ -42,7 +42,7 @@ Appearance(Luwrain luwrain, Strings strings)
 	if (!(item instanceof WifiNetwork))
 	    return;
 	    final WifiNetwork network = (WifiNetwork)item;
-	    luwrain.playSound(Sounds.NEW_LIST_ITEM);
+	    luwrain.playSound(Sounds.LIST_ITEM);
 	    if (network.hasPassword() && flags.contains(Flags.BRIEF))
 	    luwrain.say("Защищённая сеть " + network.toString()); else
 	    luwrain.say(network.toString());
