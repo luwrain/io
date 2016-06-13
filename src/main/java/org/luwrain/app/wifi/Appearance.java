@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -29,10 +29,10 @@ class Appearance implements ListArea.Appearance
 
 Appearance(Luwrain luwrain, Strings strings)
     {
-	this.luwrain = luwrain;
-	this.strings = strings;
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notNull(strings, "strings");
+	this.luwrain = luwrain;
+	this.strings = strings;
     }
 
     @Override public void announceItem(Object item, Set<Flags> flags)
@@ -44,7 +44,7 @@ Appearance(Luwrain luwrain, Strings strings)
 	    final WifiNetwork network = (WifiNetwork)item;
 	    luwrain.playSound(Sounds.LIST_ITEM);
 	    if (network.hasPassword() && flags.contains(Flags.BRIEF))
-	    luwrain.say("Защищённая сеть " + network.toString()); else
+		luwrain.say(network.toString() + " " + strings.withPassword()); else
 	    luwrain.say(network.toString());
     }
 

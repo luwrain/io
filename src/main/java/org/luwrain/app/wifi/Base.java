@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -27,26 +27,24 @@ import org.luwrain.util.RegistryPath;
 
 class Base
 {
-    static private final String REGISTRY_PATH_NETWORKS = "/org/luwrain/network/wifi-networks";
-
-    private interface NetworkSettings
-    {
-	String getPassword(String defValue);
-	void setPassword(String value);
-    }
-
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private Network network;
     private Luwrain luwrain;
+    private Strings strings;
     private final FixedListModel listModel = new FixedListModel();
     private FutureTask scanningTask;
     private FutureTask connectionTask;
     private Actions actions;
 
-    boolean init(Luwrain luwrain, Actions actions)
+    boolean init(Luwrain luwrain, Actions actions,
+		 Strings strings)
     {
+	NullCheck.notNull(luwrain, "luwrain");
+	NullCheck.notNull(actions, "actions");
+	NullCheck.notNull(strings, "strings");
 	this.luwrain = luwrain;
 	this.actions = actions;
+	this.strings = strings;
 	final Object o = luwrain.getSharedObject("luwrain.network");
 	if (o == null || !(o instanceof Network))
 	    return false;
@@ -72,7 +70,6 @@ class Base
     {
 	if (connectionTask != null && !connectionTask.isDone())
 	    return false;
-
 	if (connectTo.hasPassword() && !askForPassword(connectTo))
 	    return false;
 	connectionTask = createConnectionTask(destArea, connectTo);
@@ -82,14 +79,14 @@ class Base
 
     private void acceptResult(WifiScanResult scanRes)
     {
-    if (scanRes.type() != WifiScanResult.Type.SUCCESS)
-    {
-	listModel.clear();
+	if (scanRes.type() != WifiScanResult.Type.SUCCESS)
+	{
+	    listModel.clear();
+	    actions.onReady();
+	    return;
+	}
+	listModel.setItems(scanRes.networks());
 	actions.onReady();
-	return;
-    }
-    listModel.setItems(scanRes.networks());
-    actions.onReady();
     }
 
     private FutureTask createScanningTask()
@@ -99,7 +96,7 @@ class Base
 		luwrain.runInMainThread(()->acceptResult(res));
 	}, null);
     }
-
+    
     private FutureTask createConnectionTask(final ProgressArea destArea, final WifiNetwork connectTo)
     {
 	return new FutureTask(()->{
@@ -109,7 +106,6 @@ class Base
 	}, null);
     }
 
-
     boolean isScanning()
     {
 	return scanningTask != null && !scanningTask.isDone();
@@ -118,41 +114,20 @@ class Base
     private boolean askForPassword(WifiNetwork network)
     {
 	NullCheck.notNull(network, "network");
-	final NetworkSettings settings = createNetworkSettings(network);
-	if (!settings.getPassword("").isEmpty())
+	final Settings.Network settings = Settings.createNetwork(luwrain.getRegistry(), network);
+	if (!settings.getPassword("").isEmpty() &&
+	    Popups.confirmDefaultYes(luwrain, strings.connectionPopupName(), strings.useSavedPassword()))
 	{
-	    final YesNoPopup popup = new YesNoPopup(luwrain,
-						    "Подключение к сети", "Использовать сохранённый пароль для этой сети?", true, Popups.DEFAULT_POPUP_FLAGS);
-	    luwrain.popup(popup);
-	    if (popup.closing.cancelled())
-		return false;
-	    if (popup.result())
-	    {
-		network.setPassword(settings.getPassword(""));
-		return true;
-	    }
-	} //password from registry
-	final String password = Popups.simple(luwrain, "Подключение к wifi-сети", "Введите пароль для подключения:", "");
+	    network.setPassword(settings.getPassword(""));
+	    return true;
+	}
+	final String password = Popups.simple(luwrain, strings.connectionPopupName(), strings.enterThePassword(), "");
 	if (password == null)
 	    return false;
-	final YesNoPopup popup = new YesNoPopup(luwrain,
-						"Подключение к сети", "Сохранить пароль для будущих подключений?", true, Popups.DEFAULT_POPUP_FLAGS);
-	luwrain.popup(popup);
-	if (popup.closing.cancelled())
-	    return false;
-	if (popup.result())
-	    settings.setPassword(password);
-	network.setPassword(password);
-	return true;
+    if (Popups.confirmDefaultYes(luwrain, strings.connectionPopupName(), strings.saveThePassword()))
+	settings.setPassword(password);
+    network.setPassword(password);
+    return true;
     }
 
-    private String makeRegistryName(String value)
-    {
-	return value.replaceAll("/", "_").replaceAll("\n", "_").replaceAll(" ", "_");
-    }
-
-    private NetworkSettings createNetworkSettings(WifiNetwork network)
-    {
-	return RegistryProxy.create(luwrain.getRegistry(), RegistryPath.join(REGISTRY_PATH_NETWORKS, makeRegistryName(network.name())), NetworkSettings.class);
-    }
 }

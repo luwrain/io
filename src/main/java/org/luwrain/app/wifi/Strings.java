@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -18,5 +18,14 @@ package org.luwrain.app.wifi;
 
 public interface Strings
 {
+static final String NAME = "luwrain.wifi";
+
     String appName();
+    String scanningInProgress();
+    String noWifiNetworks();
+    String withPassword();
+    String connectionPopupName();
+    String useSavedPassword();
+    String enterThePassword();
+    String saveThePassword();
 }

@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -26,10 +26,8 @@ import org.luwrain.controls.*;
 import org.luwrain.popups.Popups;
 import org.luwrain.network.*;
 
-public class WifiApp implements Application, Actions
+public class WifiApp implements Application, Actions, MonoApp
 {
-    public static final String STRINGS_NAME = "luwrain.wifi";
-
     private Luwrain luwrain;
     private Strings strings;
     private final Base base = new Base();
@@ -39,12 +37,13 @@ public class WifiApp implements Application, Actions
 
     @Override public boolean onLaunch(Luwrain luwrain)
     {
-	final Object o = luwrain.i18n().getStrings(STRINGS_NAME);
+	NullCheck.notNull(luwrain, "luwrain");
+	final Object o = luwrain.i18n().getStrings(Strings.NAME);
 	if (o == null || !(o instanceof Strings))
 	    return false;
 	strings = (Strings)o;
 	this.luwrain = luwrain;
-	if (!base.init(luwrain, this))
+	if (!base.init(luwrain, this, strings))
 	    return false;
 	createArea();
 	layouts = new AreaLayoutSwitch(luwrain);
@@ -54,46 +53,15 @@ public class WifiApp implements Application, Actions
 	return true;
     }
 
-    @Override public void onReady()
-    {
-	listArea.refresh();
-    }
-
-    @Override public void doScanning()
-    {
-	if (!base.launchScanning())
-	    return;
-	listArea.refresh();
-    }
-
-    @Override public boolean onClick(Object obj)
-    {
-	if (obj == null || !(obj instanceof WifiNetwork))
-	    return false;
-	progressArea.clear();
-	System.out.println("here");
-	if (!base.launchConnection(progressArea, (WifiNetwork)obj))
-	    return false;
-	layouts.show(1);
-	goToProgress();
-	return true;
-    }
-
-    @Override public boolean isScanning()
-    {
-	return base.isScanning();
-    }
-
     private void createArea()
     {
-	final Actions actions = this;
-
 	final ListArea.Params params = new ListArea.Params();
 	params.environment = new DefaultControlEnvironment(luwrain);
 	params.model = base.getListModel();
 	params.appearance = new Appearance(luwrain, strings);
-	params.clickHandler = (area, index, obj)->actions.onClick(obj);
+	params.clickHandler = (area, index, obj)->onClick(obj);
 	params.name = strings.appName();
+	params.flags = ListArea.Params.loadRegularFlags(luwrain.getRegistry());
 
 	listArea = new ListArea(params){
 		@Override public boolean onKeyboardEvent(KeyboardEvent event)
@@ -103,7 +71,7 @@ public class WifiApp implements Application, Actions
 			switch(event.getSpecial())
 			{
 			case TAB:
-			    actions.goToProgress();
+			    goToProgress();
 			    return true;
 			}
 		    return super.onKeyboardEvent(event);
@@ -114,10 +82,10 @@ public class WifiApp implements Application, Actions
 		    switch(event.getCode())
 		    {
 		    case CLOSE:
-			actions.closeApp();
+closeApp();
 			return true;
 		    case REFRESH:
-			actions.doScanning();
+doScanning();
 			return true;
 		    default:
 			return super.onEnvironmentEvent(event);
@@ -125,7 +93,7 @@ public class WifiApp implements Application, Actions
 		}
 		@Override protected String noContentStr()
 		{
-		    return actions.isScanning()?"Идёт  поиск беспроводных сетей. Пожалуйста, подождите...":"Беспроводные сети отсутствуют";
+		    return isScanning()?strings.scanningInProgress():strings.noWifiNetworks();
 		}
 	    };
 
@@ -137,7 +105,7 @@ public class WifiApp implements Application, Actions
 			switch(event.getSpecial())
 			{
 			case TAB:
-			    actions.goToList();
+goToList();
 			    return true;
 			}
 		    return super.onKeyboardEvent(event);
@@ -148,7 +116,7 @@ public class WifiApp implements Application, Actions
 		    switch(event.getCode())
 		    {
 case CLOSE:
-actions.closeApp();
+closeApp();
 return true;
 default:
 return super.onEnvironmentEvent(event);
@@ -157,9 +125,59 @@ return super.onEnvironmentEvent(event);
 	    };
     }
 
+    @Override public void onReady()
+    {
+	listArea.refresh();
+    }
+
+    private void doScanning()
+    {
+	if (base.launchScanning())
+	    listArea.refresh();
+    }
+
+    private boolean onClick(Object obj)
+    {
+	NullCheck.notNull(obj, "obj");
+	if (!(obj instanceof WifiNetwork))
+	    return false;
+	progressArea.clear();
+	if (!base.launchConnection(progressArea, (WifiNetwork)obj))
+	    return false;
+	layouts.show(1);
+	goToProgress();
+	return true;
+    }
+
+    private boolean isScanning()
+    {
+	return base.isScanning();
+    }
+
+    private void goToList()
+    {
+	luwrain.setActiveArea(listArea);
+    }
+
+private void goToProgress()
+    {
+	if (layouts.getCurrentIndex() == 0)
+	{
+	    luwrain.setActiveArea(listArea);
+	    return;
+	}
+	luwrain.setActiveArea(progressArea);
+    }
+
     @Override public String getAppName()
     {
 	return strings.appName();
+    }
+
+    @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
+    {
+	NullCheck.notNull(app, "app");
+	return MonoApp.Result.BRING_FOREGROUND;
     }
 
     @Override public AreaLayout getAreasToShow()
@@ -172,21 +190,5 @@ return super.onEnvironmentEvent(event);
 	//FIXME:Checking threads;
 	luwrain.closeApp();
 	return true;
-    }
-
-    @Override public void goToList()
-    {
-	luwrain.setActiveArea(listArea);
-    }
-
-    @Override public void goToProgress()
-    {
-	System.out.println(layouts.getCurrentIndex());
-	if (layouts.getCurrentIndex() == 0)
-	{
-	    luwrain.setActiveArea(listArea);
-	    return;
-	}
-	luwrain.setActiveArea(progressArea);
     }
 }

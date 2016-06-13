@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -19,10 +19,5 @@ package org.luwrain.app.wifi;
 interface Actions
 {
     boolean closeApp();
-    void doScanning();
     void onReady();
-    boolean onClick(Object obj);
-    boolean isScanning();
-    void goToList();
-    void goToProgress();
 }
