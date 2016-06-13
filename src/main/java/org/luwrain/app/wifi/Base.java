@@ -96,7 +96,7 @@ class Base
 		luwrain.runInMainThread(()->acceptResult(res));
 	}, null);
     }
-    
+
     private FutureTask createConnectionTask(final ProgressArea destArea, final WifiNetwork connectTo)
     {
 	return new FutureTask(()->{
@@ -114,7 +114,7 @@ class Base
     private boolean askForPassword(WifiNetwork network)
     {
 	NullCheck.notNull(network, "network");
-	final Settings.Network settings = Settings.createNetwork(luwrain.getRegistry(), network);
+	final org.luwrain.network.Settings.WifiNetwork settings = org.luwrain.network.Settings.createWifiNetwork(luwrain.getRegistry(), network);
 	if (!settings.getPassword("").isEmpty() &&
 	    Popups.confirmDefaultYes(luwrain, strings.connectionPopupName(), strings.useSavedPassword()))
 	{

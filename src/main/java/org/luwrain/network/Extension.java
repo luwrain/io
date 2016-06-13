@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2015 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2016 Michael Pozhidaev <michael.pozhidaev@gmail.com>
 
    This file is part of the LUWRAIN.
 
@@ -16,7 +16,9 @@
 
 package org.luwrain.network;
 
+import java.util.concurrent.*;
 import java.net.*;
+
 import org.luwrain.core.*;
 import org.luwrain.popups.Popups;
 
@@ -29,6 +31,7 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public String init(Luwrain luwrain)
     {
 	network = new Network(luwrain);
+	checkDefaultNetwork(luwrain);
 	return null;
     }
 
@@ -80,5 +83,49 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		}
 	    },
 	};
+    }
+
+    private void checkDefaultNetwork(Luwrain luwrain)
+    {
+	NullCheck.notNull(luwrain, "luwrain");
+	Log.debug("network", "checking default wifi network");
+	org.luwrain.network.Settings.Network settings = org.luwrain.network.Settings.createNetwork(luwrain.getRegistry());
+	final String networkName = settings.getDefaultWifiNetwork("");
+	if (networkName.isEmpty())
+	{
+	    Log.debug("network", "no default wifi network");
+	    return;
+	}
+	final FutureTask task = createConnectingTask(luwrain, networkName);
+	Executors.newSingleThreadExecutor().execute(task);
+    }
+
+    private FutureTask createConnectingTask(Luwrain luwrain, String networkName)
+    {
+	NullCheck.notNull(luwrain, "luwrain");
+	NullCheck.notNull(networkName, "networkName");
+	return new FutureTask(()->{
+		Log.debug("network", "trying to connect to default network \'" + networkName + "\'");
+		final WifiScanResult res = network.wifiScan();
+		if (res == null || res.type() != WifiScanResult.Type.SUCCESS)
+		    return;
+		WifiNetwork wifiNetwork = null;
+		for(WifiNetwork n: res.networks())
+		    if (n.name().equals(networkName))
+			wifiNetwork = n;
+		if (wifiNetwork == null)
+		{
+		    Log.error("network", "no wifi network with name \'" + networkName + "\'");
+		    return;
+		}
+		if (wifiNetwork.hasPassword())
+		{
+		    org.luwrain.network.Settings.WifiNetwork settings = org.luwrain.network.Settings.createWifiNetwork(luwrain.getRegistry(), wifiNetwork);
+		    wifiNetwork.setPassword(settings.getPassword(""));
+		}
+		if (network.wifiConnect(wifiNetwork, (line)->Log.debug("network", "connecting:" + line)))
+		    Log.info("network", "connected to default network \'" + networkName + "\'"); else
+		    Log.error("network", "unable to connect to default network \'" + networkName + "\'");
+	}, null);
     }
 }
