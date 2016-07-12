@@ -47,7 +47,7 @@ public interface Network
     {
 	NullCheck.notNull(registry, "registry");
 	NullCheck.notNull(network, "network");
-	return RegistryProxy.create(registry, RegistryPath.join(NETWORKS_PATH, makeRegistryName(network.name())), WifiNetwork.class);
+	return RegistryProxy.create(registry, Registry.join(NETWORKS_PATH, makeRegistryName(network.name())), WifiNetwork.class);
     }
 
     static String makeRegistryName(String value)

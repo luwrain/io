@@ -23,7 +23,6 @@ import org.luwrain.core.events.ProgressLineEvent;
 import org.luwrain.controls.*;
 import org.luwrain.popups.*;
 import org.luwrain.network.*;
-import org.luwrain.util.RegistryPath;
 
 class Base
 {
