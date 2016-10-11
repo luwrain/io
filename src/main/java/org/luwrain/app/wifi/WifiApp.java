@@ -105,7 +105,7 @@ doScanning();
 		    case AreaQuery.BACKGROUND_SOUND:
 			if (!base.isScanning())
 			    return false;
-			((BackgroundSoundQuery)query).answer(new BackgroundSoundQuery.Answer(BkgSounds.FETCHING));
+			((BackgroundSoundQuery)query).answer(new BackgroundSoundQuery.Answer(BkgSounds.WIFI));
 			return true;
 		    default:
 			return super.onAreaQuery(query);
