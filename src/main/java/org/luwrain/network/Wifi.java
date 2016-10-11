@@ -27,10 +27,11 @@ class Wifi
 {
     static private final String INTERFACES_DIR = "/sys/class/net";
 
-    private Luwrain luwrain;
+    private final Luwrain luwrain;
 
     Wifi(Luwrain luwrain)
     {
+	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
     }
 
@@ -43,7 +44,7 @@ class Wifi
 	if (wlanInterface == null || wlanInterface.trim().isEmpty())
 	    return false;
 	try {
-	    final Process p = new ProcessBuilder("sudo", luwrain.getPathProperty("luwrain.dir.scripts").resolve("lwr-wifi-connect").toString(), wlanInterface, connectTo.name(), connectTo.password()).start();
+	    final Process p = new ProcessBuilder("sudo", luwrain.getPathProperty("luwrain.dir.scripts").resolve("lwr-wifi-connect").toString(), wlanInterface, connectTo.getName(), connectTo.getPassword()).start();
 	    p.getOutputStream().close();
 	    final BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 	    String line = null;
@@ -70,7 +71,7 @@ class Wifi
 	Log.debug("network", "wlan interface is " + wlanInterface);
 	if (wlanInterface == null || wlanInterface.trim().isEmpty())
 	    return new WifiScanResult();
-	String dir = "";
+	final String dir;
 	try {
 	    final Process p = new ProcessBuilder("sudo", luwrain.getPathProperty("luwrain.dir.scripts").resolve("lwr-wifi-scan").toString(), wlanInterface).start();
 	    p.getOutputStream().close();
@@ -81,6 +82,7 @@ class Wifi
 	catch(InterruptedException e)
 	{
 	    Thread.currentThread().interrupt();
+	    return new WifiScanResult();
 	}
 	catch(IOException e)
 	{

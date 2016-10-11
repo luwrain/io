@@ -20,18 +20,18 @@ import org.luwrain.core.NullCheck;
 
 public class WifiNetwork
 {
-String name;
-boolean hasPassword;
-    String password = "";
+private final String name;
+private final boolean hasPassword;
+    private String password = "";
 
     WifiNetwork(String name, boolean hasPassword)
     {
+	NullCheck.notNull(name, "name");
 	this.name = name;
 	this.hasPassword = hasPassword;
-	NullCheck.notNull(name, "name");
     }
 
-    public String name()
+    public String getName()
     {
 	return name;
     }
@@ -47,7 +47,7 @@ boolean hasPassword;
 	this.password = password;
     }
 
-    public String password()
+    public String getPassword()
     {
 	return password;
     }

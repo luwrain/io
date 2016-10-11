@@ -33,16 +33,19 @@ class Base
     private final FixedListModel listModel = new FixedListModel();
     private FutureTask scanningTask;
     private FutureTask connectionTask;
-    private Actions actions;
+    private final WifiApp app;
 
-    boolean init(Luwrain luwrain, Actions actions,
-		 Strings strings)
+    Base(WifiApp app)
+    {
+	NullCheck.notNull(app, "app");
+	this.app = app;
+    }
+
+    boolean init(Luwrain luwrain, Strings strings)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(actions, "actions");
 	NullCheck.notNull(strings, "strings");
 	this.luwrain = luwrain;
-	this.actions = actions;
 	this.strings = strings;
 	final Object o = luwrain.getSharedObject("luwrain.network");
 	if (o == null || !(o instanceof Network))
@@ -78,14 +81,14 @@ class Base
 
     private void acceptResult(WifiScanResult scanRes)
     {
-	if (scanRes.type() != WifiScanResult.Type.SUCCESS)
+	if (scanRes.getType() != WifiScanResult.Type.SUCCESS)
 	{
 	    listModel.clear();
-	    actions.onReady();
+	    app.onReady();
 	    return;
 	}
-	listModel.setItems(scanRes.networks());
-	actions.onReady();
+	listModel.setItems(scanRes.getNetworks());
+	app.onReady();
     }
 
     private FutureTask createScanningTask()

@@ -107,11 +107,11 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 	return new FutureTask(()->{
 		Log.debug("network", "trying to connect to default network \'" + networkName + "\'");
 		final WifiScanResult res = network.wifiScan();
-		if (res == null || res.type() != WifiScanResult.Type.SUCCESS)
+		if (res == null || res.getType() != WifiScanResult.Type.SUCCESS)
 		    return;
 		WifiNetwork wifiNetwork = null;
-		for(WifiNetwork n: res.networks())
-		    if (n.name().equals(networkName))
+		for(WifiNetwork n: res.getNetworks())
+		    if (n.getName().equals(networkName))
 			wifiNetwork = n;
 		if (wifiNetwork == null)
 		{

@@ -23,14 +23,15 @@ import java.io.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
+import org.luwrain.core.queries.*;
 import org.luwrain.popups.Popups;
 import org.luwrain.network.*;
 
-public class WifiApp implements Application, Actions, MonoApp
+public class WifiApp implements Application, MonoApp
 {
     private Luwrain luwrain;
     private Strings strings;
-    private final Base base = new Base();
+    private final Base base = new Base(this);
     private ListArea listArea;
     private ProgressArea progressArea;
     private AreaLayoutSwitch layouts;
@@ -43,7 +44,7 @@ public class WifiApp implements Application, Actions, MonoApp
 	    return false;
 	strings = (Strings)o;
 	this.luwrain = luwrain;
-	if (!base.init(luwrain, this, strings))
+	if (!base.init(luwrain, strings))
 	    return false;
 	createArea();
 	layouts = new AreaLayoutSwitch(luwrain);
@@ -61,7 +62,7 @@ public class WifiApp implements Application, Actions, MonoApp
 	params.appearance = new Appearance(luwrain, strings);
 	params.clickHandler = (area, index, obj)->onClick(obj);
 	params.name = strings.appName();
-	params.flags = ListArea.Params.loadRegularFlags(luwrain.getRegistry());
+	//	params.flags = ListArea.Params.loadRegularFlags(luwrain.getRegistry());
 
 	listArea = new ListArea(params){
 		@Override public boolean onKeyboardEvent(KeyboardEvent event)
@@ -70,6 +71,9 @@ public class WifiApp implements Application, Actions, MonoApp
 		    if (event.isSpecial() && !event.isModified())
 			switch(event.getSpecial())
 			{
+			case ESCAPE:
+			    closeApp();
+			    return true;
 			case TAB:
 			    goToProgress();
 			    return true;
@@ -79,6 +83,8 @@ public class WifiApp implements Application, Actions, MonoApp
 		@Override public boolean onEnvironmentEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
+		    if (event.getType() != EnvironmentEvent.Type.REGULAR )
+			return super.onEnvironmentEvent(event);
 		    switch(event.getCode())
 		    {
 		    case CLOSE:
@@ -91,9 +97,22 @@ doScanning();
 			return super.onEnvironmentEvent(event);
 		    }
 		}
+		@Override public boolean onAreaQuery(AreaQuery query)
+		{
+		    NullCheck.notNull(query, "query");
+		    switch(query.getQueryCode())
+		    {
+		    case AreaQuery.BACKGROUND_SOUND:
+			if (!base.isScanning())
+			    return false;
+			((BackgroundSoundQuery)query).answer(new BackgroundSoundQuery.Answer(BkgSounds.FETCHING));
+			return true;
+		    default:
+			return super.onAreaQuery(query);
+		    }}
 		@Override protected String noContentStr()
 		{
-		    return isScanning()?strings.scanningInProgress():strings.noWifiNetworks();
+		    return base.isScanning()?strings.scanningInProgress():strings.noWifiNetworks();
 		}
 	    };
 
@@ -113,6 +132,8 @@ goToList();
 		@Override public boolean onEnvironmentEvent(EnvironmentEvent event)
 		{
 		    NullCheck.notNull(event, "event");
+		    if (event.getType() != EnvironmentEvent.Type.REGULAR )
+			return super.onEnvironmentEvent(event);
 		    switch(event.getCode())
 		    {
 case CLOSE:
@@ -125,15 +146,18 @@ return super.onEnvironmentEvent(event);
 	    };
     }
 
-    @Override public void onReady()
+    void onReady()
     {
 	listArea.refresh();
+	luwrain.onAreaNewBackgroundSound(listArea);
     }
 
     private void doScanning()
     {
-	if (base.launchScanning())
-	    listArea.refresh();
+	if (!base.launchScanning())
+	    return;
+	listArea.refresh();
+	luwrain.onAreaNewBackgroundSound(listArea);
     }
 
     private boolean onClick(Object obj)
@@ -147,11 +171,6 @@ return super.onEnvironmentEvent(event);
 	layouts.show(1);
 	goToProgress();
 	return true;
-    }
-
-    private boolean isScanning()
-    {
-	return base.isScanning();
     }
 
     private void goToList()
@@ -185,7 +204,7 @@ private void goToProgress()
 	return layouts.getCurrentLayout();
     }
 
-    @Override public boolean closeApp()
+private boolean closeApp()
     {
 	//FIXME:Checking threads;
 	luwrain.closeApp();

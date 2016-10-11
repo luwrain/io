@@ -25,10 +25,11 @@ public class Network
 	void onConnectionProgressLine(String line);
     }
 
-    private Wifi wifi;
+    private final Wifi wifi;
 
     Network(Luwrain luwrain)
     {
+	NullCheck.notNull(luwrain, "luwrain");
 	wifi = new Wifi(luwrain);
     }
 
@@ -40,6 +41,8 @@ public class Network
 
     public boolean wifiConnect(WifiNetwork connectTo, ConnectionListener listener)
     {
+	NullCheck.notNull(connectTo, "connectTo");
+	NullCheck.notNull(listener, "listener");
 	return wifi.connect(connectTo, listener);
     }
 }

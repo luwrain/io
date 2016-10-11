@@ -22,8 +22,8 @@ public class WifiScanResult
 {
     public enum Type {SUCCESS, FAILED};
 
-    private Type type;
-    private WifiNetwork[] networks;
+    private final Type type;
+    private final WifiNetwork[] networks;
 
     WifiScanResult()
     {
@@ -33,17 +33,17 @@ public class WifiScanResult
 
     WifiScanResult(WifiNetwork[] networks)
     {
+	NullCheck.notNullItems(networks, "networks");
 	this.type = Type.SUCCESS;
 	this.networks = networks;
-	NullCheck.notNullItems(networks, "networks");
     }
 
-    public Type type()
+    public Type getType()
     {
 	return type;
     }
 
-    public WifiNetwork[] networks()
+    public WifiNetwork[] getNetworks()
     {
 	return networks;
     }
