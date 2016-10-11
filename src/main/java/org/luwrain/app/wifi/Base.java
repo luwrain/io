@@ -35,6 +35,8 @@ class Base
     private FutureTask connectionTask;
     private final WifiApp app;
 
+    private boolean scanningInProgress = false;
+
     Base(WifiApp app)
     {
 	NullCheck.notNull(app, "app");
@@ -64,6 +66,7 @@ class Base
 	if (scanningTask != null && !scanningTask.isDone())
 	    return false;
 	scanningTask = createScanningTask();
+	scanningInProgress = true;
 	executor.execute(scanningTask);
 	return true;
     }
@@ -81,12 +84,10 @@ class Base
 
     private void acceptResult(WifiScanResult scanRes)
     {
+	NullCheck.notNull(scanRes, "scanRes");
+	scanningInProgress = false;
 	if (scanRes.getType() != WifiScanResult.Type.SUCCESS)
-	{
-	    listModel.clear();
-	    app.onReady();
-	    return;
-	}
+	    listModel.clear(); else
 	listModel.setItems(scanRes.getNetworks());
 	app.onReady();
     }
@@ -110,7 +111,7 @@ class Base
 
     boolean isScanning()
     {
-	return scanningTask != null && !scanningTask.isDone();
+	return scanningTask != null && !scanningTask.isDone() && scanningInProgress;
     }
 
     private boolean askForPassword(WifiNetwork network)
