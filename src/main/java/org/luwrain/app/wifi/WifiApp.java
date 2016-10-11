@@ -146,10 +146,11 @@ return super.onEnvironmentEvent(event);
 	    };
     }
 
-    void onReady()
+    void onReady(boolean  success)
     {
 	listArea.refresh();
 	luwrain.onAreaNewBackgroundSound(listArea);
+	luwrain.playSound(success?Sounds.DONE:Sounds.ERROR);
     }
 
     private void doScanning()

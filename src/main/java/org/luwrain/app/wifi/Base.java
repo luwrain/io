@@ -87,9 +87,14 @@ class Base
 	NullCheck.notNull(scanRes, "scanRes");
 	scanningInProgress = false;
 	if (scanRes.getType() != WifiScanResult.Type.SUCCESS)
-	    listModel.clear(); else
-	listModel.setItems(scanRes.getNetworks());
-	app.onReady();
+	{
+	    listModel.clear();
+	    app.onReady(false);
+	} else
+	{
+	    listModel.setItems(scanRes.getNetworks());
+	    app.onReady(true);
+	}
     }
 
     private FutureTask createScanningTask()
