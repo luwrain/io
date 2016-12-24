@@ -30,7 +30,7 @@ class Base
     private Network network;
     private Luwrain luwrain;
     private Strings strings;
-    private final FixedListModel listModel = new FixedListModel();
+    private final ListUtils.FixedModel listModel = new ListUtils.FixedModel();
     private FutureTask scanningTask;
     private FutureTask connectionTask;
     private final WifiApp app;
