@@ -44,7 +44,7 @@ class Wifi
 	if (wlanInterface == null || wlanInterface.trim().isEmpty())
 	    return false;
 	try {
-	    final Process p = new ProcessBuilder("sudo", luwrain.getPathProperty("luwrain.dir.scripts").resolve("lwr-wifi-connect").toString(), wlanInterface, connectTo.getName(), connectTo.getPassword()).start();
+	    final Process p = new ProcessBuilder("sudo", luwrain.getFileProperty("luwrain.dir.scripts").toPath().resolve("lwr-wifi-connect").toString(), wlanInterface, connectTo.getName(), connectTo.getPassword()).start();
 	    p.getOutputStream().close();
 	    final BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 	    String line = null;
@@ -73,7 +73,7 @@ class Wifi
 	    return new WifiScanResult();
 	final String dir;
 	try {
-	    final Process p = new ProcessBuilder("sudo", luwrain.getPathProperty("luwrain.dir.scripts").resolve("lwr-wifi-scan").toString(), wlanInterface).start();
+	    final Process p = new ProcessBuilder("sudo", luwrain.getFileProperty("luwrain.dir.scripts").toPath().resolve("lwr-wifi-scan").toString(), wlanInterface).start();
 	    p.getOutputStream().close();
 	    final BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 	    dir = r.readLine();

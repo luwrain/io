@@ -36,28 +36,28 @@ public class WifiApp implements Application, MonoApp
     private ProgressArea progressArea;
     private AreaLayoutSwitch layouts;
 
-    @Override public boolean onLaunch(Luwrain luwrain)
+    @Override public InitResult onLaunchApp(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	final Object o = luwrain.i18n().getStrings(Strings.NAME);
 	if (o == null || !(o instanceof Strings))
-	    return false;
+	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
 	strings = (Strings)o;
 	this.luwrain = luwrain;
 	if (!base.init(luwrain, strings))
-	    return false;
+	    return new InitResult(InitResult.Type.FAILURE);
 	createArea();
 	layouts = new AreaLayoutSwitch(luwrain);
 	layouts.add(new AreaLayout(listArea));
 	layouts.add(new AreaLayout(AreaLayout.TOP_BOTTOM, listArea, progressArea));
 	base.launchScanning();
-	return true;
+	return new InitResult();
     }
 
     private void createArea()
     {
 	final ListArea.Params params = new ListArea.Params();
-	params.environment = new DefaultControlEnvironment(luwrain);
+	params.context = new DefaultControlEnvironment(luwrain);
 	params.model = base.getListModel();
 	params.appearance = new Appearance(luwrain, strings);
 	params.clickHandler = (area, index, obj)->onClick(obj);
@@ -200,15 +200,14 @@ private void goToProgress()
 	return MonoApp.Result.BRING_FOREGROUND;
     }
 
-    @Override public AreaLayout getAreasToShow()
+    @Override public AreaLayout getAreaLayout()
     {
 	return layouts.getCurrentLayout();
     }
 
-private boolean closeApp()
+    @Override public void closeApp()
     {
 	//FIXME:Checking threads;
 	luwrain.closeApp();
-	return true;
     }
 }
