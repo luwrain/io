@@ -19,7 +19,6 @@ package org.luwrain.app.wifi;
 import java.util.concurrent.*;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.ProgressLineEvent;
 import org.luwrain.controls.*;
 import org.luwrain.popups.*;
 import org.luwrain.network.*;
@@ -108,7 +107,7 @@ class Base
     private FutureTask createConnectionTask(final ProgressArea destArea, final WifiNetwork connectTo)
     {
 	return new FutureTask(()->{
-		if (network.wifiConnect(connectTo, (line)->luwrain.enqueueEvent(new ProgressLineEvent(destArea, line))))
+		if (network.wifiConnect(connectTo, (line)->luwrain.runInMainThread(()->destArea.addProgressLine(line))))
 		    luwrain.runInMainThread(()->luwrain.message("Подключение к сети установлено", Luwrain.MESSAGE_DONE)); else
 		    luwrain.runInMainThread(()->luwrain.message("Подключиться к сети не удалось", Luwrain.MESSAGE_ERROR));
 	}, null);
