@@ -48,7 +48,7 @@ class Base
 	NullCheck.notNull(strings, "strings");
 	this.luwrain = luwrain;
 	this.strings = strings;
-	final Object o = luwrain.getSharedObject("luwrain.network");
+	final Object o = null;
 	if (o == null || !(o instanceof Network))
 	    return false;
 	network = (Network)o;

@@ -19,6 +19,7 @@ package org.luwrain.network;
 import java.util.concurrent.*;
 import java.net.*;
 
+import org.luwrain.base.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.Popups;
 
@@ -56,7 +57,7 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
     @Override public Shortcut[] getShortcuts(Luwrain luwrain)
     {
 	final Shortcut wifi = new Shortcut() {
-		@Override public String getName()
+		@Override public String getExtObjName()
 		{
 		    return "wifi";
 		}
@@ -69,21 +70,6 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 	return new Shortcut[]{wifi};
     }
 
-    @Override public SharedObject[] getSharedObjects(Luwrain luwrain)
-    {
-	return new SharedObject[]{
-	    new SharedObject(){
-		@Override public String getName()
-		{
-		    return "luwrain.network";
-		}
-		@Override public Object getSharedObject()
-		{
-		    return network;
-		}
-	    },
-	};
-    }
 
     private void checkDefaultNetwork(Luwrain luwrain)
     {
