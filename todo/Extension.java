@@ -23,8 +23,6 @@ import org.luwrain.base.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.Popups;
 
-import org.luwrain.app.wifi.WifiApp;
-
 public class Extension extends org.luwrain.core.extensions.EmptyExtension
 {
     private Network network;
@@ -53,23 +51,6 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 
 };
     }
-
-    @Override public Shortcut[] getShortcuts(Luwrain luwrain)
-    {
-	final Shortcut wifi = new Shortcut() {
-		@Override public String getExtObjName()
-		{
-		    return "wifi";
-		}
-		@Override public Application[] prepareApp(String[] args)
-		{
-		    return new Application[]{new WifiApp()};
-		}
-	    };
-
-	return new Shortcut[]{wifi};
-    }
-
 
     private void checkDefaultNetwork(Luwrain luwrain)
     {
