@@ -8,7 +8,7 @@ import java.net.*;
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
-public final class Task
+public final class Task implements Runnable
 {
     static private final String LOG_COMPONENT = "download";
     static private final int MAX_ATTEMPT_COUNT = 32;
@@ -26,6 +26,12 @@ public final class Task
     private final URL srcUrl;
     private File destFile;
 
+    //For asynchronous launching
+    private final Object syncObj = new Object();
+    private Thread thread = null;
+    private boolean interrupting = false;
+    private boolean running = false;
+
     public Task(Callback callback, URL srcUrl, File destFile)
     {
 	NullCheck.notNull(callback, "callback");
@@ -38,11 +44,13 @@ public final class Task
 
     public void startSync()
     {
+	this.interrupting = false;
 	try {
 	    for(int i = 0;i < MAX_ATTEMPT_COUNT;++i)
 	{
 	    try {
 		attempt();
+		if (!this.interrupting)
 		callback.onSuccess(this);
 		return;
 	    }
@@ -73,6 +81,47 @@ public final class Task
 	}
     }
 
+    public void startAsync()
+    {
+	if (running)
+	    throw new RuntimeException("The task is already running");
+	this.thread = new Thread(this);
+	thread.start();
+    }
+
+    @Override public void run()
+    {
+	this.running = true;
+	try {
+	    startSync();
+	}
+	finally {
+	    this.running = false;
+	    synchronized(syncObj) {
+		syncObj.notifyAll();
+	    }
+	}
+    }
+
+    public void stop()
+    {
+	if (thread == null || !running)
+	    return;
+	this.interrupting = true;
+	this.thread.interrupt();
+	synchronized(syncObj) {
+	    while(running)
+		try {
+		    syncObj.wait();
+		}
+		catch(InterruptedException e)
+		{
+		    Thread.currentThread().interrupted();
+		}
+	}
+	this.thread = null;
+    }
+
     private void attempt() throws IOException
     {
 	final long pos;
@@ -101,6 +150,8 @@ public final class Task
 	    int numRead = 0;
 	    while ( (numRead = is.read(buf)) >= 0)
 	    {
+		if (this.interrupting)
+		    return;
 		os.write(buf, 0, numRead);
 	    }
 	    os.flush();
@@ -112,10 +163,6 @@ public final class Task
     }
 
     private void launchContinuing()
-    {
-    }
-
-    public void stop()
     {
     }
 
