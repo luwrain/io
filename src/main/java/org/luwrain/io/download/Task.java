@@ -1,3 +1,20 @@
+/*
+   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
+
+//LWR_API 1.0
 
 package org.luwrain.io.download;
 
@@ -22,9 +39,9 @@ public final class Task implements Runnable
 	void onFailure(Task task, Throwable throwable);
 	    }
 
-    private final Callback callback;
-    private final URL srcUrl;
-    private File destFile;
+    public final Callback callback;
+    public final URL srcUrl;
+    public File destFile;
 
     //For asynchronous launching
     private final Object syncObj = new Object();
