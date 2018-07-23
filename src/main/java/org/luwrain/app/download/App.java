@@ -34,7 +34,7 @@ public class App implements Application, MonoApp
 
     private final org.luwrain.io.download.Manager manager;
 
-    App(org.luwrain.io.download.Manager manager)
+    public App(org.luwrain.io.download.Manager manager)
     {
 	NullCheck.notNull(manager, "manager");
 	this.manager = manager;

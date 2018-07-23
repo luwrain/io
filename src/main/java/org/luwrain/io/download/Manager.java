@@ -54,6 +54,10 @@ public final class Manager implements Task.Callback
 		e.task.startAsync();
     }
 
+    public void close()
+    {
+    }
+
     
 
     	@Override public void setFileSize(Task task, long size)
