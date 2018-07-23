@@ -11,6 +11,7 @@ import org.luwrain.util.*;
 public final class Task
 {
     static private final String LOG_COMPONENT = "download";
+    static private final int MAX_ATTEMPT_COUNT = 32;
     static private final long BACKSTEP = 2048;
 
     public interface Callback
@@ -35,21 +36,35 @@ public final class Task
 	this.destFile = destFile;
     }
 
-    public void start()
+    public void startSync()
     {
 	try {
-	while(true)
+	    for(int i = 0;i < MAX_ATTEMPT_COUNT;++i)
 	{
 	    try {
 		attempt();
 		callback.onSuccess(this);
 		return;
 	    }
+	    	    catch(org.luwrain.util.Connections.InvalidHttpResponseCodeException e)
+	    {
+	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+			callback.onFailure(this, e);
+			return;
+	}
+	    catch(java.net.UnknownHostException e)
+	    {
+	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+			callback.onFailure(this, e);
+			return;
+	}
 	    catch(IOException e)
 	    {
 		Log.debug(LOG_COMPONENT, "downloading attempt failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
 	    }
 	}
+	    callback.onFailure(this, new IOException("Reached the limit of attempts"));
+	    return;
 	}
 	catch(Throwable e)
 	{
@@ -77,6 +92,9 @@ public final class Task
 	}
 	Log.debug(LOG_COMPONENT, "new downloading attempt from position " + pos + " (" + srcUrl.toString() + ")");
 	final URLConnection con = Connections.connect(srcUrl, pos);
+	final long len = con.getContentLength();
+	if (len >= 0)
+	    callback.setFileSize(this, len);
 	final BufferedInputStream is = new BufferedInputStream(con.getInputStream());
 	try {
 	    final byte[] buf = new byte[512];

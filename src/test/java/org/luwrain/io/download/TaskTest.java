@@ -27,14 +27,14 @@ public class TaskTest extends Assert
 {
     static private final String url = "http://download.luwrain.org/pdf/presentation-HongKongOSConference-en-2015-06-27.pdf";
         static private final String noSuchFileUrl = "http://download.luwrain.org/pdf/no-such-file.pdf";
-
+            static private final String noSuchHostUrl = "http://no.such.host/presentation.pdf";
 
     @Test public void fetch() throws Exception
     {
 	final TestingTaskCallback callback = new TestingTaskCallback();
 	final File destFile = File.createTempFile("lwriotest", ".pdf");
 	final Task task = new Task(callback, new URL(url), destFile);
-	task.start();
+	task.startSync();
 	assertTrue(callback.success);
 	assertTrue(callback.fileSize == 77249);
     }
@@ -44,8 +44,20 @@ public class TaskTest extends Assert
 	final TestingTaskCallback callback = new TestingTaskCallback();
 	final File destFile = File.createTempFile("lwriotest", ".pdf");
 	final Task task = new Task(callback, new URL(noSuchFileUrl), destFile);
-	task.start();
+	task.startSync();
     }
+
+            @Test public void noSuchHost() throws Exception
+    {
+	final TestingTaskCallback callback = new TestingTaskCallback();
+	final File destFile = File.createTempFile("lwriotest", ".pdf");
+	final Task task = new Task(callback, new URL(noSuchHostUrl), destFile);
+	task.startSync();
+	assertFalse(callback.success);
+	assertTrue(callback.throwable != null);
+	assertTrue(callback.throwable instanceof java.net.UnknownHostException);
+    }
+
 
     
 }
