@@ -53,8 +53,26 @@ final class Actions
 		catch(IOException e)
 		{
 		    luwrain.message(strings.downloadAddingError(luwrain.i18n().getExceptionDescr(e)), Luwrain.MessageType.ERROR);
+		    return true;
 		}
 		continue;
+	    }
+	    final URL url;
+	    try {
+		url = new URL(obj.toString());
+	    }
+	    catch(MalformedURLException e)
+	    {
+		luwrain.message(strings.unableToMakeUrl(obj.toString()), Luwrain.MessageType.ERROR);
+		return true;
+	    }
+	    try {
+		base.manager.addDownload(url, suggestDestFile(url));
+	    }
+	    catch(IOException e)
+	    {
+		luwrain.message(strings.downloadAddingError(luwrain.i18n().getExceptionDescr(e)), Luwrain.MessageType.ERROR);
+		return true;
 	    }
 	}
 	return true;
@@ -68,13 +86,13 @@ final class Actions
 	if (path == null || path.isEmpty())
 	    return new File(destDir, simplify(url.toString()));
 	final int lastSlash = path.lastIndexOf("/");
-		final int lastBackslash = path.lastIndexOf("\\");
-final int pos = Math.max(lastSlash, lastBackslash);
+	final int lastBackslash = path.lastIndexOf("\\");
+	final int pos = Math.max(lastSlash, lastBackslash);
 	if (pos < 0)
 	    return new File(destDir, path);
-if (pos + 1 >= path.length())
-return new File(destDir, simplify(url.toString()));
-return new File(destDir, path.substring(pos + 1));
+	if (pos + 1 >= path.length())
+	    return new File(destDir, simplify(url.toString()));
+	return new File(destDir, path.substring(pos + 1));
     }
 
     private String simplify(String str)

@@ -98,9 +98,9 @@ public final class Task implements Runnable
 	}
     }
 
-    public void startAsync()
+    synchronized public void startAsync()
     {
-	if (running)
+	if (thread != null)
 	    throw new RuntimeException("The task is already running");
 	this.thread = new Thread(this);
 	thread.start();
@@ -120,9 +120,9 @@ public final class Task implements Runnable
 	}
     }
 
-    public void stop()
+    synchronized public void stop()
     {
-	if (thread == null || !running)
+	if (thread == null)
 	    return;
 	this.interrupting = true;
 	this.thread.interrupt();
@@ -165,11 +165,14 @@ public final class Task implements Runnable
 	try {
 	    final byte[] buf = new byte[512];
 	    int numRead = 0;
+	    int totalRead = 0;
 	    while ( (numRead = is.read(buf)) >= 0)
 	    {
 		if (this.interrupting)
 		    return;
 		os.write(buf, 0, numRead);
+		totalRead += numRead;
+		callback.onProgress(this, pos + totalRead);
 	    }
 	    os.flush();
 	}
@@ -177,10 +180,6 @@ public final class Task implements Runnable
 	    is.close();
 	    os.close();
 	}
-    }
-
-    private void launchContinuing()
-    {
     }
 
     private void truncate(long pos) throws IOException

@@ -37,7 +37,7 @@ public final class Manager implements Task.Callback
 	this.luwrain = luwrain;
     }
 
-    public void load()
+    synchronized public void load()
     {
 	final Registry registry = luwrain.getRegistry();
 	entries.clear();
@@ -55,14 +55,22 @@ public final class Manager implements Task.Callback
 		e.task.startAsync();
     }
 
-    public void close()
+    synchronized public void close()
     {
+	for(EntryImpl e: entries)
+	{
+	    if (!e.isActive())
+		continue;
+	    Log.debug(LOG_COMPONENT, "stopping download of " + e.task.srcUrl.toString() + " at " + e.bytesFetched + "/" + e.fileSize);
+	    e.task.stop();
+	}
     }
 
-    public void addDownload(URL srcUrl, File destFile) throws IOException
+    synchronized public void addDownload(URL srcUrl, File destFile) throws IOException
     {
 	NullCheck.notNull(srcUrl, "srcUrl");
 	NullCheck.notNull(destFile, "destFile");
+		Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
 	final int id = Settings.addEntry(luwrain.getRegistry(), srcUrl.toString(), destFile.getAbsolutePath());
 	final EntryImpl entry = new EntryImpl(luwrain.getRegistry(), id, this);
 	this.entries.add(entry);
@@ -70,12 +78,12 @@ public final class Manager implements Task.Callback
 	notifyChangesListeners();
     }
 
-    public Entry[] getAllEntries()
+    synchronized public Entry[] getAllEntries()
     {
 	return entries.toArray(new Entry[entries.size()]);
     }
 
-    public void addChangesListener(Runnable runnable)
+    synchronized public void addChangesListener(Runnable runnable)
     {
 	NullCheck.notNull(runnable, "runnable");
 	for(Runnable r: changesListeners)
@@ -84,7 +92,7 @@ public final class Manager implements Task.Callback
 		changesListeners.add(runnable);
     }
 
-    public void removeChangesListener(Runnable runnable)
+    synchronized public void removeChangesListener(Runnable runnable)
     {
 	NullCheck.notNull(runnable, "runnable");
 	for(int i = 0;i < changesListeners.size();i++)
@@ -101,33 +109,67 @@ public final class Manager implements Task.Callback
 	    r.run();
     }
 
-    
+    @Override synchronized public void setFileSize(Task task, long size)
+    {
+	NullCheck.notNull(task, "task");
+	for(EntryImpl e: entries)
+	    if (e.task == task)
+	    {
+		e.fileSize = size >= 0?size:0;
+		notifyChangesListeners();
+		return;
+	    }
+    }
 
-    	@Override public void setFileSize(Task task, long size)
+	@Override synchronized public void onProgress(Task task, long bytesFetched)
     {
+	NullCheck.notNull(task, "task");
+	for(EntryImpl e: entries)
+	    if (e.task == task)
+	    {
+		e.bytesFetched = bytesFetched >= 0?bytesFetched:0;
+		notifyChangesListeners();
+		return;
+	    }
     }
-    
-	@Override public void onProgress(Task task, long bytesFetched)
+
+	@Override synchronized public void onSuccess(Task task)
     {
+	NullCheck.notNull(task, "task");
+	for(EntryImpl e: entries)
+	    if (e.task == task)
+	    {
+		e.onSuccess();
+		notifyChangesListeners();
+		return;
+	    }
     }
-    
-	@Override public void onSuccess(Task task)
+
+	@Override synchronized public void onFailure(Task task, Throwable throwable)
     {
-    }
-    
-	@Override public void onFailure(Task task, Throwable throwable)
-    {
+	NullCheck.notNull(task, "task");
+	NullCheck.notNull(throwable, "throwable");
+	for(EntryImpl e: entries)
+	    if (e.task == task)
+	    {
+		e.onFailure(throwable);
+		notifyChangesListeners();
+		return;
+	    }
     }
 
     public interface Entry
     {
 	String getUrl();
+	int getPercent();
     }
 
     static private final class EntryImpl implements Entry
     {
 	final Task task;
 	final Settings.Entry sett;
+	long fileSize = 0;
+	long bytesFetched = 0;
 	EntryImpl(Registry registry, int id, Task.Callback callback) throws IOException
 	{
 	    NullCheck.notNull(registry, "registry");
@@ -144,9 +186,25 @@ public final class Manager implements Task.Callback
 	    final String status = sett.getStatus("");
 	    return status.equals(Settings.COMPLETED) || status.equals(Settings.FAILED);
 	}
-	@Override public String getUrl()
+	void onSuccess()
+	{
+	    this.sett.setStatus(Settings.COMPLETED);
+	}
+		void onFailure(Throwable e)
+	{
+	    this.sett.setStatus(Settings.FAILED);
+	    this.sett.setErrorInfo(e.getClass().getName() + ":" + e.getMessage());
+	}
+		@Override public String getUrl()
 	{
 	    return this.task.srcUrl.toString();
+	}
+	@Override public int getPercent()
+	{
+	    if (fileSize <= 0 || bytesFetched <= 0)
+		return 0;
+	    final int res = (int)((bytesFetched * 100) / fileSize);
+	    return res <= 100?res:100;
 	}
     }
 }

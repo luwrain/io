@@ -92,7 +92,7 @@ return true;
 			return false;
 			*/
 		    case CLIPBOARD_PASTE:
-			return false;
+			return actions.onClipboardPaste();
 		    case CLOSE:
 			closeApp();
 			return true;
