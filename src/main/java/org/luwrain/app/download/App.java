@@ -25,11 +25,12 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.core.queries.*;
 
-public class App implements Application, MonoApp
+public class App implements Application, MonoApp, Runnable
 {
     private Luwrain luwrain = null;
     private Strings strings = null;
     private Base base = null;
+    private Actions actions = null;
     private ListArea listArea = null;
 
     private final org.luwrain.io.download.Manager manager;
@@ -48,8 +49,10 @@ public class App implements Application, MonoApp
 	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
 	this.strings = (Strings)o;
 	this.luwrain = luwrain;
-	this.base = new Base( luwrain, strings);
+	this.base = new Base( luwrain, strings, manager);
+	this.actions = new Actions(luwrain, strings, base);
 	createArea();
+	this.manager.addChangesListener(this);
 	return new InitResult();
     }
 
@@ -57,8 +60,7 @@ public class App implements Application, MonoApp
     {
 	final ListArea.Params params = new ListArea.Params();
 	params.context = new DefaultControlEnvironment(luwrain);
-	//	params.model = base.getListModel();
-	params.model = new ListUtils.FixedModel();
+		params.model = base.getListModel();
 	params.appearance = new Appearance(luwrain, strings);
 	//	params.clickHandler = (area, index, obj)->onConnect(obj);
 	params.name = strings.appName();
@@ -89,6 +91,8 @@ return true;
 			    return onDisconnect();
 			return false;
 			*/
+		    case CLIPBOARD_PASTE:
+			return false;
 		    case CLOSE:
 			closeApp();
 			return true;
@@ -109,6 +113,14 @@ return true;
 	    };
     }
 
+    //Catches update notifications from the download manager
+    @Override public void run()
+    {
+	luwrain.runUiSafely(()->{
+		listArea.refresh();
+	    });
+    }
+
     @Override public String getAppName()
     {
 	return strings.appName();
@@ -127,6 +139,7 @@ return true;
 
     @Override public void closeApp()
     {
+	this.manager.removeChangesListener(this);
 	luwrain.closeApp();
     }
 }

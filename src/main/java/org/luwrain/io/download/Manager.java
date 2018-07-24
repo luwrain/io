@@ -26,9 +26,10 @@ import org.luwrain.util.*;
 public final class Manager implements Task.Callback
 {
     static private final String LOG_COMPONENT = "download";
-    
-    private final Vector<Entry> entries = new Vector();
+
     private final Luwrain luwrain;
+        private final Vector<EntryImpl> entries = new Vector();
+    private final List<Runnable> changesListeners = new Vector();
 
     public Manager(Luwrain luwrain)
     {
@@ -43,19 +44,61 @@ public final class Manager implements Task.Callback
 		final int[] ids = Settings.getIds(luwrain.getRegistry());
 	for(int i = 0;i < ids.length;++i)
 	    try {
-		entries.add(new Entry(registry, ids[i], this));
+		entries.add(new EntryImpl(registry, ids[i], this));
 	    }
 	    catch(IOException ee)
 	    {
 		Log.error(LOG_COMPONENT, "unable to load an entry:" + ee.getClass().getName() + ":" + ee.getMessage());
 	    }
-	for(Entry e: entries)
+	for(EntryImpl e: entries)
 	    if (e.isActive())
 		e.task.startAsync();
     }
 
     public void close()
     {
+    }
+
+    public void addDownload(URL srcUrl, File destFile) throws IOException
+    {
+	NullCheck.notNull(srcUrl, "srcUrl");
+	NullCheck.notNull(destFile, "destFile");
+	final int id = Settings.addEntry(luwrain.getRegistry(), srcUrl.toString(), destFile.getAbsolutePath());
+	final EntryImpl entry = new EntryImpl(luwrain.getRegistry(), id, this);
+	this.entries.add(entry);
+	entry.task.startAsync();
+	notifyChangesListeners();
+    }
+
+    public Entry[] getAllEntries()
+    {
+	return entries.toArray(new Entry[entries.size()]);
+    }
+
+    public void addChangesListener(Runnable runnable)
+    {
+	NullCheck.notNull(runnable, "runnable");
+	for(Runnable r: changesListeners)
+	    if (r == runnable)
+		return;
+		changesListeners.add(runnable);
+    }
+
+    public void removeChangesListener(Runnable runnable)
+    {
+	NullCheck.notNull(runnable, "runnable");
+	for(int i = 0;i < changesListeners.size();i++)
+	    if (changesListeners.get(i) == runnable)
+	    {
+		changesListeners.remove(i);
+		return;
+	    }
+    }
+
+    private void notifyChangesListeners()
+    {
+	for(Runnable r: changesListeners)
+	    r.run();
     }
 
     
@@ -76,11 +119,16 @@ public final class Manager implements Task.Callback
     {
     }
 
-    static private final class Entry
+    public interface Entry
+    {
+	String getUrl();
+    }
+
+    static private final class EntryImpl implements Entry
     {
 	final Task task;
 	final Settings.Entry sett;
-	Entry(Registry registry, int id, Task.Callback callback) throws IOException
+	EntryImpl(Registry registry, int id, Task.Callback callback) throws IOException
 	{
 	    NullCheck.notNull(registry, "registry");
 	    NullCheck.notNull(callback, "callback");
@@ -95,6 +143,10 @@ public final class Manager implements Task.Callback
 	{
 	    final String status = sett.getStatus("");
 	    return status.equals(Settings.COMPLETED) || status.equals(Settings.FAILED);
+	}
+	@Override public String getUrl()
+	{
+	    return this.task.srcUrl.toString();
 	}
     }
 }

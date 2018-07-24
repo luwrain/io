@@ -21,4 +21,5 @@ public interface Strings
 static final String NAME = "luwrain.download";
 
     String appName();
+    String downloadAddingError(String details);
 }

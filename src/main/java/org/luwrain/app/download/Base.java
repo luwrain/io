@@ -16,24 +16,55 @@
 
 package org.luwrain.app.download;
 
-import java.util.concurrent.*;
-
 import org.luwrain.core.*;
 import org.luwrain.linux.wifi.*;
 import org.luwrain.controls.*;
+import org.luwrain.io.download.Manager.Entry;
 
 final class Base
 {
     private final Luwrain luwrain;
     private final Strings strings;
+    final org.luwrain.io.download.Manager manager;
     final Conversations conv;
 
-    Base(Luwrain luwrain, Strings strings)
+    private Entry[] entries = new Entry[0];
+
+    Base(Luwrain luwrain, Strings strings, org.luwrain.io.download.Manager manager)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notNull(strings, "strings");
+	NullCheck.notNull(manager, "manager");
 	this.luwrain = luwrain;
 	this.strings = strings;
+	this.manager = manager;
 	this.conv = new Conversations(luwrain, strings);
+	refresh();
+    }
+
+    void refresh()
+    {
+	this.entries = manager.getAllEntries();
+    }
+
+    ListArea.Model getListModel()
+    {
+	return new ListModel();
+    }
+
+    private final class ListModel implements ListArea.Model
+    {
+	@Override public int getItemCount()
+	{
+	    return entries != null?entries.length:0;
+	}
+	@Override public Object getItem(int index)
+	{
+	    return entries != null?entries[index]:null;
+	}
+	@Override public void refresh()
+	{
+	    Base.this.refresh();
+	}
     }
 }
