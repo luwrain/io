@@ -126,19 +126,8 @@ public final class Task implements Runnable
 	    } catch(IOException e) {}
 	    try {
 		cur.getOutputStream().close();
-			    } catch(IOException e) {}
-	    /*
-	    if (cur instanceof HttpURLConnection)
-	    {
-		Log.debug(LOG_COMPONENT, "stopping through disconnecting");
-		final HttpURLConnection httpCon = (HttpURLConnection)cur;
-		httpCon.disconnect();
-	    }
-	    //	this.thread.interrupt();
-	    */
-	    
+	    } catch(IOException e) {}
 	}
-	Log.debug(LOG_COMPONENT, "waiting for downloading interrupting");
 	try {
 	    this.thread.join();
 	}
@@ -147,7 +136,7 @@ public final class Task implements Runnable
 	    Thread.currentThread().interrupt();
 	}
 	this.thread = null;
-	    }
+    }
 
     private void attempt() throws IOException
     {
@@ -166,7 +155,6 @@ public final class Task implements Runnable
 	    pos = 0;
 	    os = new BufferedOutputStream(new FileOutputStream(destFile));
 	}
-	Log.debug(LOG_COMPONENT, "new downloading attempt from position " + pos + " (" + srcUrl.toString() + ")");
 	if (interrupting)
 	    return;
 	this.con = Connections.connect(srcUrl, pos);
@@ -177,7 +165,6 @@ public final class Task implements Runnable
 	    callback.setFileSize(this, pos + len);
 	if (interrupting)
 	    return;
-	//	final BufferedInputStream is = new BufferedInputStream(con.getInputStream());
 	final InputStream is = con.getInputStream();
 	try {
 	    final byte[] buf = new byte[512];
@@ -187,17 +174,13 @@ public final class Task implements Runnable
 		return;
 	    while ( (numRead = is.read(buf)) >= 0)
 	    {
-		Log.debug(LOG_COMPONENT, "read " + numRead + " interrupting=" + interrupting);
 		if (this.interrupting)
 		    return;
-		Log.debug(LOG_COMPONENT, "write");
 		os.write(buf, 0, numRead);
 		totalRead += numRead;
-		Log.debug(LOG_COMPONENT, "callback");
 		callback.onProgress(this, pos + totalRead);
 		if (interrupting)
 		    return;
-		Log.debug(LOG_COMPONENT, "next step");
 	    }
 	    if (interrupting)
 		return;
