@@ -1,5 +1,5 @@
 
-package org.luwrain.api.wikipedia;
+package org.luwrain.io.api.wikipedia;
 
 public class Wikipedia
 {
