@@ -46,8 +46,8 @@ public final class Task implements Runnable
     //For asynchronous launching
     private final Object syncObj = new Object();
     private Thread thread = null;
-    private boolean interrupting = false;
-    private boolean running = false;
+    private volatile boolean interrupting = false;
+    private volatile boolean running = false;
 
     public Task(Callback callback, URL srcUrl, File destFile)
     {

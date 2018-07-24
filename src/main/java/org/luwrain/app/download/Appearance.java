@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
+import org.luwrain.io.download.Manager.Entry;
 
 final class Appearance implements ListArea.Appearance
 {
@@ -38,13 +39,26 @@ final class Appearance implements ListArea.Appearance
     {
 	NullCheck.notNull(item, "item");
 	NullCheck.notNull(flags, "flags");
-	    luwrain.setEventResponse(DefaultEventResponse.listItem(item.toString(), Suggestions.LIST_ITEM));
+	if (item instanceof Entry)
+	{
+	    final Entry entry = (Entry)item;
+	    final String text = luwrain.i18n().getNumberStr(entry.getPercent(), "percents") + " " + getName(entry);
+	    luwrain.setEventResponse(DefaultEventResponse.listItem(text, Suggestions.LIST_ITEM));
+	    return;
+	}
+		    luwrain.setEventResponse(DefaultEventResponse.listItem(item.toString(), Suggestions.LIST_ITEM));
     }
 
     @Override public String getScreenAppearance(Object item, Set<Flags> flags)
     {
 	NullCheck.notNull(item, "item");
 	NullCheck.notNull(flags, "flags");
+
+		if (item instanceof Entry)
+	{
+	    final Entry entry = (Entry)item;
+	    return "" + entry.getPercent() + "% " + getName(entry);
+	}
 	return item.toString();
     }
 
@@ -56,5 +70,19 @@ final class Appearance implements ListArea.Appearance
     @Override public int getObservableRightBound(Object item)
     {
 	return getScreenAppearance(item, EnumSet.noneOf(Flags.class)).length();
+    }
+
+    private String getName(Entry entry)
+    {
+	NullCheck.notNull(entry, "entry");
+	final String fileName = entry.getUrl().getFile();
+	if (fileName != null && !fileName.isEmpty())
+	{
+	    final int slash = fileName.lastIndexOf("/");
+	    if (slash >= 0 && slash + 1 < fileName.length())
+		return fileName.substring(slash + 1);
+	    return fileName;
+	}
+	return entry.getUrl().toString();
     }
 }

@@ -128,7 +128,12 @@ public final class Manager implements Task.Callback
 	    if (e.task == task)
 	    {
 		e.bytesFetched = bytesFetched >= 0?bytesFetched:0;
+		final int percent = e.getPercent();
+		if (percent != e.prevNotificationPercent)
+		{
 		notifyChangesListeners();
+		e.prevNotificationPercent = percent;
+		}
 		return;
 	    }
     }
@@ -160,7 +165,7 @@ public final class Manager implements Task.Callback
 
     public interface Entry
     {
-	String getUrl();
+	URL getUrl();
 	int getPercent();
     }
 
@@ -170,6 +175,7 @@ public final class Manager implements Task.Callback
 	final Settings.Entry sett;
 	long fileSize = 0;
 	long bytesFetched = 0;
+	int prevNotificationPercent = -1;
 	EntryImpl(Registry registry, int id, Task.Callback callback) throws IOException
 	{
 	    NullCheck.notNull(registry, "registry");
@@ -184,7 +190,7 @@ public final class Manager implements Task.Callback
 	boolean isActive()
 	{
 	    final String status = sett.getStatus("");
-	    return status.equals(Settings.COMPLETED) || status.equals(Settings.FAILED);
+	    return !status.equals(Settings.COMPLETED) && !status.equals(Settings.FAILED);
 	}
 	void onSuccess()
 	{
@@ -195,9 +201,9 @@ public final class Manager implements Task.Callback
 	    this.sett.setStatus(Settings.FAILED);
 	    this.sett.setErrorInfo(e.getClass().getName() + ":" + e.getMessage());
 	}
-		@Override public String getUrl()
+		@Override public URL getUrl()
 	{
-	    return this.task.srcUrl.toString();
+	    return this.task.srcUrl;
 	}
 	@Override public int getPercent()
 	{
