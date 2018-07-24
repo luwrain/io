@@ -55,9 +55,12 @@ public final class Manager implements Task.Callback
 		e.task.startAsync();
     }
 
-    synchronized public void close()
+    public void close()
     {
-	for(EntryImpl e: entries)
+	changesListeners.clear();
+	final EntryImpl[] ee = this.entries.toArray(new EntryImpl[this.entries.size()]);
+	this.entries.clear();
+	for(EntryImpl e: ee)
 	{
 	    if (!e.isActive())
 		continue;
