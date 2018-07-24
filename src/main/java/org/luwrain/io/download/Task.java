@@ -42,12 +42,11 @@ public final class Task implements Runnable
     public final Callback callback;
     public final URL srcUrl;
     public File destFile;
+    private URLConnection con = null;
 
     //For asynchronous launching
-    private final Object syncObj = new Object();
     private Thread thread = null;
     private volatile boolean interrupting = false;
-    private volatile boolean running = false;
 
     public Task(Callback callback, URL srcUrl, File destFile)
     {
@@ -65,6 +64,8 @@ public final class Task implements Runnable
 	try {
 	    for(int i = 0;i < MAX_ATTEMPT_COUNT;++i)
 	{
+		if (this.interrupting)
+		    return;
 	    try {
 		attempt();
 		if (!this.interrupting)
@@ -94,6 +95,7 @@ public final class Task implements Runnable
 	catch(Throwable e)
 	{
 	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+			if (!interrupting)
 			callback.onFailure(this, e);
 	}
     }
@@ -108,16 +110,7 @@ public final class Task implements Runnable
 
     @Override public void run()
     {
-	this.running = true;
-	try {
 	    startSync();
-	}
-	finally {
-	    this.running = false;
-	    synchronized(syncObj) {
-		syncObj.notifyAll();
-	    }
-	}
     }
 
     synchronized public void stop()
@@ -125,19 +118,33 @@ public final class Task implements Runnable
 	if (thread == null)
 	    return;
 	this.interrupting = true;
+	final URLConnection cur = this.con;
+	if (cur != null)
+	{
+	    try {
+		cur.getInputStream().close();
+	    } catch(IOException e) {}
+	    try {
+		cur.getOutputStream().close();
+			    } catch(IOException e) {}
+	    if (cur instanceof HttpURLConnection)
+	    {
+		Log.debug(LOG_COMPONENT, "stopping through disconnecting");
+		final HttpURLConnection httpCon = (HttpURLConnection)cur;
+		httpCon.disconnect();
+	    }
 	this.thread.interrupt();
-	synchronized(syncObj) {
-	    while(running)
-		try {
-		    syncObj.wait();
-		}
-		catch(InterruptedException e)
-		{
-		    Thread.currentThread().interrupted();
-		}
 	}
-	this.thread = null;
-    }
+	Log.debug(LOG_COMPONENT, "waiting for downloading interrupting");
+	try {
+	    this.thread.join();
+	}
+	catch(InterruptedException e)
+	{
+	    Thread.currentThread().interrupt();
+	}
+	Log.debug(LOG_COMPONENT, "finished");
+	    }
 
     private void attempt() throws IOException
     {
@@ -157,28 +164,45 @@ public final class Task implements Runnable
 	    os = new BufferedOutputStream(new FileOutputStream(destFile));
 	}
 	Log.debug(LOG_COMPONENT, "new downloading attempt from position " + pos + " (" + srcUrl.toString() + ")");
-	final URLConnection con = Connections.connect(srcUrl, pos);
+	if (interrupting)
+	    return;
+	this.con = Connections.connect(srcUrl, pos);
+	if (interrupting)
+	    return;
 	final long len = con.getContentLength();
 	if (len >= 0)
-	    callback.setFileSize(this, len);
+	    callback.setFileSize(this, pos + len);
+	if (interrupting)
+	    return;
 	final BufferedInputStream is = new BufferedInputStream(con.getInputStream());
 	try {
 	    final byte[] buf = new byte[512];
 	    int numRead = 0;
 	    int totalRead = 0;
+	    if (interrupting)
+		return;
 	    while ( (numRead = is.read(buf)) >= 0)
 	    {
+		Log.debug(LOG_COMPONENT, "read " + numRead + " interrupting=" + interrupting);
 		if (this.interrupting)
 		    return;
 		os.write(buf, 0, numRead);
 		totalRead += numRead;
 		callback.onProgress(this, pos + totalRead);
+		if (interrupting)
+		    return;
 	    }
+	    if (interrupting)
+		return;
 	    os.flush();
 	}
 	finally {
-	    is.close();
-	    os.close();
+	    try {
+		is.close();
+		os.close();
+	    }
+	    catch(IOException e) {}
+	    this.con = null;
 	}
     }
 
