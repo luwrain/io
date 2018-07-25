@@ -42,7 +42,31 @@ final class Appearance implements ListArea.Appearance
 	if (item instanceof Entry)
 	{
 	    final Entry entry = (Entry)item;
-	    final String text = luwrain.i18n().getNumberStr(entry.getPercent(), "percents") + " " + getName(entry);
+	    final Sounds sound;
+	    final String text;
+	    switch(entry.getStatus())
+	    {
+	    case RUNNING:
+		text = luwrain.i18n().getNumberStr(entry.getPercent(), "percents") + " " + getName(entry);
+		sound = null;
+		break;
+	    case SUCCESS:
+		text = strings.statusOk() + " " + getName(entry);
+		sound = Sounds.OK;
+		break;
+
+
+		
+	    case FAILED:
+
+		text = strings.statusFailure() + " " + getName(entry) + " " + entry.getErrorInfo();
+		sound = Sounds.ATTENTION;
+		break;
+	    default:
+		return;
+	    }
+	    if (sound != null)
+		luwrain.setEventResponse(DefaultEventResponse.listItem(sound, text, Suggestions.LIST_ITEM)); else
 	    luwrain.setEventResponse(DefaultEventResponse.listItem(text, Suggestions.LIST_ITEM));
 	    return;
 	}

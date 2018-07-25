@@ -168,8 +168,12 @@ public final class Manager implements Task.Callback
 
     public interface Entry
     {
+	public enum Status {RUNNING, SUCCESS, FAILED};
+
 	URL getUrl();
 	int getPercent();
+	Status getStatus();
+	String getErrorInfo();
     }
 
     static private final class EntryImpl implements Entry
@@ -179,6 +183,9 @@ public final class Manager implements Task.Callback
 	long fileSize = 0;
 	long bytesFetched = 0;
 	int prevNotificationPercent = -1;
+	//To reduce the number of queries to the registry
+	private Entry.Status statusCache = null;
+	private String errorInfoCache = null;
 	EntryImpl(Registry registry, int id, Task.Callback callback) throws IOException
 	{
 	    NullCheck.notNull(registry, "registry");
@@ -207,6 +214,33 @@ public final class Manager implements Task.Callback
 		@Override public URL getUrl()
 	{
 	    return this.task.srcUrl;
+	}
+	@Override public Status getStatus()
+	{
+	    if (statusCache != null)
+		return statusCache;
+	    final String statusStr = sett.getStatus("");
+	    switch(statusStr)
+	    {
+	    case Settings.COMPLETED:
+		this.statusCache = Status.SUCCESS;
+		return Status.SUCCESS;
+	    case Settings.FAILED:
+		this.statusCache = Status.FAILED;
+		return Status.FAILED;
+	    default:
+		return Status.RUNNING;
+	    }
+	}
+	@Override public String getErrorInfo()
+	{
+	    if (errorInfoCache != null)
+		return errorInfoCache;
+	    final String value = sett.getErrorInfo("");
+	    if (value.isEmpty())
+		return "";
+	    errorInfoCache = value;
+	    return value;
 	}
 	@Override public int getPercent()
 	{

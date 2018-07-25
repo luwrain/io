@@ -23,4 +23,6 @@ static final String NAME = "luwrain.download";
     String appName();
     String downloadAddingError(String details);
     String unableToMakeUrl(String url);
+    String statusOk();
+    String statusFailure();
 }
