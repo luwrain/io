@@ -54,11 +54,7 @@ final class Appearance implements ListArea.Appearance
 		text = strings.statusOk() + " " + getName(entry);
 		sound = Sounds.OK;
 		break;
-
-
-		
 	    case FAILED:
-
 		text = strings.statusFailure() + " " + getName(entry) + " " + entry.getErrorInfo();
 		sound = Sounds.ATTENTION;
 		break;
@@ -67,21 +63,30 @@ final class Appearance implements ListArea.Appearance
 	    }
 	    if (sound != null)
 		luwrain.setEventResponse(DefaultEventResponse.listItem(sound, text, Suggestions.LIST_ITEM)); else
-	    luwrain.setEventResponse(DefaultEventResponse.listItem(text, Suggestions.LIST_ITEM));
+		luwrain.setEventResponse(DefaultEventResponse.listItem(text, Suggestions.LIST_ITEM));
 	    return;
 	}
-		    luwrain.setEventResponse(DefaultEventResponse.listItem(item.toString(), Suggestions.LIST_ITEM));
+	luwrain.setEventResponse(DefaultEventResponse.listItem(item.toString(), Suggestions.LIST_ITEM));
     }
 
     @Override public String getScreenAppearance(Object item, Set<Flags> flags)
     {
 	NullCheck.notNull(item, "item");
 	NullCheck.notNull(flags, "flags");
-
 		if (item instanceof Entry)
 	{
 	    final Entry entry = (Entry)item;
+	    switch(entry.getStatus())
+	    {
+	    case RUNNING:
 	    return "" + entry.getPercent() + "% " + getName(entry);
+	    case SUCCESS:
+		return strings.statusOk() + "% " + getName(entry);
+	    case FAILED:
+		return strings.statusFailure() + "% " + getName(entry) + " (" + entry.getErrorInfo() + ")";
+	    default:
+			return item.toString();
+	    }			
 	}
 	return item.toString();
     }
