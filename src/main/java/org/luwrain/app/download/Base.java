@@ -17,7 +17,6 @@
 package org.luwrain.app.download;
 
 import org.luwrain.core.*;
-import org.luwrain.linux.wifi.*;
 import org.luwrain.controls.*;
 import org.luwrain.io.download.Manager.Entry;
 
