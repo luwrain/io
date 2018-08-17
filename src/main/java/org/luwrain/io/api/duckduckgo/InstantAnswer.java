@@ -1,3 +1,18 @@
+/*
+   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
 
 package org.luwrain.io.api.duckduckgo;
 
@@ -8,10 +23,6 @@ import org.json.*;
 
 import org.luwrain.core.*;
 import org.luwrain.util.*;
-
-//https://api.duckduckgo.com/?q=лондон&format=xml&kl=ru-ru&skip_disambig
-//skip_disambig
-
 
 public final class InstantAnswer
 {
@@ -36,11 +47,42 @@ public final class InstantAnswer
 	final InputStream is = con.getInputStream();
 			final JSONTokener t = new JSONTokener(is);
 		final JSONObject obj = new JSONObject(t);
-		final String type = obj.getString("Type");
-		return null;
+		final String typeValue = obj.getString("Type");
+		final Answer.Type type;
+		switch(typeValue.toLowerCase().trim())
+		{
+		case "a":
+		    type = Answer.Type.A;
+		    break;
+		case "d":
+		    type = Answer.Type.D;
+		    break;
+		default:
+		    type = Answer.Type.NONE;
+		}
+		final String absText = obj.getString("AbstractText");
+		return new Answer(type, absText);
     }
 
     static public final class Answer
     {
+	public enum Type {A, D, NONE};
+	private final Type type;
+	private final String absText;
+	Answer(Type type, String absText)
+	{
+	    NullCheck.notNull(type, "type");
+	    NullCheck.notNull(absText, "absText");
+	    this.type = type;
+	    this.absText = absText;
+	}
+	public Type getType()
+	{
+	    return type;
+	}
+	public String getAbsText()
+	{
+	    return absText;
+	}
     }
 }

@@ -17,9 +17,12 @@
 package org.luwrain.io;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.io.*;
 
 import org.luwrain.base.*;
 import org.luwrain.core.*;
+import org.luwrain.io.api.duckduckgo.*;
 
 public class Extension extends org.luwrain.core.extensions.EmptyExtension
 {
@@ -47,6 +50,50 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		    luwrain.launchApp("download");
 		}
 	    },
+
+	    	    new Command(){
+		@Override public String getName()
+		{
+		    return "ddg";
+		}
+		@Override public void onCommand(Luwrain luwrain)
+			{
+			    NullCheck.notNull(luwrain, "luwrain");
+			    final String region = luwrain.getActiveAreaText(Luwrain.AreaTextType.REGION, false);
+			    final String word = luwrain.getActiveAreaText(Luwrain.AreaTextType.WORD, false);
+			    final String text;
+			    if (region != null && !region.trim().isEmpty())
+				text = region; else
+				text = word;
+			    if (text == null || text.trim().isEmpty())
+			    {
+				luwrain.playSound(Sounds.BLOCKED);
+				return;
+			    }
+		    final FutureTask task = new FutureTask(()->{
+			    final Properties props = new Properties();
+			    props.setProperty("kl", "ru-ru");//FIXME:
+			    final InstantAnswer insAnswer = new InstantAnswer();
+			    final InstantAnswer.Answer answer;
+			    try {
+				answer = insAnswer.getAnswer(text.trim(), props, EnumSet.noneOf(InstantAnswer.Flags.class));
+			    }
+			    catch(IOException e)
+			    {
+				luwrain.message(luwrain.i18n().getExceptionDescr(e), Luwrain.MessageType.ERROR);
+				return;
+			    }
+			    if (answer.getType() == InstantAnswer.Answer.Type.A)
+			    {
+				luwrain.message(answer.getAbsText());
+				return;
+			    }
+			    luwrain.playSound(Sounds.ERROR);
+			}, null);
+		    luwrain.executeBkg(task);
+		}
+	    },
+
 
 	};
     }

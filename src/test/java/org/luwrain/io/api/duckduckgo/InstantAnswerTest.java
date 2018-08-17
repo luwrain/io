@@ -29,6 +29,19 @@ public class InstantAnswerTest extends Assert
     @Test public void simple() throws Exception
     {
 	final InstantAnswer instantAnswer = new InstantAnswer();
-	final InstantAnswer.Answer a = instantAnswer.getAnswer("London", new Properties(), EnumSet.noneOf(InstantAnswer.Flags.class));
+	final InstantAnswer.Answer answer = instantAnswer.getAnswer("London", new Properties(), EnumSet.noneOf(InstantAnswer.Flags.class));
+	assertNotNull(answer);
+	assertTrue(answer.getType() == InstantAnswer.Answer.Type.D);
     }
+
+        @Test public void rus() throws Exception
+    {
+	final InstantAnswer instantAnswer = new InstantAnswer();
+	final Properties props = new Properties();
+	props.setProperty("kl", "ru-ru");
+	final InstantAnswer.Answer answer = instantAnswer.getAnswer("Amazon", props, EnumSet.noneOf(InstantAnswer.Flags.class));
+	assertNotNull(answer);
+	assertTrue(answer.getType() == InstantAnswer.Answer.Type.A);
+    }
+
 }
