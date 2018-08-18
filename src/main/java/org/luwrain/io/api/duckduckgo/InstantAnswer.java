@@ -68,8 +68,11 @@ absText = obj.getString("AbstractText"); else
 				if (obj.has("Heading") && !obj.isNull("Heading"))
 heading = obj.getString("Heading"); else
 		    heading = "";
-		final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
+
 		final List<RelatedTopic> topics = new LinkedList();
+		if (obj.has("RelatedTopics") && !obj.isNull("RelatedTopics"))
+		{
+				final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
 		for(int i = 0;i < relatedTopics.length();i++)
 		{
 		    if (relatedTopics.isNull(i))
@@ -80,6 +83,7 @@ heading = obj.getString("Heading"); else
 		    final String text = item.getString("Text");
 		    		    final String firstUrl = item.getString("FirstURL");
 				    topics.add(new RelatedTopic(text, firstUrl));
+		}
 		}
 		return new Answer(type, heading, absText, topics.toArray(new RelatedTopic[topics.size()]));
     }
