@@ -22,6 +22,7 @@ import java.io.*;
 
 import org.luwrain.base.*;
 import org.luwrain.core.*;
+import org.luwrain.popups.*;
 import org.luwrain.io.api.duckduckgo.*;
 
 public class Extension extends org.luwrain.core.extensions.EmptyExtension
@@ -83,12 +84,27 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 				luwrain.message(luwrain.i18n().getExceptionDescr(e), Luwrain.MessageType.ERROR);
 				return;
 			    }
-			    if (answer.getType() == InstantAnswer.Answer.Type.A)
+				luwrain.runUiSafely(()->{
+			    switch(answer.getType())
 			    {
+			    case A:
 				luwrain.message(answer.getAbsText());
 				return;
+			    case D:
+			    {
+				final Object res = Popups.fixedList(luwrain, "header", answer.getRelatedTopics());
+				if (res == null || !(res instanceof InstantAnswer.RelatedTopic))
+				    return;
+				final InstantAnswer.RelatedTopic topic = (InstantAnswer.RelatedTopic)res;
+				if (!topic.getFirstUrl().isEmpty())
+				    luwrain.launchApp("browser", new String[]{topic.getFirstUrl()});
+				return;
 			    }
+			    default:
 			    luwrain.playSound(Sounds.ERROR);
+			    return;
+			    }
+				    });
 			}, null);
 		    luwrain.executeBkg(task);
 		}

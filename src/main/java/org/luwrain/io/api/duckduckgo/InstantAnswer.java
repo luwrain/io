@@ -61,7 +61,46 @@ public final class InstantAnswer
 		    type = Answer.Type.NONE;
 		}
 		final String absText = obj.getString("AbstractText");
-		return new Answer(type, absText);
+		final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
+		final List<RelatedTopic> topics = new LinkedList();
+		for(int i = 0;i < relatedTopics.length();i++)
+		{
+		    if (relatedTopics.isNull(i))
+			continue;
+		    final JSONObject item = relatedTopics.getJSONObject(i);
+		    if (!item.has("Text") || !item.has("FirstURL"))
+			continue;
+		    final String text = item.getString("Text");
+		    		    final String firstUrl = item.getString("FirstURL");
+				    topics.add(new RelatedTopic(text, firstUrl));
+		}
+		return new Answer(type, absText, topics.toArray(new RelatedTopic[topics.size()]));
+    }
+
+    static public final class RelatedTopic
+    {
+	private final String text;
+	private final String firstUrl;
+
+	RelatedTopic(String text, String firstUrl)
+	{
+	    NullCheck.notNull(text, "text");
+	    NullCheck.notNull(firstUrl, "firstUrl");
+	    this.text = text;
+	    this.firstUrl = firstUrl;
+	}
+	public String getText()
+	{
+	    return text;
+	}
+	public String getFirstUrl()
+	{
+	    return firstUrl;
+	}
+	@Override public String toString()
+	{
+	    return text;
+	}
     }
 
     static public final class Answer
@@ -69,12 +108,15 @@ public final class InstantAnswer
 	public enum Type {A, D, NONE};
 	private final Type type;
 	private final String absText;
-	Answer(Type type, String absText)
+	private final RelatedTopic[] relatedTopics;
+	Answer(Type type, String absText, RelatedTopic[] relatedTopics)
 	{
 	    NullCheck.notNull(type, "type");
 	    NullCheck.notNull(absText, "absText");
+	    NullCheck.notNullItems(relatedTopics, "relatedTopics");
 	    this.type = type;
 	    this.absText = absText;
+	    this.relatedTopics = relatedTopics;
 	}
 	public Type getType()
 	{
@@ -83,6 +125,10 @@ public final class InstantAnswer
 	public String getAbsText()
 	{
 	    return absText;
+	}
+	public RelatedTopic[] getRelatedTopics()
+	{
+	    return relatedTopics.clone();
 	}
     }
 }

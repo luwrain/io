@@ -32,6 +32,7 @@ public class InstantAnswerTest extends Assert
 	final InstantAnswer.Answer answer = instantAnswer.getAnswer("London", new Properties(), EnumSet.noneOf(InstantAnswer.Flags.class));
 	assertNotNull(answer);
 	assertTrue(answer.getType() == InstantAnswer.Answer.Type.D);
+	assertTrue(answer.getRelatedTopics().length > 0);
     }
 
         @Test public void rus() throws Exception
