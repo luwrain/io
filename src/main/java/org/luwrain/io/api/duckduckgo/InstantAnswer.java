@@ -41,51 +41,49 @@ public final class InstantAnswer
 	b.append("&format=json");
 	if (props.getProperty("kl") != null && !props.getProperty("kl").isEmpty())
 	    b.append("&kl=" + props.getProperty("kl"));
-
 	final URL url = new URL(new String(b));
 	final URLConnection con = Connections.connect(url, 0);
 	final InputStream is = con.getInputStream();
-			final JSONTokener t = new JSONTokener(is);
-		final JSONObject obj = new JSONObject(t);
-		final String typeValue = obj.getString("Type");
-		final Answer.Type type;
-		switch(typeValue.toLowerCase().trim())
-		{
-		case "a":
-		    type = Answer.Type.A;
-		    break;
-		case "d":
-		    type = Answer.Type.D;
-		    break;
-		default:
-		    type = Answer.Type.NONE;
-		}
-		final String absText;
-		if (obj.has("AbstractText") && !obj.isNull("AbstractText"))
-absText = obj.getString("AbstractText"); else
-		    absText = "";
-		final String heading;
-				if (obj.has("Heading") && !obj.isNull("Heading"))
-heading = obj.getString("Heading"); else
-		    heading = "";
-
-		final List<RelatedTopic> topics = new LinkedList();
-		if (obj.has("RelatedTopics") && !obj.isNull("RelatedTopics"))
-		{
-				final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
-		for(int i = 0;i < relatedTopics.length();i++)
-		{
-		    if (relatedTopics.isNull(i))
-			continue;
-		    final JSONObject item = relatedTopics.getJSONObject(i);
-		    if (!item.has("Text") || !item.has("FirstURL"))
-			continue;
-		    final String text = item.getString("Text");
-		    		    final String firstUrl = item.getString("FirstURL");
-				    topics.add(new RelatedTopic(text, firstUrl));
-		}
-		}
-		return new Answer(type, heading, absText, topics.toArray(new RelatedTopic[topics.size()]));
+	final JSONTokener t = new JSONTokener(is);
+	final JSONObject obj = new JSONObject(t);
+	final String typeValue = obj.getString("Type");
+	final Answer.Type type;
+	switch(typeValue.toLowerCase().trim())
+	{
+	case "a":
+	    type = Answer.Type.A;
+	    break;
+	case "d":
+	    type = Answer.Type.D;
+	    break;
+	default:
+	    type = Answer.Type.NONE;
+	}
+	final String absText;
+	if (obj.has("AbstractText") && !obj.isNull("AbstractText"))
+	    absText = obj.getString("AbstractText"); else
+	    absText = "";
+	final String heading;
+	if (obj.has("Heading") && !obj.isNull("Heading"))
+	    heading = obj.getString("Heading"); else
+	    heading = "";
+	final List<RelatedTopic> topics = new LinkedList();
+	if (obj.has("RelatedTopics") && !obj.isNull("RelatedTopics"))
+	{
+	    final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
+	    for(int i = 0;i < relatedTopics.length();i++)
+	    {
+		if (relatedTopics.isNull(i))
+		    continue;
+		final JSONObject item = relatedTopics.getJSONObject(i);
+		if (!item.has("Text") || !item.has("FirstURL"))
+		    continue;
+		final String text = item.getString("Text");
+		final String firstUrl = item.getString("FirstURL");
+		topics.add(new RelatedTopic(text, firstUrl));
+	    }
+	}
+	return new Answer(type, heading, absText, topics.toArray(new RelatedTopic[topics.size()]));
     }
 
     static public final class RelatedTopic
