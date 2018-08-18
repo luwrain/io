@@ -92,12 +92,15 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 				return;
 			    case D:
 			    {
-				final Object res = Popups.fixedList(luwrain, "header", answer.getRelatedTopics());
+				final Object res = Popups.fixedList(luwrain, answer.getHeading(), answer.getRelatedTopics());
 				if (res == null || !(res instanceof InstantAnswer.RelatedTopic))
 				    return;
 				final InstantAnswer.RelatedTopic topic = (InstantAnswer.RelatedTopic)res;
 				if (!topic.getFirstUrl().isEmpty())
-				    luwrain.launchApp("browser", new String[]{topic.getFirstUrl()});
+				{
+				    String addr = new org.luwrain.io.api.duckduckgo.Search().makeUrlFromInstantAnswer(topic.getFirstUrl());
+				    luwrain.launchApp("reader", new String[]{addr});
+				}
 				return;
 			    }
 			    default:

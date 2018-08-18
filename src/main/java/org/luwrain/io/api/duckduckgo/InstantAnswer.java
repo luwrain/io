@@ -60,7 +60,14 @@ public final class InstantAnswer
 		default:
 		    type = Answer.Type.NONE;
 		}
-		final String absText = obj.getString("AbstractText");
+		final String absText;
+		if (obj.has("AbstractText") && !obj.isNull("AbstractText"))
+absText = obj.getString("AbstractText"); else
+		    absText = "";
+		final String heading;
+				if (obj.has("Heading") && !obj.isNull("Heading"))
+heading = obj.getString("Heading"); else
+		    heading = "";
 		final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
 		final List<RelatedTopic> topics = new LinkedList();
 		for(int i = 0;i < relatedTopics.length();i++)
@@ -74,14 +81,13 @@ public final class InstantAnswer
 		    		    final String firstUrl = item.getString("FirstURL");
 				    topics.add(new RelatedTopic(text, firstUrl));
 		}
-		return new Answer(type, absText, topics.toArray(new RelatedTopic[topics.size()]));
+		return new Answer(type, heading, absText, topics.toArray(new RelatedTopic[topics.size()]));
     }
 
     static public final class RelatedTopic
     {
 	private final String text;
 	private final String firstUrl;
-
 	RelatedTopic(String text, String firstUrl)
 	{
 	    NullCheck.notNull(text, "text");
@@ -107,20 +113,27 @@ public final class InstantAnswer
     {
 	public enum Type {A, D, NONE};
 	private final Type type;
+	private final String heading;
 	private final String absText;
 	private final RelatedTopic[] relatedTopics;
-	Answer(Type type, String absText, RelatedTopic[] relatedTopics)
+	Answer(Type type, String heading, String absText, RelatedTopic[] relatedTopics)
 	{
 	    NullCheck.notNull(type, "type");
+	    NullCheck.notNull(heading, "heading");
 	    NullCheck.notNull(absText, "absText");
 	    NullCheck.notNullItems(relatedTopics, "relatedTopics");
 	    this.type = type;
+	    this.heading = heading;
 	    this.absText = absText;
 	    this.relatedTopics = relatedTopics;
 	}
 	public Type getType()
 	{
 	    return type;
+	}
+	public String getHeading()
+	{
+	    return heading;
 	}
 	public String getAbsText()
 	{
