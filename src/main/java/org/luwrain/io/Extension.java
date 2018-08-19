@@ -51,6 +51,20 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		    luwrain.launchApp("download");
 		}
 	    },
+	    
+	    new Command(){
+	    		@Override public String getName()
+		{
+		    return "wiki-context";
+		}
+		@Override public void onCommand(Luwrain luwrain)
+		{
+		    final String word = luwrain.getActiveAreaText(Luwrain.AreaTextType.WORD, true);
+		    if (word != null && !word.trim().isEmpty())
+			luwrain.launchApp("wiki", new String[]{word.trim()}); else
+			luwrain.launchApp("wiki");
+		}
+	    },
 
 	    	    new Command(){
 		@Override public String getName()
@@ -113,7 +127,6 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		}
 	    },
 
-
 	};
     }
 
@@ -135,6 +148,19 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		}
 	    },
 
+new Shortcut() {
+		@Override public String getExtObjName()
+		{
+		    return "wiki";
+		}
+		@Override public Application[] prepareApp(String[] args)
+		{
+		    NullCheck.notNullItems(args, "args");
+		    if (args.length == 1)
+			return new Application[]{new org.luwrain.app.wiki.WikiApp(args[0])};
+		    return new Application[]{new org.luwrain.app.wiki.WikiApp()};
+		}
+},
 	};
     }
 
