@@ -26,7 +26,7 @@ import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 import org.luwrain.popups.*;
 
-public class WikiApp implements Application
+public class App implements Application
 {
     private Luwrain luwrain = null;
     private Base base = null;
@@ -35,12 +35,12 @@ public class WikiApp implements Application
 
     private final String launchArg;
 
-    public WikiApp()
+    public App()
     {
 	launchArg = "";
     }
 
-    public WikiApp(String launchArg)
+    public App(String launchArg)
     {
 	NullCheck.notNull(launchArg, "launchArg");
 	this.launchArg = launchArg;

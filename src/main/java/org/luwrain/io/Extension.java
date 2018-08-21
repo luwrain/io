@@ -51,25 +51,46 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 		    luwrain.launchApp("download");
 		}
 	    },
-	    
+
 	    new Command(){
 	    		@Override public String getName()
 		{
-		    return "wiki-context";
+		    return "context-wiki";
 		}
 		@Override public void onCommand(Luwrain luwrain)
 		{
-		    final String word = luwrain.getActiveAreaText(Luwrain.AreaTextType.WORD, true);
-		    if (word != null && !word.trim().isEmpty())
-			luwrain.launchApp("wiki", new String[]{word.trim()}); else
-			luwrain.launchApp("wiki");
+		    			    final String region = luwrain.getActiveAreaText(Luwrain.AreaTextType.REGION, false);
+			    final String word = luwrain.getActiveAreaText(Luwrain.AreaTextType.WORD, false);
+			    final String text;
+			    if (region != null && !region.trim().isEmpty())
+				text = region; else
+				text = word;
+			    if (text == null || text.trim().isEmpty())
+			    {
+				luwrain.playSound(Sounds.BLOCKED);
+				return;
+			    }
+			luwrain.launchApp("wiki", new String[]{text.trim()});
 		}
 	    },
 
 	    	    new Command(){
+	    		@Override public String getName()
+		{
+		    return "wiki";
+		}
+		@Override public void onCommand(Luwrain luwrain)
+		{
+			luwrain.launchApp("wiki");
+		}
+	    },
+
+	    
+
+	    	    new Command(){
 		@Override public String getName()
 		{
-		    return "ddg";
+		    return "context-ddg";
 		}
 		@Override public void onCommand(Luwrain luwrain)
 			{
@@ -157,8 +178,8 @@ new Shortcut() {
 		{
 		    NullCheck.notNullItems(args, "args");
 		    if (args.length == 1)
-			return new Application[]{new org.luwrain.app.wiki.WikiApp(args[0])};
-		    return new Application[]{new org.luwrain.app.wiki.WikiApp()};
+			return new Application[]{new org.luwrain.app.wiki.App(args[0])};
+		    return new Application[]{new org.luwrain.app.wiki.App()};
 		}
 },
 	};

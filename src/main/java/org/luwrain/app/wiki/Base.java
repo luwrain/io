@@ -143,8 +143,8 @@ class Base
 			searchResult = res.toArray(new Page[res.size()]);
 	luwrain.onAreaNewBackgroundSound(area);
 			if (searchResult.length > 0)
-			    luwrain.message(strings.querySuccess("" + searchResult.length), Luwrain.MessageType.DONE); else
-			    luwrain.message(strings.nothingFound(), Luwrain.MessageType.DONE);
+			    luwrain.message(strings.querySuccess("" + searchResult.length), Luwrain.MessageType.OK); else
+			    luwrain.message(strings.nothingFound(), Luwrain.MessageType.ERROR);
 			area.refresh();
 		    });
 	}, null);
