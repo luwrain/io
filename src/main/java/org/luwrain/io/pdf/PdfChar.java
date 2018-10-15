@@ -3,10 +3,10 @@ package org.luwrain.io.pdf;
 
 public final class PdfChar
 {
-    final char ch;
-    final double x;
-    final double y;
-    final boolean bold;
+    public final char ch;
+    public final double x;
+    public final double y;
+    public final boolean bold;
 
     PdfChar(char ch, double x, double y, boolean bold)
     {

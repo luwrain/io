@@ -88,7 +88,7 @@ public final class PdfCharsExtractor
 	    final double x = getCm(at.getTranslateX());
 	    final double y = getCm(at.getTranslateY());
 	    final boolean bold = (font.getName().toLowerCase().indexOf("bold") >= 0);
-	    output.add(new PdfChar((unicode != null && unicode.isEmpty())?unicode.charAt(0):'\0', x, y, bold));
+	    output.add(new PdfChar((unicode != null && !unicode.isEmpty())?unicode.charAt(0):'\0', x, y, bold));
 	}
 
 	static private double getCm(double pt)

@@ -5,8 +5,8 @@ import org.luwrain.core.*;
 
 public final class PdfPage
 {
-    final int num;
-    final PdfChar[] chars;
+    public final int num;
+    public final PdfChar[] chars;
 
     public PdfPage(int num, PdfChar[] chars)
     {
