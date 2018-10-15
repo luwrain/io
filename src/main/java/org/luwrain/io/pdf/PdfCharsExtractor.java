@@ -15,40 +15,40 @@ import org.apache.pdfbox.contentstream.operator.DrawObject;
 import org.apache.pdfbox.contentstream.operator.state.*;
 import org.apache.pdfbox.contentstream.operator.text.*;
 
+import org.luwrain.core.*;
+
 public final class PdfCharsExtractor
 {
-    public int run(String scriptName, String fileName) throws IOException
+    public PdfPage[] getChars(File file) throws IOException
     {
+	NullCheck.notNull(file, "file");
 	PDDocument document = null;
 	try {
-	    document = PDDocument.load(new File(fileName));
-	    processPages(scriptName, document);
+	    document = PDDocument.load(file);
+	    return processPages(document);
 	}
 	finally {
 	    if (document != null)
 		document.close();
 	}
-	return 0;
     }
 
-    private void processPages(String scriptName, PDDocument doc) throws IOException
+    private PdfPage[] processPages(PDDocument doc) throws IOException
     {
-	int pageNum = 1;
+	NullCheck.notNull(doc, "doc");
+	int pageNum = 0;
+	final List<PdfPage> res = new LinkedList();
 	for (PDPage page : doc.getPages())
+	{
+	    ++pageNum;
             if (page.hasContents())
 	    {
-		final StreamChars stripper = new StreamChars();
-                stripper.processPage(page);
+		final StreamChars chars = new StreamChars();
+                chars.processPage(page);
+		res.add(new PdfPage(pageNum, chars.output.toArray(new PdfChar[chars.output.size()])));
 	    }
-    }
-
-    private void showDocInfo(PDDocumentInformation information)
-    {
-        System.out.println("Title: " + information.getTitle());
-        System.out.println("Subject: " + information.getSubject());
-        System.out.println("Author:" + information.getAuthor());
-        System.out.println("Creator: " + information.getCreator());
-        System.out.println("Producer: " + information.getProducer());
+	}
+	return res.toArray(new PdfPage[res.size()]);
     }
 
     final static private class StreamChars extends org.apache.pdfbox.contentstream.PDFStreamEngine
