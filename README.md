@@ -1,11 +1,10 @@
 
-## I/O functions
+# I/O functions
 
 This repository contains various utilities used for interoperability
 of [LUWRAIN](https://github.com/luwrain/luwrain/) with various external services.
 
-### See also
 
-* [Main repository](https://github.com/luwrain/luwrain)
-* [Our website](http://luwrain.org/?lang=en)
-* [Our Twitter](http://twitter.com/luwrain)
+This repository is a part of the LUWRAIN project.
+LUWRAIN is a platform for the creation of apps for the blind and partially-sighted.
+Please visit [luwrain.org](http://luwrain.org/?lang=en) for further information.
