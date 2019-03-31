@@ -157,7 +157,13 @@ public final class Task implements Runnable
 	}
 	if (interrupting)
 	    return;
-	this.con = Connections.connect(srcUrl, pos);
+	try {
+	this.con = Connections.connect(srcUrl.toURI(), pos);
+	}
+	catch(URISyntaxException e)
+	{
+	    throw new IOException(e);
+	}
 	if (interrupting)
 	    return;
 	final long len = con.getContentLength();

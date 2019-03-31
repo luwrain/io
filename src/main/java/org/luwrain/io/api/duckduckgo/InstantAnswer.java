@@ -42,7 +42,14 @@ public final class InstantAnswer
 	if (props.getProperty("kl") != null && !props.getProperty("kl").isEmpty())
 	    b.append("&kl=" + props.getProperty("kl"));
 	final URL url = new URL(new String(b));
-	final URLConnection con = Connections.connect(url, 0);
+	final URLConnection con;
+	try {
+ con = Connections.connect(url.toURI(), 0);
+	}
+	catch(URISyntaxException e)
+	{
+	    throw new IOException(e);
+	}
 	final InputStream is = con.getInputStream();
 	final JSONTokener t = new JSONTokener(is);
 	final JSONObject obj = new JSONObject(t);
