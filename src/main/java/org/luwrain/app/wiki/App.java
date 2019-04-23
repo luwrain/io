@@ -31,7 +31,7 @@ public class App implements Application
     private Luwrain luwrain = null;
     private Base base = null;
     private Strings strings = null;
-    private ConsoleArea2 area;
+    private ConsoleArea area;
 
     private final String launchArg;
 
@@ -66,13 +66,13 @@ public class App implements Application
 
     private void createArea()
     {
-	final ConsoleArea2.Params params = new ConsoleArea2.Params();
-	params.context = new DefaultControlEnvironment(luwrain);
+	final ConsoleArea.Params params = new ConsoleArea.Params();
+	params.context = new DefaultControlContext(luwrain);
 	params.model = base.getModel();
 	params.appearance = base.getAppearance();
 	params.areaName = strings.appName();
-	params.inputPos = ConsoleArea2.InputPos.TOP;
-	area = new ConsoleArea2(params){
+	params.inputPos = ConsoleArea.InputPos.TOP;
+	area = new ConsoleArea(params){
 		@Override public boolean onInputEvent(KeyboardEvent event)
 		{
 		    NullCheck.notNull(event, "event");
@@ -133,9 +133,9 @@ public class App implements Application
 	area.setConsoleInputHandler((area,text)->{
 		NullCheck.notNull(text, "text");
 		if (text.trim().isEmpty() || base.isBusy())
-		    return ConsoleArea2.InputHandler.Result.REJECTED;
+		    return ConsoleArea.InputHandler.Result.REJECTED;
 		base.search("ru"/*luwrain.getProperty("luwrain.lang")*/, text.trim(), area);
-		return ConsoleArea2.InputHandler.Result.OK;
+		return ConsoleArea.InputHandler.Result.OK;
 	    });
 	area.setInputPrefix(strings.appName() + ">");
     }

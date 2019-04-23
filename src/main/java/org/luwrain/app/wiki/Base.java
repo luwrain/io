@@ -45,7 +45,7 @@ class Base
 	this.strings = strings;
     }
 
-    boolean search(String lang, String query, ConsoleArea2 area)
+    boolean search(String lang, String query, ConsoleArea area)
     {
 	NullCheck.notEmpty(lang, "lang");
 	NullCheck.notEmpty(query, "query");
@@ -63,10 +63,10 @@ class Base
 	return task != null && !task.isDone();
     }
 
-    ConsoleArea2.Model getModel()
+    ConsoleArea.Model getModel()
     {
 	NullCheck.notNullItems(searchResult, "searchResult");
-	return new ConsoleArea2.Model(){
+	return new ConsoleArea.Model(){
 	    @Override public int getConsoleItemCount()
 	    {
 		NullCheck.notNullItems(searchResult, "searchResult");
@@ -81,9 +81,9 @@ class Base
 	};
     }
 
-    ConsoleArea2.Appearance getAppearance()
+    ConsoleArea.Appearance getAppearance()
     {
-	return new ConsoleArea2.Appearance(){
+	return new ConsoleArea.Appearance(){
 	    @Override public void announceItem(Object item)
 	    {
 		NullCheck.notNull(item, "item");
@@ -101,7 +101,7 @@ class Base
 	};
     }
 
-    private FutureTask createTask(ConsoleArea2 area, String lang, String query)
+    private FutureTask createTask(ConsoleArea area, String lang, String query)
     {
 	NullCheck.notNull(area, "area");
 	NullCheck.notNull(lang, "lang");

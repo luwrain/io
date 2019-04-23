@@ -59,7 +59,7 @@ public class App implements Application, MonoApp, Runnable
     private void createArea()
     {
 	final ListArea.Params params = new ListArea.Params();
-	params.context = new DefaultControlEnvironment(luwrain);
+	params.context = new DefaultControlContext(luwrain);
 		params.model = base.getListModel();
 	params.appearance = new Appearance(luwrain, strings);
 	//	params.clickHandler = (area, index, obj)->onConnect(obj);
