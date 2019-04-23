@@ -1,22 +1,8 @@
-/*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.app.wiki;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.*;
 import java.net.*;
 import java.io.*;
@@ -27,13 +13,14 @@ import javax.xml.parsers.*;
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.util.MlTagStrip;
+import org.luwrain.script.*;
 
-class Base
+final class Base
 {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private final Luwrain luwrain;
-    private final Strings strings;
+final Luwrain luwrain;
+final Strings strings;
     private FutureTask task;
     private Page[] searchResult = new Page[0];
 
@@ -61,6 +48,47 @@ class Base
     boolean isBusy()
     {
 	return task != null && !task.isDone();
+    }
+
+    private Page[] query(String query)
+    {
+	NullCheck.notEmpty(query, "query");
+	final AtomicReference res = new AtomicReference();
+	luwrain.xRunHooks("luwrain.wiki.search", (hook)->{
+		try {
+		    final Object obj = hook.run(new Object[]{query});
+		    if (obj == null)
+			return Luwrain.HookResult.CONTINUE;
+		    res.set(obj);
+		    return Luwrain.HookResult.BREAK;
+		}
+		catch(RuntimeException e)
+		{
+		    res.set(e);
+		    return Luwrain.HookResult.BREAK;
+		}
+	    });
+	if (res.get() == null)
+	    return new Page[0];
+	if (res.get() instanceof RuntimeException)
+	    throw (RuntimeException)res.get();
+	final List objs = ScriptUtils.getArray(res.get());
+	if (objs == null)
+return new Page[0];
+	final List<Page> pages = new LinkedList();
+	for(Object o: objs)
+	{
+	    final Object langObj = ScriptUtils.getMember(o, "lang");
+	    	    final Object titleObj = ScriptUtils.getMember(o, "title");
+		    	    final Object commentObj = ScriptUtils.getMember(o, "comment");
+			    final String lang = ScriptUtils.getStringValue(langObj);
+			    			    final String title = ScriptUtils.getStringValue(titleObj);
+						    			    			    final String comment = ScriptUtils.getStringValue(commentObj);
+												    if (lang == null || title == null || comment == null)
+													continue;
+												    pages.add(new Page(lang, title, comment));
+	}
+	return pages.toArray(new Page[pages.size()]);
     }
 
     ConsoleArea.Model getModel()
