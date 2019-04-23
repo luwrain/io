@@ -17,10 +17,8 @@ import org.luwrain.script.*;
 
 final class Base
 {
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
-final Luwrain luwrain;
-final Strings strings;
+    final Luwrain luwrain;
+    final Strings strings;
     private FutureTask task;
     private Page[] searchResult = new Page[0];
 
@@ -40,7 +38,7 @@ final Strings strings;
 	if (task != null && !task.isDone())
 	    return false;
 	task = createTask(area, lang, query);
-	executor.execute(task);
+	luwrain.executeBkg(task);
 	luwrain.onAreaNewBackgroundSound(area);
 	return true;
     }
@@ -74,19 +72,19 @@ final Strings strings;
 	    throw (RuntimeException)res.get();
 	final List objs = ScriptUtils.getArray(res.get());
 	if (objs == null)
-return new Page[0];
+	    return new Page[0];
 	final List<Page> pages = new LinkedList();
 	for(Object o: objs)
 	{
 	    final Object langObj = ScriptUtils.getMember(o, "lang");
-	    	    final Object titleObj = ScriptUtils.getMember(o, "title");
-		    	    final Object commentObj = ScriptUtils.getMember(o, "comment");
-			    final String lang = ScriptUtils.getStringValue(langObj);
-			    			    final String title = ScriptUtils.getStringValue(titleObj);
-						    			    			    final String comment = ScriptUtils.getStringValue(commentObj);
-												    if (lang == null || title == null || comment == null)
-													continue;
-												    pages.add(new Page(lang, title, comment));
+	    final Object titleObj = ScriptUtils.getMember(o, "title");
+	    final Object commentObj = ScriptUtils.getMember(o, "comment");
+	    final String lang = ScriptUtils.getStringValue(langObj);
+	    final String title = ScriptUtils.getStringValue(titleObj);
+	    final String comment = ScriptUtils.getStringValue(commentObj);
+	    if (lang == null || title == null || comment == null)
+		continue;
+	    pages.add(new Page(lang, title, comment));
 	}
 	return pages.toArray(new Page[pages.size()]);
     }
@@ -129,6 +127,7 @@ return new Page[0];
 	};
     }
 
+    /*
     private FutureTask createTask(ConsoleArea area, String lang, String query)
     {
 	NullCheck.notNull(area, "area");
@@ -178,3 +177,28 @@ return new Page[0];
 	}, null);
     }
 }
+    */
+
+        private FutureTask createTask(ConsoleArea area, String lang, String query)
+    {
+	NullCheck.notNull(area, "area");
+	NullCheck.notNull(lang, "lang");
+	NullCheck.notNull(query, "query");
+	return new FutureTask(()->{
+		try {
+this.searchResult = query(query);
+		}
+		catch(RuntimeException e)
+		{
+		    luwrain.crash(e);
+		}
+		luwrain.runUiSafely(()->{
+			task = null;
+	luwrain.onAreaNewBackgroundSound(area);
+	area.refresh();
+		    });
+	}, null);
+    }
+}
+
+    
