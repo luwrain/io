@@ -1,18 +1,27 @@
+/*
+   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
 
 package org.luwrain.app.wiki;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.*;
-import java.net.*;
-import java.io.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import javax.xml.parsers.*;
 
 import org.luwrain.core.*;
 import org.luwrain.controls.*;
-import org.luwrain.util.MlTagStrip;
 import org.luwrain.script.*;
 
 final class Base
@@ -32,7 +41,7 @@ final class Base
 
     boolean search(String lang, String query, ConsoleArea area)
     {
-	NullCheck.notEmpty(lang, "lang");
+	NullCheck.notNull(lang, "lang");
 	NullCheck.notEmpty(query, "query");
 	NullCheck.notNull(area, "area");
 	if (task != null && !task.isDone())
@@ -127,58 +136,6 @@ final class Base
 	};
     }
 
-    /*
-    private FutureTask createTask(ConsoleArea area, String lang, String query)
-    {
-	NullCheck.notNull(area, "area");
-	NullCheck.notNull(lang, "lang");
-	NullCheck.notNull(query, "query");
-	return new FutureTask(()->{
-		final List<Page> res = new LinkedList<Page>();
-		final URL url;
-		try {
-		    url = new URL("https://" + URLEncoder.encode(lang) + ".wikipedia.org/w/api.php?action=query&list=search&srsearch=" + URLEncoder.encode(query, "UTF-8") + "&format=xml");
-		}
-		catch(MalformedURLException | UnsupportedEncodingException e)
-		{
-		    luwrain.crash(e);
-		    return;
-		}
-		try {
-		    final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		    final Document document = builder.parse(new InputSource(url.openStream()));
-		    final NodeList nodes = document.getElementsByTagName("p");
-		    for (int i = 0;i < nodes.getLength();++i)
-		    {
-			final Node node = nodes.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
-			    continue;
-			final Element el = (Element)node;
-			final NamedNodeMap attr = el.getAttributes();
-			final Node title = attr.getNamedItem("title");
-			final Node snippet = attr.getNamedItem("snippet");
-			if (title != null)
-			    res.add(new Page(lang, title.getTextContent(), snippet != null?MlTagStrip.run(snippet.getTextContent()):""));
-		    }
-		}
-		catch(ParserConfigurationException | IOException | SAXException e)
-		{
-		    luwrain.message(e.getMessage(), Luwrain.MessageType.ERROR);
-		}
-		luwrain.runUiSafely(()->{
-			task = null;
-			searchResult = res.toArray(new Page[res.size()]);
-	luwrain.onAreaNewBackgroundSound(area);
-			if (searchResult.length > 0)
-			    luwrain.message(strings.querySuccess("" + searchResult.length), Luwrain.MessageType.OK); else
-			    luwrain.message(strings.nothingFound(), Luwrain.MessageType.ERROR);
-			area.refresh();
-		    });
-	}, null);
-    }
-}
-    */
-
         private FutureTask createTask(ConsoleArea area, String lang, String query)
     {
 	NullCheck.notNull(area, "area");
@@ -196,9 +153,8 @@ this.searchResult = query(query);
 			task = null;
 	luwrain.onAreaNewBackgroundSound(area);
 	area.refresh();
+	area.reset(false);
 		    });
 	}, null);
     }
 }
-
-    

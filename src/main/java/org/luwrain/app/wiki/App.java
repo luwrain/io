@@ -1,3 +1,18 @@
+/*
+   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
 
 package org.luwrain.app.wiki;
 
@@ -18,17 +33,17 @@ public final class App implements Application, MonoApp
     private Strings strings = null;
     private ConsoleArea area;
 
-    private final String launchArg;
+    final String arg;
 
     public App()
     {
-	launchArg = "";
+	this.arg = "";
     }
 
-    public App(String launchArg)
+    public App(String arg)
     {
-	NullCheck.notNull(launchArg, "launchArg");
-	this.launchArg = launchArg;
+	NullCheck.notNull(arg, "arg");
+	this.arg = arg;
     }
 
     @Override public InitResult onLaunchApp(Luwrain luwrain)
@@ -37,14 +52,14 @@ public final class App implements Application, MonoApp
 	final Object o = luwrain.i18n().getStrings(Strings.NAME);
 	if (o == null || !(o instanceof Strings))
 	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
-	strings = (Strings)o;
+	this.strings = (Strings)o;
 	this.luwrain = luwrain;
 	this.base = new Base(luwrain, strings);
 	createArea();
-	if (!launchArg.trim().isEmpty())
+	if (!arg.trim().isEmpty())
 	{
-	    base.search("ru"/*luwrain.getProperty("luwrain.lang")*/, launchArg.trim(), area);
-	    area.setInput(launchArg.trim());
+	    base.search("", arg.trim(), area);
+	    area.setInput(arg.trim());
 	}
 	return new InitResult();
     }
@@ -119,7 +134,7 @@ public final class App implements Application, MonoApp
 		NullCheck.notNull(text, "text");
 		if (text.trim().isEmpty() || base.isBusy())
 		    return ConsoleArea.InputHandler.Result.REJECTED;
-		base.search("ru"/*luwrain.getProperty("luwrain.lang")*/, text.trim(), area);
+		base.search("", text.trim(), area);
 		return ConsoleArea.InputHandler.Result.OK;
 	    });
 	area.setInputPrefix(strings.appName() + ">");
@@ -140,9 +155,14 @@ public final class App implements Application, MonoApp
 	luwrain.closeApp();
     }
 
-        @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
+    @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
     {
 	NullCheck.notNull(app, "app");
+	if (!(app instanceof App))
+	    return MonoApp.Result.BRING_FOREGROUND;
+	final App wikiApp = (App)app;
+	base.search("", wikiApp.arg.trim(), area);
+	area.setInput(wikiApp.arg.trim());
 	return MonoApp.Result.BRING_FOREGROUND;
     }
 }
