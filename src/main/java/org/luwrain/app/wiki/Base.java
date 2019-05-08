@@ -126,7 +126,7 @@ final class Base
 		    return;
 		luwrain.playSound(Sounds.LIST_ITEM);
 		final Page page = (Page)item ;
-		luwrain.say(item.toString());
+		luwrain.speak(item.toString());
 	    }
 	    @Override public String getTextAppearance(Object item)
 	    {
