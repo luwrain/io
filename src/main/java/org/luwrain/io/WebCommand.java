@@ -26,8 +26,9 @@ import org.luwrain.script.*;
 
 public final class WebCommand implements Command
 {
+    static private final String LOG_COMPONENT = "io";
     static public final String WEB_SEARCH_HOOK = "luwrain.web.search";
-    
+
     @Override public String getName()
     {
 	return "web";
@@ -36,7 +37,9 @@ public final class WebCommand implements Command
     @Override public void onCommand(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	luwrain.message("probna");
+	final WebSearchResult res = runWebSearchHook(luwrain, "query");
+	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, "proba", res, Popups.DEFAULT_POPUP_FLAGS);
+	luwrain.popup(popup);
     }
 
     private WebSearchResult runWebSearchHook(Luwrain luwrain, String query)
@@ -58,36 +61,25 @@ public final class WebCommand implements Command
 	final List<WebSearchResult.Item> res = new LinkedList();
 	for(Object o: items)
 	    if (o != null)
-	{
-	    final Object titleObj = ScriptUtils.getMember(o, "title");
-
-	    	    final Object snippetObj = ScriptUtils.getMember(o, "snippet");
-		    	    final Object displayUrlObj = ScriptUtils.getMember(o, "displayUrlObj");
-			    	    final Object clickUrlObj = ScriptUtils.getMember(o, "clickUrlObj");
-
-				    if (titleObj == null || snippetObj == null ||
-					displayUrlObj == null || clickUrlObj == null)
-					continue;
-				    final String title = ScriptUtils.getStringValue(titleObj);
-				    				    final String snippet = ScriptUtils.getStringValue(snippetObj);
-								    				    				    final String displayUrl = ScriptUtils.getStringValue(displayUrlObj);
-																    final String clickUrl = ScriptUtils.getStringValue(clickUrlObj);
-
-																    if (title == null || snippet == null ||
-																	clickUrl == null || displayUrl == null)
-																	continue;
-																    if (title.isEmpty() || clickUrl.isEmpty())
-																	continue;
-																    res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
-																    
-																    
-								    
-
-				    
-	    
-	}
+	    {
+		final Object titleObj = ScriptUtils.getMember(o, "title");
+		final Object snippetObj = ScriptUtils.getMember(o, "snippet");
+		final Object displayUrlObj = ScriptUtils.getMember(o, "displayUrl");
+		final Object clickUrlObj = ScriptUtils.getMember(o, "clickUrl");
+		if (titleObj == null || snippetObj == null ||
+		    displayUrlObj == null || clickUrlObj == null)
+		    continue;
+		final String title = ScriptUtils.getStringValue(titleObj);
+		final String snippet = ScriptUtils.getStringValue(snippetObj);
+		final String displayUrl = ScriptUtils.getStringValue(displayUrlObj);
+		final String clickUrl = ScriptUtils.getStringValue(clickUrlObj);
+		if (title == null || snippet == null ||
+		    clickUrl == null || displayUrl == null)
+		    continue;
+		if (title.isEmpty() || clickUrl.isEmpty())
+		    continue;
+		res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
+	    }
 	return new WebSearchResult(res.toArray(new WebSearchResult.Item[res.size()]));
     }
-
-    
 }

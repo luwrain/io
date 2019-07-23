@@ -43,6 +43,7 @@ public class WebSearchResultPopup extends ListPopupBase
 	params.context = new DefaultControlContext(luwrain);
 	params.name = name;
 	params.model = new ListUtils.FixedModel(createListItems(res));
+	params.appearance = new Appearance(params.context);
 	return params;
     }
 
@@ -51,9 +52,12 @@ public class WebSearchResultPopup extends ListPopupBase
 	NullCheck.notNull(res, "res");
 	final List r = new LinkedList();
 	for(WebSearchResult.Item i: res.getItems())
+	{
 	    r.add(i);
+	    	    r.add(i.getDisplayUrl());
+	    r.add(i.getSnippet());
+	}
 	return r.toArray(new Object[r.size()]);
-	    
     }
 
     static protected class Appearance extends ListUtils.DoubleLevelAppearance
