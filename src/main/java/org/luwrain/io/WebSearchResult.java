@@ -14,7 +14,6 @@
    General Public License for more details.
 */
 
-
 package org.luwrain.io;
 
 import org.luwrain.core.*;
@@ -29,7 +28,7 @@ public final class WebSearchResult
 	this.items = items;
     }
 
-    public Item[] getItem()
+    public Item[] getItems()
     {
 	return items.clone();
     }
@@ -44,49 +43,42 @@ public final class WebSearchResult
 	return items.length;
     }
 
-static public final class Item
-{
-    private final String title;
-    private final String snippet;
-    private final String displayUrl;
-    private final String clickUrl;
-
-    public Item(String title, String snippet, String displayUrl, String clickUrl)
+    static public final class Item
     {
-	NullCheck.notNull(title, "title");
-	NullCheck.notNull(snippet, "snippet");
-	NullCheck.notNull(displayUrl, "displayUrl");
-	NullCheck.notNull(clickUrl, "clickUrl");
-	this.title = title;
-	this.snippet = snippet;
-	this.displayUrl = displayUrl;
-	this.clickUrl = clickUrl;
+	private final String title;
+	private final String snippet;
+	private final String displayUrl;
+	private final String clickUrl;
+	public Item(String title, String snippet, String displayUrl, String clickUrl)
+	{
+	    NullCheck.notNull(title, "title");
+	    NullCheck.notNull(snippet, "snippet");
+	    NullCheck.notNull(displayUrl, "displayUrl");
+	    NullCheck.notNull(clickUrl, "clickUrl");
+	    this.title = title;
+	    this.snippet = snippet;
+	    this.displayUrl = displayUrl;
+	    this.clickUrl = clickUrl;
+	}
+	public String getTitle()
+	{
+	    return title;
+	}
+	public String getSnippet()
+	{
+	    return snippet;
+	}
+	public String getDisplayUrl()
+	{
+	    return displayUrl;
+	}
+	public String getClickUrl()
+	{
+	    return clickUrl;
+	}
+	@Override public String toString()
+	{
+	    return title;
+	}
     }
-
-    public String getTitle()
-    {
-	return title;
-    }
-
-    public String getSnippet()
-    {
-	return snippet;
-    }
-
-    public String getDisplayUrl()
-    {
-	return displayUrl;
-    }
-
-    public String getClickUrl()
-    {
-	return clickUrl;
-    }
-
-    @Override public String toString()
-    {
-	return title;
-    }
-}
-    
 }

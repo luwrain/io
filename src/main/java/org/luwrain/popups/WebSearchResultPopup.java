@@ -30,18 +30,42 @@ public class WebSearchResultPopup extends ListPopupBase
     
     public WebSearchResultPopup(Luwrain luwrain, String name, WebSearchResult webSearchResult, Set<Popup.Flags> popupFlags)
     {
-	super(luwrain, createParams(luwrain, name), popupFlags);
+	super(luwrain, createParams(luwrain, name, webSearchResult), popupFlags);
 	this.webSearchResult = webSearchResult;
     }
 
-    static protected ListArea.Params createParams(Luwrain luwrain, String name)
+    static protected ListArea.Params createParams(Luwrain luwrain, String name, WebSearchResult res)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notNull(name, "name");
+	NullCheck.notNull(res, "res");
 	final ListArea.Params params = new ListArea.Params();
 	params.context = new DefaultControlContext(luwrain);
 	params.name = name;
-	params.model = new ListUtils.FixedModel();
+	params.model = new ListUtils.FixedModel(createListItems(res));
 	return params;
+    }
+
+    static protected Object[] createListItems(WebSearchResult res)
+    {
+	NullCheck.notNull(res, "res");
+	final List r = new LinkedList();
+	for(WebSearchResult.Item i: res.getItems())
+	    r.add(i);
+	return r.toArray(new Object[r.size()]);
+	    
+    }
+
+    static protected class Appearance extends ListUtils.DoubleLevelAppearance
+    {
+	public Appearance(ControlContext context)
+	{
+	    super(context);
+	}
+	@Override public boolean isSectionItem(Object obj)
+	{
+	    NullCheck.notNull(obj, "obj");
+	    return obj instanceof WebSearchResult.Item;
+	}
     }
 }

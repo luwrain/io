@@ -1,18 +1,3 @@
-/*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.io;
 
@@ -25,7 +10,7 @@ import org.luwrain.core.*;
 import org.luwrain.popups.*;
 import org.luwrain.io.api.duckduckgo.*;
 
-public class Extension extends org.luwrain.core.extensions.EmptyExtension
+public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 {
     private org.luwrain.io.download.Manager downloadManager = null;
 
@@ -36,21 +21,12 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 	this.downloadManager.load();
 	return null;
     }
-    
+
     @Override public Command[] getCommands(Luwrain luwrain)
     {
 	return new Command[]{
-
-	    new Command(){
-		@Override public String getName()
-		{
-		    return "download";
-		}
-		@Override public void onCommand(Luwrain luwrain)
-		{
-		    luwrain.launchApp("download");
-		}
-	    },
+	    new SimpleShortcutCommand("download"),
+	    new WebCommand(),
 
 	    new Command(){
 	    		@Override public String getName()
@@ -84,8 +60,6 @@ public class Extension extends org.luwrain.core.extensions.EmptyExtension
 			luwrain.launchApp("wiki");
 		}
 	    },
-
-	    
 
 	    	    new Command(){
 		@Override public String getName()
