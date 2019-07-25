@@ -37,8 +37,16 @@ public final class WebCommand implements Command
     @Override public void onCommand(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	final WebSearchResult res = runWebSearchHook(luwrain, "query");
-	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, "proba", res, Popups.DEFAULT_POPUP_FLAGS);
+	final String query = Popups.simple(luwrain, "Интернет", "В Интернете:", "");
+	if (query == null || query.trim().isEmpty())
+	    return;
+	final WebSearchResult res = runWebSearchHook(luwrain, query);
+	if (res == null || res.getItemCount() == 0)
+	{
+	    luwrain.message("Ничего не найдено", Luwrain.MessageType.ERROR);
+	    return;
+	}
+	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, res.getTitle(), res, Popups.DEFAULT_POPUP_FLAGS);
 	luwrain.popup(popup);
     }
 
@@ -55,7 +63,10 @@ public final class WebCommand implements Command
 	    luwrain.crash(e);
 	    return null;
 	}
-	final List items = ScriptUtils.getArray(obj);
+	final Object itemsObj = ScriptUtils.getMember(obj, "items");
+	if (itemsObj == null)
+	    return null;
+	final List items = ScriptUtils.getArray(itemsObj);
 	if (items == null)
 	    return null;
 	final List<WebSearchResult.Item> res = new LinkedList();
@@ -80,6 +91,14 @@ public final class WebCommand implements Command
 		    continue;
 		res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
 	    }
-	return new WebSearchResult(res.toArray(new WebSearchResult.Item[res.size()]));
+	final String title;
+	final Object titleObj = ScriptUtils.getMember(obj, "title");
+	if(titleObj != null)
+	{
+	    final String value = ScriptUtils.getStringValue(titleObj);
+	    title = value != null?value:"";
+	} else
+	    title = "";
+	return new WebSearchResult(title, res.toArray(new WebSearchResult.Item[res.size()]));
     }
 }

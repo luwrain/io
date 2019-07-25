@@ -20,12 +20,20 @@ import org.luwrain.core.*;
 
 public final class WebSearchResult
 {
+    private final String title;
     private final Item[] items;
 
-    public WebSearchResult(Item[] items)
+    public WebSearchResult(String title, Item[] items)
     {
+	NullCheck.notNull(title, "title");
 	NullCheck.notNullItems(items, "items");
+	this.title = title;
 	this.items = items;
+    }
+
+    public String getTitle()
+    {
+	return title;
     }
 
     public Item[] getItems()
