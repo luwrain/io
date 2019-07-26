@@ -23,15 +23,29 @@ import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.io.*;
 
-public class WebSearchResultPopup extends ListPopupBase
+public class WebSearchResultPopup extends ListPopupBase implements ListArea.ClickHandler
 {
     protected final WebSearchResult webSearchResult;
+    protected WebSearchResult.Item result = null;
 
-    
     public WebSearchResultPopup(Luwrain luwrain, String name, WebSearchResult webSearchResult, Set<Popup.Flags> popupFlags)
     {
 	super(luwrain, createParams(luwrain, name, webSearchResult), popupFlags);
 	this.webSearchResult = webSearchResult;
+		setListClickHandler(this);
+    }
+
+    public WebSearchResult.Item result()
+    {
+		return result;
+    }
+
+    	@Override public boolean onListClick(ListArea area, int index, Object item)
+    {
+	if (item == null || !(item instanceof WebSearchResult.Item))
+	    return false;
+	this.result = (WebSearchResult.Item)item;
+	return this.closing.doOk();
     }
 
     static protected ListArea.Params createParams(Luwrain luwrain, String name, WebSearchResult res)
@@ -41,6 +55,7 @@ public class WebSearchResultPopup extends ListPopupBase
 	NullCheck.notNull(res, "res");
 	final ListArea.Params params = new ListArea.Params();
 	params.context = new DefaultControlContext(luwrain);
+	params.flags = EnumSet.of(ListArea.Flags.EMPTY_LINE_TOP);
 	params.name = name;
 	params.model = new ListUtils.FixedModel(createListItems(res));
 	params.appearance = new Appearance(params.context);

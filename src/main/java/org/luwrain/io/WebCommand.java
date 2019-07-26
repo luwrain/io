@@ -27,7 +27,7 @@ import org.luwrain.script.*;
 public final class WebCommand implements Command
 {
     static private final String LOG_COMPONENT = "io";
-    static public final String WEB_SEARCH_HOOK = "luwrain.web.search";
+    static public final String WEB_OPEN_HOOK = "luwrain.web.open";
 
     @Override public String getName()
     {
@@ -37,10 +37,10 @@ public final class WebCommand implements Command
     @Override public void onCommand(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	final String query = Popups.simple(luwrain, "Интернет", "В Интернете:", "");
+	final String query = Popups.simple(luwrain, "Найти или открыть в Интернете", "Интернет:", "");
 	if (query == null || query.trim().isEmpty())
 	    return;
-	final WebSearchResult res = runWebSearchHook(luwrain, query);
+	final WebSearchResult res = runWebOpenHook(luwrain, query);
 	if (res == null || res.getItemCount() == 0)
 	{
 	    luwrain.message("Ничего не найдено", Luwrain.MessageType.ERROR);
@@ -48,15 +48,21 @@ public final class WebCommand implements Command
 	}
 	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, res.getTitle(), res, Popups.DEFAULT_POPUP_FLAGS);
 	luwrain.popup(popup);
+	if (popup.wasCancelled())
+	    return;
+	final WebSearchResult.Item result = popup.result();
+	if (result == null)
+	    return;
+	luwrain.openUrl(result.getClickUrl());
     }
 
-    private WebSearchResult runWebSearchHook(Luwrain luwrain, String query)
+    private WebSearchResult runWebOpenHook(Luwrain luwrain, String query)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notEmpty(query, "query");
 	final Object obj;
 	try {
-	    obj = new org.luwrain.script.hooks.ProviderHook(luwrain).run(WEB_SEARCH_HOOK, new Object[]{query});
+	    obj = new org.luwrain.script.hooks.ProviderHook(luwrain).run(WEB_OPEN_HOOK, new Object[]{query});
 	}
 	catch(RuntimeException e)
 	{
