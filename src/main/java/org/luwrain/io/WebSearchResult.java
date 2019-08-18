@@ -16,7 +16,10 @@
 
 package org.luwrain.io;
 
+import java.util.*;
+
 import org.luwrain.core.*;
+import org.luwrain.script.*;
 
 public final class WebSearchResult
 {
@@ -88,5 +91,36 @@ public final class WebSearchResult
 	{
 	    return title;
 	}
+    }
+
+    static public Item[] getItemsFromHookObject(Object itemsObj)
+    {
+	NullCheck.notNull(itemsObj, "itemsObj");
+	final List items = ScriptUtils.getArray(itemsObj);
+	if (items == null)
+	    return null;
+	final List<Item> res = new LinkedList();
+	for(Object o: items)
+	    if (o != null)
+	    {
+		final Object titleObj = ScriptUtils.getMember(o, "title");
+		final Object snippetObj = ScriptUtils.getMember(o, "snippet");
+		final Object displayUrlObj = ScriptUtils.getMember(o, "displayUrl");
+		final Object clickUrlObj = ScriptUtils.getMember(o, "clickUrl");
+		if (titleObj == null || snippetObj == null ||
+		    displayUrlObj == null || clickUrlObj == null)
+		    continue;
+		final String title = ScriptUtils.getStringValue(titleObj);
+		final String snippet = ScriptUtils.getStringValue(snippetObj);
+		final String displayUrl = ScriptUtils.getStringValue(displayUrlObj);
+		final String clickUrl = ScriptUtils.getStringValue(clickUrlObj);
+		if (title == null || snippet == null ||
+		    clickUrl == null || displayUrl == null)
+		    continue;
+		if (title.isEmpty() || clickUrl.isEmpty())
+		    continue;
+		res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
+	    }
+	return res.toArray(new WebSearchResult.Item[res.size()]);
     }
 }
