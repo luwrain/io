@@ -40,23 +40,38 @@ public final class WebCommand implements Command
 	final String query = Popups.simple(luwrain, "Найти или открыть в Интернете", "Интернет:", "");
 	if (query == null || query.trim().isEmpty())
 	    return;
-	final WebSearchResult res = runWebOpenHook(luwrain, query);
-	if (res == null || res.getItemCount() == 0)
+	final Object res = runWebOpenHook(luwrain, query);
+	if (res == null)
 	{
-	    luwrain.message("Ничего не найдено", Luwrain.MessageType.ERROR);
+	    new WebSearch(luwrain).searchAsync(query);
 	    return;
 	}
-	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, res.getTitle(), res, Popups.DEFAULT_POPUP_FLAGS);
-	luwrain.popup(popup);
-	if (popup.wasCancelled())
+	if (res instanceof Exception)
+	{
+	    luwrain.message(luwrain.i18n().getExceptionDescr((Exception)res), Luwrain.MessageType.ERROR);
 	    return;
-	final WebSearchResult.Item result = popup.result();
-	if (result == null)
+	}
+	if (res instanceof Boolean)
+	{
+	    final Boolean bool = (Boolean)res;
+	    if (bool.booleanValue())
+		return;
+	}
+	if (!(res instanceof WebSearchResult))
 	    return;
-	luwrain.openUrl(result.getClickUrl());
+	final WebSearchResult webSearchResult = (WebSearchResult)res;
+	if (webSearchResult.getItemCount() == 0)
+	{
+	    luwrain.message("Поиск в Интернете не дал результатов", Luwrain.MessageType.DONE);
+	    return;
+	}
+	final WebSearchResult.Item item = WebSearchResultPopup.open(luwrain, webSearchResult);
+	if (item == null)
+	    return;
+	luwrain.openUrl(item.getClickUrl());
     }
 
-    private WebSearchResult runWebOpenHook(Luwrain luwrain, String query)
+    private Object runWebOpenHook(Luwrain luwrain, String query)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notEmpty(query, "query");
@@ -66,8 +81,14 @@ public final class WebCommand implements Command
 	}
 	catch(RuntimeException e)
 	{
-	    luwrain.crash(e);
+	    return e;
+	}
+	if (obj == null)
 	    return null;
+	if (obj instanceof Boolean)
+	{
+	    final Boolean bool = (Boolean)obj;
+	    return bool.booleanValue()?bool:null;
 	}
 	final Object itemsObj = ScriptUtils.getMember(obj, "items");
 	if (itemsObj == null)

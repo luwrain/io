@@ -30,18 +30,60 @@ public class WebSearch
     static private final String LOG_COMPONENT = "io";
     static public final String WEB_SEARCH_HOOK = "luwrain.web.search";
 
-    public void searchAsync(Luwrain luwrain, String query, Consumer resultHandler)
+    protected final Luwrain luwrain;
+
+    public WebSearch(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
+	this.luwrain = luwrain;
+    }
+
+    public void searchAsync(String query, Consumer resultHandler)
+    {
 	NullCheck.notEmpty(query, "qeury");
 	NullCheck.notNull(resultHandler, "resultHandler");
 	luwrain.executeBkg(new FutureTask(()->{
-		    final WebSearchResult res = runWebSearchHook(luwrain, query);
+		    final Object res = runWebSearchHook(luwrain, query);
 		    luwrain.runUiSafely(()->resultHandler.accept(res));
 	}, null));
     }
 
-    private WebSearchResult runWebSearchHook(Luwrain luwrain, String query)
+    public void searchAsync(String query)
+    {
+	NullCheck.notNull(luwrain, "luwrain");
+	NullCheck.notEmpty(query, "query");
+	searchAsync(query, (result)->{
+		if (result != null && (result instanceof Exception))
+		{
+		    luwrain.message(luwrain.i18n().getExceptionDescr((Exception)result), Luwrain.MessageType.ERROR);
+		    return;
+		}
+		if (result == null || !(result instanceof WebSearchResult))
+		{
+		    onNothingFound();
+		    return;
+		}
+		final WebSearchResult webSearchResult = (WebSearchResult)result;
+		final WebSearchResult.Item item = WebSearchResultPopup.open(luwrain, webSearchResult);
+		if (item == null)
+		    return;
+		onItemClick(item);
+	    });
+    }
+
+    public void onItemClick(WebSearchResult.Item item)
+    {
+	NullCheck.notNull(item, "item");
+	if (!item.getClickUrl().isEmpty())
+	    luwrain.openUrl(item.getClickUrl());
+    }
+
+    public void onNothingFound()
+    {
+	luwrain.message("Поиск в Интернете не дал результата", Luwrain.MessageType.DONE);
+    }
+
+    private Object runWebSearchHook(Luwrain luwrain, String query)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notEmpty(query, "query");
@@ -51,8 +93,7 @@ public class WebSearch
 	}
 	catch(RuntimeException e)
 	{
-	    luwrain.crash(e);
-	    return null;
+	    return e;
 	}
 	if (obj == null)
 	    return null;

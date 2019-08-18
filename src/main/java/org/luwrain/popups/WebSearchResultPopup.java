@@ -75,6 +75,18 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	return r.toArray(new Object[r.size()]);
     }
 
+    static public WebSearchResult.Item open(Luwrain luwrain, WebSearchResult webSearchResult)
+    {
+	NullCheck.notNull(luwrain, "luwrain");
+	NullCheck.notNull(webSearchResult, "webSearchResult");
+	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, webSearchResult.getTitle(), webSearchResult, Popups.DEFAULT_POPUP_FLAGS);
+	luwrain.popup(popup);
+	if (popup.wasCancelled())
+	    return null;
+	final WebSearchResult.Item result = popup.result();
+	return result;
+    }
+
     static protected class Appearance extends ListUtils.DoubleLevelAppearance
     {
 	public Appearance(ControlContext context)
