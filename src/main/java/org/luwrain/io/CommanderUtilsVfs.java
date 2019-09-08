@@ -28,25 +28,22 @@ import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.CommanderArea.EntryType;
 
-public class CommanderUtilsVfs
+public final class CommanderUtilsVfs
 {
     static private final String LOG_COMPONENT = "commander-vfs";
 
     static public class Model implements CommanderArea.Model<FileObject>
     {
 	protected final FileSystemManager manager;
-
 	public Model(FileSystemManager manager)
 	{
 	    NullCheck.notNull(manager, "manager");
 	    this.manager = manager;
 	}
-
 	public FileSystemManager getFileSystemManager()
 	{
 	    return manager;
 	}
-
 	@Override public EntryType getEntryType(FileObject currentLocation, FileObject entry)
 	{
 	    NullCheck.notNull(entry, "entry");
@@ -72,7 +69,6 @@ public class CommanderUtilsVfs
 		return EntryType.REGULAR;
 	    }
 	}
-
 	@Override public FileObject[] getEntryChildren(FileObject entry)
 	{
 	    NullCheck.notNull(entry, "entry");
@@ -94,7 +90,6 @@ public class CommanderUtilsVfs
 		return null;
 	    }
 	}
-
 	@Override public FileObject getEntryParent(FileObject entry)
 	{
 	    NullCheck.notNull(entry, "entry");
@@ -111,33 +106,27 @@ public class CommanderUtilsVfs
 
     static public class Appearance implements CommanderArea.Appearance<FileObject>
     {
-	protected final ControlContext environment;
+	protected final ControlContext context;
 	protected final FileSystemManager manager;
-
-	public Appearance(ControlContext environment, FileSystemManager manager)
+	public Appearance(ControlContext context, FileSystemManager manager)
 	{
-	    NullCheck.notNull(environment, "environment");
+	    NullCheck.notNull(context, "context");
 	    NullCheck.notNull(manager, "manager");
-	    this.environment = environment;
+	    this.context = context;
 	    this.manager = manager;
 	}
-
 	@Override public String getCommanderName(FileObject entry)
 	{
 	    NullCheck.notNull(entry, "entry");
 	    return entry.getName().getPath();
 	}
-
 	@Override public void announceLocation(FileObject entry)
 	{
 	    NullCheck.notNull(entry, "entry");
-	    environment.silence();
-	    environment.playSound(Sounds.COMMANDER_LOCATION);
 	    if (entry.getName().getPath().equals("/"))
-		environment.say(environment.getStaticStr("PartitionsPopupItemRoot")); else
-		environment.say(entry.getName().getBaseName());
+		context.setEventResponse(DefaultEventResponse.text(Sounds.COMMANDER_LOCATION, context.getStaticStr("PartitionsPopupItemRoot"))); else
+		context.setEventResponse(DefaultEventResponse.text(Sounds.COMMANDER_LOCATION, context.getSpeakableText(entry.getName().getBaseName(), Luwrain.SpeakableTextType.PROGRAMMING)));
 	}
-
 	@Override public String getEntryText(FileObject entry, EntryType type, boolean marked)
 	{
 	    NullCheck.notNull(entry, "entry");
@@ -146,13 +135,12 @@ public class CommanderUtilsVfs
 		return "..";
 	    return entry.getName().getBaseName();
 	}
-
 	@Override public void announceEntry(FileObject entry, CommanderArea.EntryType type, boolean marked)
 	{
 	    NullCheck.notNull(entry, "entry");
 	    NullCheck.notNull(type, "type");
-	    final String name = entry.getName().getBaseName();
-	    CommanderUtils.defaultEntryAnnouncement(environment, name, type, marked);
+	    final String name = context.getSpeakableText(entry.getName().getBaseName(), Luwrain.SpeakableTextType.PROGRAMMING);
+	    CommanderUtils.defaultEntryAnnouncement(context, name, type, marked);
 	}
     }
 
