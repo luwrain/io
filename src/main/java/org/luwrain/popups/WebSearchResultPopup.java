@@ -59,6 +59,7 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	params.name = name;
 	params.model = new ListUtils.FixedModel(createListItems(res));
 	params.appearance = new Appearance(params.context);
+	params.transition = new Transition(params.model);
 	return params;
     }
 
@@ -69,7 +70,7 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	for(WebSearchResult.Item i: res.getItems())
 	{
 	    r.add(i);
-	    	    r.add(i.getDisplayUrl());
+	    r.add(i.getDisplayUrl());
 	    r.add(i.getSnippet());
 	}
 	return r.toArray(new Object[r.size()]);
@@ -92,6 +93,19 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	public Appearance(ControlContext context)
 	{
 	    super(context);
+	}
+	@Override public boolean isSectionItem(Object obj)
+	{
+	    NullCheck.notNull(obj, "obj");
+	    return obj instanceof WebSearchResult.Item;
+	}
+    }
+
+    static protected class Transition extends ListUtils.DoubleLevelTransition
+    {
+	public Transition(ListArea.Model model)
+	{
+	    super(model);
 	}
 	@Override public boolean isSectionItem(Object obj)
 	{

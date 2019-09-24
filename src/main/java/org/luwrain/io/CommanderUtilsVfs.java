@@ -87,6 +87,7 @@ public final class CommanderUtilsVfs
 	    catch(Throwable e)
 	    {
 		Log.error(LOG_COMPONENT, "unable to get children of " + entry + ":" + e.getClass().getName() + ":" + e.getMessage());
+		e.printStackTrace();
 		return null;
 	    }
 	}
