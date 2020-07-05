@@ -102,12 +102,12 @@ final class Base
     {
 	NullCheck.notNullItems(searchResult, "searchResult");
 	return new ConsoleArea.Model(){
-	    @Override public int getConsoleItemCount()
+	    @Override public int getItemCount()
 	    {
 		NullCheck.notNullItems(searchResult, "searchResult");
 		return searchResult.length;
 	    }
-	    @Override public Object getConsoleItem(int index)
+	    @Override public Object getItem(int index)
 	    {
 		if (index < 0 || index >= searchResult.length)
 		    throw new IllegalArgumentException("Illegal index value (" + index + ")");

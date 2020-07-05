@@ -70,10 +70,10 @@ public final class App implements Application, MonoApp
 	params.context = new DefaultControlContext(luwrain);
 	params.model = base.getModel();
 	params.appearance = base.getAppearance();
-	params.areaName = strings.appName();
+	params.name = strings.appName();
 	params.inputPos = ConsoleArea.InputPos.TOP;
 	area = new ConsoleArea(params){
-		@Override public boolean onInputEvent(KeyboardEvent event)
+		@Override public boolean onInputEvent(InputEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    if (event.isSpecial() && !event.isModified())
