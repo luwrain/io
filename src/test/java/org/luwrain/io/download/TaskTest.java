@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2020 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -23,7 +23,7 @@ import org.junit.*;
 
 import org.luwrain.core.*;
 
-public class TaskTest extends Assert
+@Ignore public class TaskTest extends Assert
 {
     static private final String url = "http://download.luwrain.org/pdf/presentation-HongKongOSConference-en-2015-06-27.pdf";
         static private final String noSuchFileUrl = "http://download.luwrain.org/pdf/no-such-file.pdf";
