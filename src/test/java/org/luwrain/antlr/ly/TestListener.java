@@ -9,6 +9,12 @@ class TestListener implements LilypondListener
     @Override public void enterCommand(LilypondParser.CommandContext ctx) {}
     @Override public void exitCommand(LilypondParser.CommandContext ctx) {}
 
+        @Override public void enterNote(LilypondParser.NoteContext ctx) {}
+            @Override public void exitNote(LilypondParser.NoteContext ctx) {}
+
+
+    
+
         @Override public void enterMusicUnit(LilypondParser.MusicUnitContext ctx) {}
             @Override public void exitMusicUnit(LilypondParser.MusicUnitContext ctx) {}
 

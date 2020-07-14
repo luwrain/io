@@ -10,7 +10,7 @@ music
     ;
 
 musicUnit
-: command | String
+: command | note | String
 ;
 
 command
@@ -21,9 +21,26 @@ seq
 : '{' IDENT '}'
     ;
 
+note
+: NoteName Oct? Duration?
+;
+
+NoteName
+: ('a' | 'b')
+;
+
+Oct
+: (',' | ',,')
+;
+
+Duration
+: ('1' | '2' | '4' | '8' | '16' | '32' | '64')
+;
+
 Ident
-    :   [A-Za-z0-9]+
+    :   [A-Za-z]+
     ;
+
 
 String
 : '"' [ a-zA-Z0-9.]* '"'
