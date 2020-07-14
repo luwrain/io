@@ -6,18 +6,21 @@ import org.antlr.v4.runtime.tree.*;
 
 class TestListener implements LilypondListener
 {
-    @Override public void enterScore(LilypondParser.ScoreContext ctx) {}
-    @Override public void exitScore(LilypondParser.ScoreContext ctx) {}
     @Override public void enterCommand(LilypondParser.CommandContext ctx) {}
     @Override public void exitCommand(LilypondParser.CommandContext ctx) {}
-    @Override public void enterValue(LilypondParser.ValueContext ctx) {}
-    @Override public void exitValue(LilypondParser.ValueContext ctx) {}
 
-        @Override public void enterString(LilypondParser.StringContext ctx) {}
-    @Override public void exitString(LilypondParser.StringContext ctx) {}
+        @Override public void enterMusicUnit(LilypondParser.MusicUnitContext ctx) {}
+            @Override public void exitMusicUnit(LilypondParser.MusicUnitContext ctx) {}
 
-            @Override public void enterPrimitive(LilypondParser.PrimitiveContext ctx) {}
-    @Override public void exitPrimitive(LilypondParser.PrimitiveContext ctx) {}
+            @Override public void enterMusic(LilypondParser.MusicContext ctx) {}
+            @Override public void exitMusic(LilypondParser.MusicContext ctx) {}
+
+    
+
+
+    
+
+
 
                 @Override public void enterSeq(LilypondParser.SeqContext ctx) {}
     @Override public void exitSeq(LilypondParser.SeqContext ctx) {}

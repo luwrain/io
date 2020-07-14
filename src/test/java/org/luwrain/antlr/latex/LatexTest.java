@@ -35,7 +35,7 @@ public class LatexTest extends Assert
 	final ParseTree tree = p.math();
 	assertNotNull(tree);
 	final ParseTreeWalker walker = new ParseTreeWalker();
-	final List<LatexParser.MathUnitContext> units = new LinkedList();
+	final List<LatexParser.MathUnitContext> units = new ArrayList();
 	final EmptyLatexListener listener = new EmptyLatexListener(){
 		@Override public void enterMathUnit(LatexParser.MathUnitContext c)
 		{

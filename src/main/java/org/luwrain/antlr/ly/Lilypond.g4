@@ -5,33 +5,29 @@ grammar Lilypond;
 package org.luwrain.antlr.ly;
 }
 
-score
-    : command* EOF
+music
+    : musicUnit* EOF
     ;
+
+musicUnit
+: command | String
+;
 
 command
-    : '\\' IDENT value*
+    : '\\' Ident 
     ;
 
-value
-    : seq | primitive 
+seq
+: '{' IDENT '}'
     ;
 
-seq : '{' IDENT '}'
-    ;
-
-primitive
-    : string
-    ;
-
-string
-    : '"' ~('"')+ '"'
-    ;
-
-
-IDENT
+Ident
     :   [A-Za-z0-9]+
     ;
+
+String
+: '"' [ a-zA-Z0-9.]* '"'
+;
 
 WS
     :   [ \t\r\n]+ -> skip
