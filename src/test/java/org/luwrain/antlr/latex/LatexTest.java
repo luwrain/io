@@ -30,7 +30,7 @@ public class LatexTest extends Assert
 	final LatexLexer l = new LatexLexer(CharStreams.fromString(text));
 	final CommonTokenStream tokens = new CommonTokenStream(l);
 final LatexParser p = new LatexParser(tokens);
-final ParseTree tree = p.score();
+final ParseTree tree = p.math();
 assertNotNull(tree);
 final ParseTreeWalker walker = new ParseTreeWalker();
 final EmptyLatexListener listener = new EmptyLatexListener();

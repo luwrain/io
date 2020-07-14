@@ -5,34 +5,25 @@ grammar Latex;
 package org.luwrain.antlr.latex;
 }
 
-score
-    : command* EOF
+math
+    : mathUnit* EOF
     ;
 
-command
-    : '\\' IDENT value*
-    ;
+mathUnit
+: Num | MathOp
+;
 
-value
-    : seq | primitive 
-    ;
+Num
+: [0-9]
+;
 
-seq : '{' IDENT '}'
-    ;
-
-primitive
-    : string
-    ;
-
-string
-    : '"' ~('"')+ '"'
-    ;
+MathOp
+: [+*]
+;
 
 
-IDENT
-    :   [A-Za-z0-9]+
-    ;
+
 
 WS
-    :   [ \t\r\n]+ -> skip
+    : [ \t\r\n]+ -> skip
     ;
