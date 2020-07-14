@@ -20,6 +20,10 @@
       <arg value="src/main/java/org/luwrain/antlr/latex/Latex.g4" />
       <classpath refid="classpath" />
     </java>
+        <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+      <arg value="src/main/java/org/luwrain/antlr/ly/Lilypond.g4" />
+      <classpath refid="classpath" />
+    </java>
   </target>
   <target name="compile" depends="grammar">
     <mkdir dir="build"/>
