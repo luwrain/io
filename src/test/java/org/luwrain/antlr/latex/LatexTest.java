@@ -16,6 +16,8 @@
 
 package org.luwrain.antlr.latex;
 
+import java.util.*;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.junit.*;
@@ -26,14 +28,59 @@ public class LatexTest extends Assert
 {
     @Test public void twoPlusTwo() throws Exception
     {
-	final String text = "2+2";
+	final String text = "2 + 2";
 	final LatexLexer l = new LatexLexer(CharStreams.fromString(text));
 	final CommonTokenStream tokens = new CommonTokenStream(l);
-final LatexParser p = new LatexParser(tokens);
-final ParseTree tree = p.math();
-assertNotNull(tree);
-final ParseTreeWalker walker = new ParseTreeWalker();
-final EmptyLatexListener listener = new EmptyLatexListener();
-walker.walk(listener, tree);
+	final LatexParser p = new LatexParser(tokens);
+	final ParseTree tree = p.math();
+	assertNotNull(tree);
+	final ParseTreeWalker walker = new ParseTreeWalker();
+	final List<LatexParser.MathUnitContext> units = new LinkedList();
+	final EmptyLatexListener listener = new EmptyLatexListener(){
+		@Override public void enterMathUnit(LatexParser.MathUnitContext c)
+		{
+		    units.add(c);
+		}
+	    };
+	walker.walk(listener, tree);
+	assertEquals(units.size(), 3);
+	assertNotNull(units.get(0).Num());
+	assertEquals(units.get(0).Num().toString(), "2");
+	assertNotNull(units.get(1).MathOp());
+	assertEquals(units.get(1).MathOp().toString(), "+");
+	assertNotNull(units.get(2).Num());
+	assertEquals(units.get(2).Num().toString(), "2");
+    }
+
+    @Test public void frac2and3() throws Exception
+    {
+	final String text = "\\frac {2} {3}";
+	final LatexLexer l = new LatexLexer(CharStreams.fromString(text));
+	final CommonTokenStream tokens = new CommonTokenStream(l);
+	final LatexParser p = new LatexParser(tokens);
+	final ParseTree tree = p.math();
+	assertNotNull(tree);
+	final ParseTreeWalker walker = new ParseTreeWalker();
+	final List<LatexParser.MathUnitContext> units = new LinkedList();
+	final EmptyLatexListener listener = new EmptyLatexListener(){
+		@Override public void enterMathUnit(LatexParser.MathUnitContext c)
+		{
+		    units.add(c);
+		}
+	    };
+	walker.walk(listener, tree);
+	assertEquals(units.size(), 5);
+	
+	assertNotNull(units.get(0).command());
+	assertNotNull(units.get(0).command().Ident());
+	assertEquals(units.get(0).command().Ident().toString(), "frac");
+	assertNotNull(units.get(1).block());
+	assertNotNull(units.get(1).block().mathUnit());
+	assertNotNull(units.get(2).Num());
+	assertEquals(units.get(2).Num().toString(), "2");
+	assertNotNull(units.get(3).block());
+	assertNotNull(units.get(3).block().mathUnit());
+	assertNotNull(units.get(4).Num());
+	assertEquals(units.get(4).Num().toString(), "3");
     }
 }

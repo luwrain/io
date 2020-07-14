@@ -6,12 +6,16 @@ import org.antlr.v4.runtime.tree.*;
 
 class EmptyLatexListener implements LatexListener
 {
-
-
-
-
                     @Override public void enterMathUnit(LatexParser.MathUnitContext ctx) {}
                         @Override public void exitMathUnit(LatexParser.MathUnitContext ctx) {}
+
+                        @Override public void enterCommand(LatexParser.CommandContext ctx) {}
+                            @Override public void exitCommand(LatexParser.CommandContext ctx) {}
+
+                            @Override public void enterBlock(LatexParser.BlockContext ctx) {}
+                                @Override public void exitBlock(LatexParser.BlockContext ctx) {}
+
+
 
                         @Override public void enterMath(LatexParser.MathContext ctx) {}
                         @Override public void exitMath(LatexParser.MathContext ctx) {}
