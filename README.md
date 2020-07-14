@@ -1,10 +1,8 @@
 
-# I/O functions
-
-This repository contains various utilities used for interoperability
-of [LUWRAIN](https://github.com/luwrain/luwrain/) with various external services.
+# LUWRAIN I/O
 
 
-This repository is a part of the LUWRAIN project.
 LUWRAIN is a platform for the creation of apps for the blind and partially-sighted.
+It provides a Java API for constructing highly-distributable apps
+with the user interface adjusted to the perception of blind people.
 Please visit [luwrain.org](http://luwrain.org/?lang=en) for further information.
