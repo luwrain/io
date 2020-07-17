@@ -12,13 +12,14 @@
   <target name="clean">
     <delete dir="build"/>
     <delete dir="jar"/>
+    <delete dir="target"/>
   </target>
   <target name="grammar" depends="clean">
     <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
       <arg value="src/main/java/org/luwrain/antlr/latex/Latex.g4" />
       <classpath refid="classpath" />
     </java>
-        <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+    <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
       <arg value="src/main/java/org/luwrain/antlr/ly/Lilypond.g4" />
       <classpath refid="classpath" />
     </java>
@@ -43,7 +44,7 @@
       </fileset>
     </jar>
   </target>
-    <target name="compile-test" depends="jar">
+  <target name="compile-test" depends="jar">
     <mkdir dir="build"/>
     <mkdir dir="build/test"/>
     <javac srcdir="src/test/java" destdir="build/test" source="1.8" target="1.8">
