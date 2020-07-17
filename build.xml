@@ -1,15 +1,13 @@
 <project name="luwrain-io" default="jar" basedir=".">
   <path id="classpath">
     <pathelement location="."/>
-     <fileset dir="lib">
-      <include name="**/*.jar"/>
-    </fileset>
+    <fileset dir="../lib"><include name="**/*.jar"/></fileset>
+    <fileset dir="../base/jar"><include name="**/*.jar"/></fileset>
+    <fileset dir="../luwrain/jar"><include name="**/*.jar"/></fileset>
   </path>
   <path id="mainjar">
     <pathelement location="."/>
-    <fileset dir="jar">
-      <include name="**/*.jar"/>
-    </fileset>
+    <fileset dir="jar"><include name="**/*.jar"/></fileset>
   </path>
   <target name="clean">
     <delete dir="build"/>
@@ -75,14 +73,5 @@
         </fileset>
       </batchtest>
     </junit>
-  </target>
-  <target name="junit-report">
-    <mkdir dir="/tmp/lwr-report"/>
-    <junitreport todir="/tmp/lwr-report">
-      <fileset dir="..">
-        <include name="**/TEST-*.xml"/>
-      </fileset>
-      <report format="noframes" todir="/tmp/lwr-report/"/>
-    </junitreport>
   </target>
 </project>
