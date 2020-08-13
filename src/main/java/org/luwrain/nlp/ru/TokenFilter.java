@@ -139,6 +139,8 @@ public final class TokenFilter extends EmptyHookObject
 	{
 	case "match":
 	    return (BiPredicate)this::matchHook;
+	case "length":
+	    return size();
 	default:
 	    return super.getMember(name);
 	}
