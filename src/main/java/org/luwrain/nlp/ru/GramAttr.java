@@ -16,6 +16,8 @@
 
 package org.luwrain.nlp.ru;
 
+import java.util.*;
+
 import org.luwrain.core.*;
 import org.luwrain.i18n.*;
 
@@ -24,12 +26,52 @@ public final class GramAttr implements org.luwrain.nlp.GrammaticalAttr
     public enum Gender {
 	MASCULINE,
 	FEMININE,
-NEUTER
+	NEUTER;
+
+	static public Gender find(String s)
+	{
+	    NullCheck.notNull(s, "s");
+	    switch(s.toUpperCase())
+	    {
+	    case "M":
+	    case "MASC":
+	    case "MASCULINE":
+		return Gender.MASCULINE;
+	    case "F":
+	    case "FEM":
+	    case "FEMININE":
+		return Gender.FEMININE;
+	    case "N":
+	    case "NEU":
+	    case "NEUTER":
+		return Gender.NEUTER;
+	    default:
+		return null;
+	    }
+	}
     };
 
     public enum Number {
 	SINGULAR,
-	PLURAL
+	PLURAL;
+
+	static public Number find(String s)
+	{
+	    NullCheck.notNull(s, "s");
+	    switch(s.toUpperCase())
+	    {
+	    case "S":
+	    case "SG":
+	    case "SINGULAR":
+		return Number.SINGULAR;
+	    case "P":
+	    case "PL":
+	    case "PLURAL":
+		return Number.PLURAL;
+	    default:
+		return null;
+	    }
+	}
     };
 
     public enum Case {
@@ -38,7 +80,38 @@ NEUTER
 	DAT,
 	ACC,
 	INST,
-	PRAE
+	PRAE;
+
+	static public Case find(String s)
+	{
+	    NullCheck.notNull(s, "s");
+	    switch(s.toUpperCase())
+	    {
+	    case "N":
+	    case "NOM":
+		return Case.NOM;
+	    case "G":
+	    case "GEN":
+		return Case.GEN;
+	    case "D":
+	    case "DAT":
+		return Case.DAT;
+	    case "A":
+	    case "ACC":
+		return Case.ACC;
+	    case "I":
+	    case "INS":
+	    case "INST":
+		return Case.INST;
+	    case "P":
+	    case "PRE":
+	    case "PRA":
+	    case "PRAE":
+		return Case.PRAE;
+	    default:
+		return null;
+	    }
+	}
     };
 
     private final Gender gender;
