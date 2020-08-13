@@ -23,6 +23,15 @@
       <arg value="src/main/java/org/luwrain/antlr/ly/Lilypond.g4" />
       <classpath refid="classpath" />
     </java>
+    <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+      <arg value="src/main/antlr4/org/luwrain/antlr/rutoken/TokenFilterNotation.g4" />
+      <classpath refid="classpath" />
+    </java>
+    <copy todir="src/main/java/org/luwrain/antlr/rutoken/">
+      <fileset dir="src/main/antlr4/org/luwrain/antlr/rutoken/">
+	<include name="**/*.java"/>
+      </fileset>
+    </copy>
   </target>
   <target name="compile" depends="grammar">
     <mkdir dir="build"/>
