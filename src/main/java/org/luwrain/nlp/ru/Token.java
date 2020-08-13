@@ -23,8 +23,8 @@ public final class Token extends EmptyHookObject
 {
     public enum Type {NUM, LATIN, CYRIL, SPACE, PUNC};
 
-    private final Type type;
-    private final String text;
+    public final Type type;
+    public final String text;
 
     public Token(Type type, String text)
     {
