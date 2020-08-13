@@ -120,13 +120,18 @@ public final class GramAttr implements org.luwrain.nlp.GrammaticalAttr
 
     public GramAttr(Gender gender, Number number, Case gcase)
     {
-	NullCheck.notNull(gender, "gender");
-	NullCheck.notNull(number, "number");
-	NullCheck.notNull(gcase, "gcase");
 	this.gender = gender;
 	this.number = number;
 	this.gcase = gcase;
     }
+
+    public GramAttr(GramAttr a1, GramAttr a2)
+    {
+	this.gender = a2.getGender() != null?a2.getGender():a1.getGender();
+	this.number = a2.getNumber() != null?a2.getNumber():a1.getNumber();
+	this.gcase = a2.getCase() != null?a2.getCase():a1.getCase();
+    }
+
 
     public Gender getGender()
     {
@@ -141,5 +146,30 @@ public final class GramAttr implements org.luwrain.nlp.GrammaticalAttr
     public Case getCase()
     {
 	return gcase;
+    }
+
+    static public GramAttr fromString(String s)
+    {
+	NullCheck.notNull(s, "s");
+	final String[] items = s.replaceAll(";", ",").split(",", -1);;
+	Gender g = null;
+	Case c = null;
+	Number n = null;
+	for(String i: items)
+	{
+	    final String k = i.trim();
+	    if (k.length() < 2)
+		continue;
+	    final Gender gg = Gender.find(k);
+	    final Case cc = Case.find(k);
+	    final Number nn = Number.find(k);
+	    if (cc != null)
+		c = cc; else
+		if (nn != null)
+		    n = nn; else
+		    if (gg != null)
+			g = gg;
+	}
+	return new GramAttr(g, n, c);
     }
 }
