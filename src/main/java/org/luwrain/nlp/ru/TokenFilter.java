@@ -17,11 +17,15 @@
 package org.luwrain.nlp.ru;
 
 import java.util.*;
+import java.util.function.*;
 
+import org.luwrain.core.*;
 import org.luwrain.nlp.ru.Token.Type;
 import org.luwrain.nlp.RomanNum;
 
-public final class TokenFilter
+import org.luwrain.script.*;
+
+public final class TokenFilter extends EmptyHookObject
 {
     private final Token[][] tokens;
     private final boolean[] optional;
@@ -126,5 +130,35 @@ public final class TokenFilter
 	default:
 	    return false;
 	}
+    }
+
+    @Override public Object getMember(String name)
+    {
+	NullCheck.notNull(name, "name");
+	switch(name)
+	{
+	case "match":
+	    return (BiPredicate)this::matchHook;
+	default:
+	    return super.getMember(name);
+	}
+    }
+
+    private boolean matchHook(Object a1, Object a2)
+    {
+	if (a1 == null || a2 == null)
+	    return false;
+	final List l = ScriptUtils.getArray(a1);
+	if (l == null)
+	    return false;
+	final List<Token> tokens = new LinkedList();
+	for(Object o: l)
+	    if (o instanceof Token)
+		tokens.add((Token)o); else
+		return false;
+	final Number index = ScriptUtils.getNumberValue(a2);
+	if (index == null)
+	    return false;
+	return match(tokens.toArray(new Token[tokens.size()]), index.intValue());
     }
 }

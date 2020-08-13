@@ -19,7 +19,7 @@ package org.luwrain.nlp.ru;
 import org.luwrain.core.*;
 import org.luwrain.i18n.*;
 
-public final class GramAttr implements GrammaticalAttr
+public final class GramAttr implements org.luwrain.nlp.GrammaticalAttr
 {
     public enum Gender {
 	MASCULINE,
