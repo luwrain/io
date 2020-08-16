@@ -15,10 +15,19 @@
     <delete dir="target"/>
   </target>
   <target name="grammar" depends="clean">
-    <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
-      <arg value="src/main/java/org/luwrain/antlr/latex/Latex.g4" />
+
+        <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+      <arg value="src/main/antlr4/org/luwrain/antlr/latex/Latex.g4" />
       <classpath refid="classpath" />
     </java>
+    <copy todir="src/main/java/org/luwrain/antlr/latex/">
+      <fileset dir="src/main/antlr4/org/luwrain/antlr/latex/">
+	<include name="**/*.java"/>
+      </fileset>
+    </copy>
+
+    
+    
     <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
       <arg value="src/main/java/org/luwrain/antlr/ly/Lilypond.g4" />
       <classpath refid="classpath" />
