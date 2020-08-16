@@ -1,9 +1,11 @@
 
 grammar Lilypond;
 
+/*
 @header{
 package org.luwrain.antlr.ly;
 }
+*/
 
 music
     : musicUnit* EOF

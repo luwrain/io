@@ -1,9 +1,11 @@
 
 grammar Latex;
 
+/*
 @header{
 package org.luwrain.antlr.latex;
 }
+*/
 
 math
     : mathUnit* EOF

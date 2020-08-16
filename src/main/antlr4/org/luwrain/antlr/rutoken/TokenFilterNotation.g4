@@ -1,9 +1,10 @@
 
 grammar TokenFilterNotation;
-
+/*
 @header{
   package org.luwrain.antlr.rutoken;
 }
+*/
 
 notation
     : unit* EOF

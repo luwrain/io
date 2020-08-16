@@ -16,7 +16,9 @@
   </target>
   <target name="grammar" depends="clean">
 
-            <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+    <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+      <arg value="-package" />
+                  <arg value="org.luwrain.antlr.latex" />
       <arg value="src/main/antlr4/org/luwrain/antlr/latex/Latex.g4" />
       <classpath refid="classpath" />
     </java>
@@ -25,7 +27,9 @@
 	<include name="**/*.java"/>
       </fileset>
     </copy>
-        <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+    <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+      <arg value="-package" />
+                  <arg value="org.luwrain.antlr.ly" />
       <arg value="src/main/antlr4/org/luwrain/antlr/ly/Lilypond.g4" />
       <classpath refid="classpath" />
     </java>
@@ -35,6 +39,8 @@
       </fileset>
     </copy>
     <java classname="org.antlr.v4.Tool" fork="true" failonerror="true">
+            <arg value="-package" />
+                  <arg value="org.luwrain.antlr.rutoken" />
       <arg value="src/main/antlr4/org/luwrain/antlr/rutoken/TokenFilterNotation.g4" />
       <classpath refid="classpath" />
     </java>
