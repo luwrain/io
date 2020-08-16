@@ -55,7 +55,7 @@ public final class TokenFilter extends EmptyHookObject
 	return this.optional[index];
     }
 
-    public boolean match(Token[] tokens)
+    public int match(Token[] tokens)
     {
 	return match(tokens, 0);
     }
@@ -64,23 +64,27 @@ public final class TokenFilter extends EmptyHookObject
     {
 	if (index < size())
 	    return false;
-	return match(tokens, index - size());
+	return match(tokens, index - size()) > 0;
     }
 
-    public boolean match(Token[] tokens, int offset)
+        public int match(Token[] tokens, int offset)
     {
 	if (offset >= tokens.length)
-	    return false;
-	if (tokens.length - offset < size())
-	    return false;
+	    return 0;
+	int pos = 0;
 	for(int i = 0;i < this.tokens.length;i++)
 	{
-	    if (match(this.tokens[i], tokens[i + offset]))
+	    if (pos + offset >= tokens.length)
+		return 0;
+	    if (match(this.tokens[i], tokens[pos + offset]))
+	    {
+		pos++;
 		continue;
+	    }
 	    if (!this.optional[i])
-		return false;
+		return 0;
 	}
-	return true;
+	return pos;
     }
 
     private boolean match(Token[] filter, Token token)
@@ -138,7 +142,7 @@ public final class TokenFilter extends EmptyHookObject
 	switch(name)
 	{
 	case "match":
-	    return (BiPredicate)this::matchHook;
+	    return (BiFunction)this::matchHook;
 	case "length":
 	    return size();
 	default:
@@ -146,21 +150,21 @@ public final class TokenFilter extends EmptyHookObject
 	}
     }
 
-    private boolean matchHook(Object a1, Object a2)
+    private Integer matchHook(Object a1, Object a2)
     {
 	if (a1 == null || a2 == null)
-	    return false;
+	    return new Integer(0);
 	final List l = ScriptUtils.getArray(a1);
 	if (l == null)
-	    return false;
+	    return new Integer(0);
 	final List<Token> tokens = new LinkedList();
 	for(Object o: l)
 	    if (o instanceof Token)
 		tokens.add((Token)o); else
-		return false;
+		return new Integer(0);
 	final Number index = ScriptUtils.getNumberValue(a2);
 	if (index == null)
-	    return false;
-	return match(tokens.toArray(new Token[tokens.size()]), index.intValue());
+	    return new Integer(0);
+	return new Integer(match(tokens.toArray(new Token[tokens.size()]), index.intValue()));
     }
 }
