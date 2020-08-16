@@ -1,5 +1,3 @@
-// Copyright 2016-2020 Michael Pozhidaev <msp@luwrain.org>
-// The LUWRAIN project, NDA
 
 grammar TokenFilterNotation;
 
@@ -36,7 +34,7 @@ Num
     ;
 
 Punc
-    : [.,?!:;$%@()_+=\-]
+    : [.,?!:;$%@()_+=\-°′″]
     ;
 
 Space
