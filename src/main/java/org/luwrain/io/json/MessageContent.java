@@ -14,7 +14,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.message;
+package org.luwrain.io.json;
 
 import java.util.*;
 import com.google.gson.*;
@@ -39,6 +39,10 @@ public final class MessageContent
     @SerializedName("attachments")
     public List<String> attachments = null;
 
+    public MessageContent()
+    {
+    }
+
     public MessageContent(String to, String cc, String subject, String[] text)
     {
 	NullCheck.notNull(to, "to");
@@ -51,6 +55,17 @@ public final class MessageContent
 	this.text = Arrays.asList(text);
 	this.attachments = Arrays.asList(new String[0]);
     }
+
+    public MessageContent(String to, String cc, String subject, String text, String lineSep)
+    {
+	this(to, cc, subject, text.split(lineSep, -1));
+    }
+
+        public MessageContent(String to, String cc, String subject, String text)
+    {
+	this(to, cc, subject, text, System.lineSeparator());
+    }
+
 
     public String[] getTextAsArray()
     {
