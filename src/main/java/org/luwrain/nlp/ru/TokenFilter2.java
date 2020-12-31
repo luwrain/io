@@ -25,34 +25,24 @@ import org.luwrain.nlp.RomanNum;
 
 import org.luwrain.script.*;
 
-public final class TokenFilter extends EmptyHookObject
+public final class TokenFilter2 extends EmptyHookObject
 {
-    private final Token[][] tokens;
-    private final boolean[] optional;
+    private final TokenPlaceholder[] placeholders;
 
     static private RomanNum romanNum = null;
 
-    TokenFilter(Token[][] tokens, boolean[] optional)
+    TokenFilter2(Token[][] tokens, boolean[] optional)
     {
-	this.tokens = tokens;
-	this.optional = optional;
 	if (tokens.length != optional.length)
 	    throw new IllegalArgumentException("tokens and optional must have the save size");
+	this.placeholders = new TokenPlaceholder[tokens.length];
+	for(int i = 0;i < tokens.length;i++)
+	    this.placeholders[i] = new TokenPlaceholder(tokens[i], optional[i]);
     }
 
     public int size()
     {
-	return tokens.length;
-    }
-
-    public Token[] getTokens(int index)
-    {
-	return this.tokens[index];
-    }
-
-    public boolean getOptional(int index)
-    {
-	return this.optional[index];
+	return placeholders.length;
     }
 
     public int match(Token[] tokens)
@@ -62,7 +52,7 @@ public final class TokenFilter extends EmptyHookObject
 
     public boolean matchBefore(Token[] tokens, int index)
     {
-	if (index < size())
+	if (index < placeholders.length)
 	    return false;
 	return match(tokens, index - size()) > 0;
     }
@@ -72,65 +62,19 @@ public final class TokenFilter extends EmptyHookObject
 	if (offset >= tokens.length)
 	    return 0;
 	int pos = 0;
-	for(int i = 0;i < this.tokens.length;i++)
+	for(int i = 0;i < this.placeholders.length;i++)
 	{
 	    if (pos + offset >= tokens.length)
 		return 0;
-	    if (match(this.tokens[i], tokens[pos + offset]))
+	    if (this.placeholders[i].match(tokens[pos + offset]))
 	    {
 		pos++;
 		continue;
 	    }
-	    if (!this.optional[i])
+	    if (!this.placeholders[i].optional)
 		return 0;
 	}
 	return pos;
-    }
-
-    private boolean match(Token[] filter, Token token)
-    {
-	for(Token f: filter)
-	    if (match(f, token))
-		return true;
-	return false;
-    }
-
-    private boolean match(Token filter, Token token)
-    {
-	switch(filter.type)
-	{
-	case CYRIL:
-	    return token.type == Type.CYRIL && filter.text.equals(token.text.toUpperCase());
-	    	case NUM:
-	    return token.type == Type.NUM && filter.text.equals(token.text);
-	    	    	case PUNC:
-	    return token.type == Type.PUNC && filter.text.equals(token.text);
-	case LATIN:
-	    if (Character.isUpperCase(filter.text.charAt(0)))
-		return matchClass(filter.text.toUpperCase(), token);
-	    return token.type == Type.LATIN && filter.text.toUpperCase().equals(token.text.toUpperCase());
-	case SPACE:
-	    return token.type == Type.SPACE;
-	default:
-	    return false;
-	}
-    }
-
-    private boolean matchClass(String className, Token token)
-    {
-	switch(className)
-	{
-	case "NUM":
-	    return token.type == Type.NUM;
-	case "RN":
-	    if (token.type != Type.LATIN)
-		return false;
-	    if (romanNum == null)
-		romanNum = new RomanNum();
-	    return romanNum.find(token.text) >= 0;
-	default:
-	    return false;
-	}
     }
 
     @Override public Object getMember(String name)
@@ -141,7 +85,7 @@ public final class TokenFilter extends EmptyHookObject
 	case "match":
 	    return (BiFunction)this::matchHook;
 	case "length":
-	    return size();
+	    return placeholders.length;
 	default:
 	    return super.getMember(name);
 	}
