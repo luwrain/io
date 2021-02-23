@@ -103,17 +103,23 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 			    try {
 				answer = insAnswer.getAnswer(text.trim(), props, EnumSet.noneOf(InstantAnswer.Flags.class));
 			    }
-			    catch(IOException e)
+			    catch(Throwable e)
 			    {
 				luwrain.crash(e);
 				return;
 			    }
 				luwrain.runUiSafely(()->{
+					if (answer.getType() == null)
+					{
+					    luwrain.playSound(Sounds.ERROR);
+					    return;
+					}
 			    switch(answer.getType())
 			    {
 			    case InstantAnswer.Answer.TYPE_A:
 				luwrain.message(answer.getAbsText());
 				return;
+			    /*
 			    case InstantAnswer.Answer.TYPE_D:
 			    {
 				final Object res = Popups.fixedList(luwrain, answer.getHeading(), answer.getRelatedTopics());
@@ -127,6 +133,7 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 				}
 				return;
 			    }
+			    */
 			    default:
 			    luwrain.playSound(Sounds.ERROR);
 			    return;

@@ -29,9 +29,7 @@ import org.luwrain.util.*;
 public final class InstantAnswer
 {
     static private final String CHARSET = "UTF-8";
-
     static private Gson gson = null;
-
     public enum Flags {}
 
     public Answer getAnswer(String query, Properties props, Set<Flags> flags) throws IOException
@@ -39,22 +37,26 @@ public final class InstantAnswer
 	NullCheck.notEmpty(query, "query");
 	NullCheck.notNull(props, "props");
 	NullCheck.notNull(flags, "flags");
+	if (gson == null)
+	    gson = new Gson();
 	final StringBuilder b = new StringBuilder();
 	b.append("https://api.duckduckgo.com/?q=")
 	.append(URLEncoder.encode(query, CHARSET))
-.append("&format=json");
+	.append("&format=json");
 	if (props.getProperty("kl") != null && !props.getProperty("kl").isEmpty())
 	    b.append("&kl=").append(props.getProperty("kl"));
 	final URL url = new URL(new String(b));
+	Log.debug("proba", url.toString());
 	final URLConnection con;
 	try {
- con = Connections.connect(url.toURI(), 0);
+	    con = Connections.connect(url.toURI(), 0);
 	}
 	catch(URISyntaxException e)
 	{
 	    throw new IOException(e);
 	}
 	try (final BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET))) {
+	    Log.debug("proba", "data");
 	    return gson.fromJson(r, Answer.class);
 	}
     }
@@ -81,10 +83,10 @@ public final class InstantAnswer
 
     static public final class Answer
     {
-static public final  String 
-    TYPE_A = "a",
-    TYPE_D = "d";
-    @SerializedName("Type")
+	static public final  String 
+	    TYPE_A = "A",
+	    TYPE_D = "D";
+	@SerializedName("Type")
 	private String type = null;
 	@SerializedName("Heading")
 	private String heading = null;
@@ -108,5 +110,5 @@ static public final  String
 	{
 	    return relatedTopics != null?relatedTopics.toArray(new RelatedTopic[relatedTopics.size()]):null;
 	}
-}
+    }
 }
