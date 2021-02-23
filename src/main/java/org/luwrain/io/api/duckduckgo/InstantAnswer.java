@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -19,14 +19,18 @@ package org.luwrain.io.api.duckduckgo;
 import java.io.*;
 import java.util.*;
 import java.net.*;
-import org.json.*;
+
+import com.google.gson.*;
+import com.google.gson.annotations.*;
 
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
 public final class InstantAnswer
 {
-    static private final String ENCODING = "UTF-8";
+    static private final String CHARSET = "UTF-8";
+
+    static private Gson gson = null;
 
     public enum Flags {}
 
@@ -36,11 +40,11 @@ public final class InstantAnswer
 	NullCheck.notNull(props, "props");
 	NullCheck.notNull(flags, "flags");
 	final StringBuilder b = new StringBuilder();
-	b.append("https://api.duckduckgo.com/?q=");
-	b.append(URLEncoder.encode(query, ENCODING));
-	b.append("&format=json");
+	b.append("https://api.duckduckgo.com/?q=")
+	.append(URLEncoder.encode(query, CHARSET))
+.append("&format=json");
 	if (props.getProperty("kl") != null && !props.getProperty("kl").isEmpty())
-	    b.append("&kl=" + props.getProperty("kl"));
+	    b.append("&kl=").append(props.getProperty("kl"));
 	final URL url = new URL(new String(b));
 	final URLConnection con;
 	try {
@@ -50,60 +54,17 @@ public final class InstantAnswer
 	{
 	    throw new IOException(e);
 	}
-	final InputStream is = con.getInputStream();
-	final JSONTokener t = new JSONTokener(is);
-	final JSONObject obj = new JSONObject(t);
-	final String typeValue = obj.getString("Type");
-	final Answer.Type type;
-	switch(typeValue.toLowerCase().trim())
-	{
-	case "a":
-	    type = Answer.Type.A;
-	    break;
-	case "d":
-	    type = Answer.Type.D;
-	    break;
-	default:
-	    type = Answer.Type.NONE;
+	try (final BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET))) {
+	    return gson.fromJson(r, Answer.class);
 	}
-	final String absText;
-	if (obj.has("AbstractText") && !obj.isNull("AbstractText"))
-	    absText = obj.getString("AbstractText"); else
-	    absText = "";
-	final String heading;
-	if (obj.has("Heading") && !obj.isNull("Heading"))
-	    heading = obj.getString("Heading"); else
-	    heading = "";
-	final List<RelatedTopic> topics = new LinkedList();
-	if (obj.has("RelatedTopics") && !obj.isNull("RelatedTopics"))
-	{
-	    final JSONArray relatedTopics = obj.getJSONArray("RelatedTopics");
-	    for(int i = 0;i < relatedTopics.length();i++)
-	    {
-		if (relatedTopics.isNull(i))
-		    continue;
-		final JSONObject item = relatedTopics.getJSONObject(i);
-		if (!item.has("Text") || !item.has("FirstURL"))
-		    continue;
-		final String text = item.getString("Text");
-		final String firstUrl = item.getString("FirstURL");
-		topics.add(new RelatedTopic(text, firstUrl));
-	    }
-	}
-	return new Answer(type, heading, absText, topics.toArray(new RelatedTopic[topics.size()]));
     }
 
     static public final class RelatedTopic
     {
-	private final String text;
-	private final String firstUrl;
-	RelatedTopic(String text, String firstUrl)
-	{
-	    NullCheck.notNull(text, "text");
-	    NullCheck.notNull(firstUrl, "firstUrl");
-	    this.text = text;
-	    this.firstUrl = firstUrl;
-	}
+	@SerializedName("Text")
+	private String text = null;
+	@SerializedName("FirstURL")
+	private String firstUrl = null;
 	public String getText()
 	{
 	    return text;
@@ -114,43 +75,38 @@ public final class InstantAnswer
 	}
 	@Override public String toString()
 	{
-	    return text;
+	    return text != null?text:"";
 	}
     }
 
     static public final class Answer
     {
-	public enum Type {A, D, NONE};
-	private final Type type;
-	private final String heading;
-	private final String absText;
-	private final RelatedTopic[] relatedTopics;
-	Answer(Type type, String heading, String absText, RelatedTopic[] relatedTopics)
-	{
-	    NullCheck.notNull(type, "type");
-	    NullCheck.notNull(heading, "heading");
-	    NullCheck.notNull(absText, "absText");
-	    NullCheck.notNullItems(relatedTopics, "relatedTopics");
-	    this.type = type;
-	    this.heading = heading;
-	    this.absText = absText;
-	    this.relatedTopics = relatedTopics;
-	}
-	public Type getType()
+static public final  String 
+    TYPE_A = "a",
+    TYPE_D = "d";
+    @SerializedName("Type")
+	private String type = null;
+	@SerializedName("Heading")
+	private String heading = null;
+	@SerializedName("AbstractText")
+	private String absText = null;
+	@SerializedName("RelatedTopics")	
+	private List<RelatedTopic> relatedTopics;
+	public String getType()
 	{
 	    return type;
-	}
-	public String getHeading()
-	{
-	    return heading;
 	}
 	public String getAbsText()
 	{
 	    return absText;
 	}
+	public String getHeading()
+	{
+	    return heading;
+	}
 	public RelatedTopic[] getRelatedTopics()
 	{
-	    return relatedTopics.clone();
+	    return relatedTopics != null?relatedTopics.toArray(new RelatedTopic[relatedTopics.size()]):null;
 	}
-    }
+}
 }

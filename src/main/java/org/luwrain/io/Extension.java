@@ -105,16 +105,16 @@ public final class Extension extends org.luwrain.core.extensions.EmptyExtension
 			    }
 			    catch(IOException e)
 			    {
-				luwrain.message(luwrain.i18n().getExceptionDescr(e), Luwrain.MessageType.ERROR);
+				luwrain.crash(e);
 				return;
 			    }
 				luwrain.runUiSafely(()->{
 			    switch(answer.getType())
 			    {
-			    case A:
+			    case InstantAnswer.Answer.TYPE_A:
 				luwrain.message(answer.getAbsText());
 				return;
-			    case D:
+			    case InstantAnswer.Answer.TYPE_D:
 			    {
 				final Object res = Popups.fixedList(luwrain, answer.getHeading(), answer.getRelatedTopics());
 				if (res == null || !(res instanceof InstantAnswer.RelatedTopic))
