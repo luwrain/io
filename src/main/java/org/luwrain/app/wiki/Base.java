@@ -61,7 +61,7 @@ final class Base
     {
 	NullCheck.notEmpty(query, "query");
 	final AtomicReference res = new AtomicReference();
-	luwrain.xRunHooks("luwrain.wiki.search", (hook)->{
+	luwrain.runHooks("luwrain.wiki.search", (hook)->{
 		try {
 		    final Object obj = hook.run(new Object[]{query});
 		    if (obj == null)
