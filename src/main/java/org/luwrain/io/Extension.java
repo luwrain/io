@@ -20,12 +20,11 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-import org.luwrain.base.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 import org.luwrain.io.api.duckduckgo.*;
 
-public final class Extension extends org.luwrain.core.extensions.EmptyExtension
+public final class Extension extends EmptyExtension
 {
     private org.luwrain.io.download.Manager downloadManager = null;
 
