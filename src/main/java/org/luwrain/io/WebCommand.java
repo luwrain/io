@@ -37,7 +37,7 @@ public final class WebCommand implements Command
     @Override public void onCommand(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
-	final String query = Popups.simple(luwrain, luwrain.i18n().getStaticStr("WebCommandPopupName"), luwrain.i18n().getStaticStr("WebCommandPopupPrefix"), "");
+	final String query = Popups.text(luwrain, luwrain.i18n().getStaticStr("WebCommandPopupName"), luwrain.i18n().getStaticStr("WebCommandPopupPrefix"), "");
 	if (query == null || query.trim().isEmpty())
 	    return;
 	final Object res = runWebOpenHook(luwrain, query);
