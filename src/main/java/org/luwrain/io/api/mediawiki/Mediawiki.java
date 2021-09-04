@@ -36,7 +36,7 @@ public final class Mediawiki
 	this.baseUrl = baseUrl;
     }
 
-    public void query(String q) throws IOException
+    public Page[] search(String q) throws IOException
     {
 	final String url = baseUrl + "/api.php?action=query&list=search&srsearch=" + URLEncoder.encode(q, "UTF-8") + "&format=xml";
 	final Connection con = Jsoup.connect(url);
@@ -52,8 +52,9 @@ public final class Mediawiki
 	    if (comment == null)
 		comment = "";
 	    comment = stripTags(comment);
-	    //	    res.push({title: title, lang: lang, comment: comment});
+	    res.add(new Page(baseUrl, title, comment));
 	}
+	return res.toArray(new Page[res.size()]);
     }
 
     static private String stripTags(String s)

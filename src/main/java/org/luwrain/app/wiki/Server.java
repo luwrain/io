@@ -16,19 +16,22 @@
 
 package org.luwrain.app.wiki;
 
-public interface Strings
-{
-    static final String NAME = "luwrain.wiki";
+import java.lang.reflect.*;
+import java.util.*;
 
-    String appName();
-    String querySuccess(String count);
-    String errorSearching();
-    String nothingFound();
-    String searchEn();
-    String searchRu();
-    String queryResults();
-    String queryPopupName();
-    String queryPopupPrefix();
-    String noContent();
-    String defaultServerName();
+import com.google.gson.annotations.*;
+import com.google.gson.reflect.*;
+
+final class Server
+{
+    static final Type LIST_TYPE = new TypeToken<List<Server>>(){}.getType();
+
+    @SerializedName("name")
+    String name = null;
+
+    @SerializedName("searchUrl")
+    String searchUrl = null;
+
+    @SerializedName("pagesUrl")
+    String pagesUrl = null;
 }
