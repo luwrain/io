@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,22 +14,22 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.wiki;
+package org.luwrain.io.api.mediawiki;
 
 import org.luwrain.core.*;
 
-final class Page
+public final class Page
 {
-    final String lang;
-    final String title;
-    final String comment;
+    public final String baseUrl;
+    public final String title;
+    public final String comment;
 
-    Page(String lang, String title, String comment)
+    Page(String baseUrl, String title, String comment)
     {
-	NullCheck.notNull(lang, "lang");
+	NullCheck.notNull(baseUrl, "baseUrl");
 	NullCheck.notNull(title, "title");
 	NullCheck.notNull(comment, "comment");
-	this.lang = lang;
+	this.baseUrl = baseUrl;
 	this.title = title;
 	this.comment = comment;
     }

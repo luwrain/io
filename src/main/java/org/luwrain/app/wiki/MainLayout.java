@@ -11,6 +11,7 @@ import org.luwrain.core.queries.*;
 import org.luwrain.controls.*;
 import org.luwrain.popups.*;
 import org.luwrain.app.base.*;
+import org.luwrain.io.api.mediawiki.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 
 final class MainLayout extends LayoutBase
@@ -33,7 +34,7 @@ final ConsoleArea area;
 		    return false;
 		final Page page = (Page)obj;
 		try {
-		    final String url = "https://" + URLEncoder.encode(page.lang) + ".wikipedia.org/wiki/" + URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
+		    final String url = "https:" + URLEncoder.encode("", ""); ////" + URLEncoder.encode(page.lang) + ".wikipedia.org/wiki/" + URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
 		    app.getLuwrain().launchApp("reader", new String[]{url});
 		}
 		catch (UnsupportedEncodingException e)
