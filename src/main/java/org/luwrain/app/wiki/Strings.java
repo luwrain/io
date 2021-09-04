@@ -20,21 +20,12 @@ public interface Strings
 {
     static final String NAME = "luwrain.wiki";
 
-    String appName();
-    String querySuccess(String count);
-    String errorSearching();
-    String nothingFound();
-    String searchEn();
-    String searchRu();
-    String queryResults();
-    String queryPopupName();
-    String queryPopupPrefix();
-    String noContent();
-    String defaultServerName();
-    String serversAreaName();
-    String serverParamsAreaName();
+    String actionNewServer();
     String actionServers();
+    String appName();
+    String defaultServerName();
     String newServerPopupName();
     String newServerPopupPrefix();
-    String actionNewServer();
+    String serverParamsAreaName();
+    String serversAreaName();
 }
