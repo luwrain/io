@@ -32,7 +32,7 @@ public final class App extends AppBase<Strings> implements MonoApp
     private final Gson gson = new Gson();
     private Settings sett = null;
     private final String arg;
-    private final List<Server> servers = new ArrayList<>();
+    final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
     private MainLayout mainLayout = null;
 

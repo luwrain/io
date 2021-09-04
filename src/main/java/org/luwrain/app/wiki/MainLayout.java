@@ -21,6 +21,7 @@ import java.util.*;
 import java.io.*;
 
 import org.luwrain.core.*;
+import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.io.api.mediawiki.*;
@@ -42,7 +43,10 @@ final ConsoleArea area;
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
 	params.inputPos = ConsoleArea.InputPos.TOP;
-		})) ;
+		}));
+	final Actions actions = actions(
+					new ActionInfo("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
+);
     	area.setConsoleClickHandler((area,index,obj)->{
 		if (obj == null || !(obj instanceof Page))
 		    return false;
@@ -64,7 +68,19 @@ final ConsoleArea area;
 		return app.search(text.trim())?ConsoleArea.InputHandler.Result.OK:ConsoleArea.InputHandler.Result.REJECTED;
 	    });
 	area.setInputPrefix(app.getStrings().appName() + ">");
-	setAreaLayout(area, actions());
+	setAreaLayout(area, actions);
+    }
+
+    private boolean actServers()
+    {
+	final ServersLayout serversLayout = new ServersLayout(app, ()->{
+		app.setAreaLayout(this);
+		app.getLuwrain().announceActiveArea();
+		return true;
+	    });
+	app.setAreaLayout(serversLayout);
+	app.getLuwrain().announceActiveArea();
+	return true;
     }
 
 final class Appearance implements ConsoleArea.Appearance

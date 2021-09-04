@@ -31,4 +31,8 @@ public interface Strings
     String queryPopupPrefix();
     String noContent();
     String defaultServerName();
+    String serversAreaName();
+    String searchParamsAreaName();
+    String serverParamsAreaName();
+    String actionServers();
 }
