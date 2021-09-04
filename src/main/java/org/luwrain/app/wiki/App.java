@@ -34,6 +34,7 @@ public final class App extends AppBase<Strings> implements MonoApp
     private final String arg;
     final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
+    private Conversations conv = null;
     private MainLayout mainLayout = null;
 
     public App()
@@ -49,6 +50,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     @Override protected AreaLayout onAppInit()
     {
+	getLuwrain().getRegistry().addDirectory(SETTINGS_PATH);
 	this.sett = RegistryProxy.create(getLuwrain().getRegistry(), SETTINGS_PATH, Settings.class);
 	final List<Server> serv = gson.fromJson(this.sett.getServers(""), Server.LIST_TYPE);
 	if (serv != null)
@@ -65,6 +67,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 	    s.searchUrl = s.searchUrl.trim();
 	    s.pagesUrl = s.pagesUrl.trim();
 	}
+	this.conv = new Conversations(this);
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return this.mainLayout.getAreaLayout();
@@ -91,6 +94,11 @@ public final class App extends AppBase<Strings> implements MonoApp
 	    });
     }
 
+    void saveServers()
+    {
+	this.sett.setServers(gson.toJson(this.servers));
+    }
+
     @Override public boolean onEscape()
     {
 	closeApp();
@@ -103,7 +111,9 @@ public final class App extends AppBase<Strings> implements MonoApp
 		return MonoApp.Result.BRING_FOREGROUND;
     }
 
-    interface Settings
+    Conversations getConv() { return this.conv; }
+
+    private interface Settings
     {
 	String getServers(String defValue);
 	void setServers(String value);

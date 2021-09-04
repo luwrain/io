@@ -34,4 +34,9 @@ final class Server
 
     @SerializedName("pagesUrl")
     String pagesUrl = null;
+
+    @Override public String toString()
+    {
+	return this.name != null?this.name:"";
+    }
 }

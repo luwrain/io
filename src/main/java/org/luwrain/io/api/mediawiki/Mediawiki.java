@@ -33,12 +33,14 @@ public final class Mediawiki
     public Mediawiki(String baseUrl)
     {
 	NullCheck.notEmpty(baseUrl, "baseUrl");
-	this.baseUrl = baseUrl;
+	if (baseUrl.endsWith("/"))
+	this.baseUrl = baseUrl; else
+	    this.baseUrl = baseUrl + "/";
     }
 
     public Page[] search(String q) throws IOException
     {
-	final String url = baseUrl + "/api.php?action=query&list=search&srsearch=" + URLEncoder.encode(q, "UTF-8") + "&format=xml";
+	final String url = baseUrl + "api.php?action=query&list=search&srsearch=" + URLEncoder.encode(q, "UTF-8") + "&format=xml";
 	final Connection con = Jsoup.connect(url);
 	final Document doc = con.get();
 	final Elements pages = doc.getElementsByTag("p");

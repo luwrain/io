@@ -29,7 +29,7 @@ import org.luwrain.io.api.mediawiki.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.controls.ConsoleUtils.*;
 
-final class MainLayout extends LayoutBase
+final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler
 {
     private final App app;
 final ConsoleArea area;
@@ -42,25 +42,12 @@ final ConsoleArea area;
 		    params.model = new ListModel(app.pages);
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
+		    params.clickHandler = this;
 	params.inputPos = ConsoleArea.InputPos.TOP;
 		}));
 	final Actions actions = actions(
-					new ActionInfo("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
+					action("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
 );
-    	area.setConsoleClickHandler((area,index,obj)->{
-		if (obj == null || !(obj instanceof Page))
-		    return false;
-		final Page page = (Page)obj;
-		try {
-		    final String url = "https:" + URLEncoder.encode("", ""); ////" + URLEncoder.encode(page.lang) + ".wikipedia.org/wiki/" + URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
-		    app.getLuwrain().launchApp("reader", new String[]{url});
-		}
-		catch (UnsupportedEncodingException e)
-		{
-		    app.crash(e);
-		}
-		return true;
-	    });
 	area.setConsoleInputHandler((area,text)->{
 		NullCheck.notNull(text, "text");
 		if (text.trim().isEmpty())
@@ -70,6 +57,34 @@ final ConsoleArea area;
 	area.setInputPrefix(app.getStrings().appName() + ">");
 	setAreaLayout(area, actions);
     }
+
+    @Override public boolean onConsoleClick(ConsoleArea area, int index, Object obj)
+    {
+		if (obj == null || !(obj instanceof Page))
+		    return false;
+		final Page page = (Page)obj;
+Server serv = null;
+		for(Server s: app.servers)
+		    if (page.baseUrl.equals(s.searchUrl))
+		    {
+			serv = s;
+			break;
+		    }
+		if (serv == null || serv.pagesUrl == null || serv.pagesUrl.trim().isEmpty())
+		    return false;
+		try {
+		    String url = serv.pagesUrl;
+		    if (!url.endsWith("/"))
+			url += "/";
+url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
+		    app.getLuwrain().launchApp("reader", new String[]{url});
+		}
+		catch (UnsupportedEncodingException e)
+		{
+		    app.crash(e);
+		}
+		return true;
+	    }
 
     private boolean actServers()
     {

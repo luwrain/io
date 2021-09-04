@@ -21,6 +21,7 @@ import java.util.*;
 import java.io.*;
 
 import org.luwrain.core.*;
+import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.io.api.mediawiki.*;
@@ -49,10 +50,33 @@ static private final String
 		    params.model = new ListModel(servers);
 		    params.name = app.getStrings().serversAreaName();
 		})) ;
-	final Actions serversActions = actions();
+	final Actions serversActions = actions(
+					       action("new-server", app.getStrings().actionNewServer(), new InputEvent(InputEvent.Special.INSERT), this ::actNewServer)
+					       );
 	this.paramsArea = new FormArea(getControlContext(), app.getStrings().serverParamsAreaName());
 	final Actions paramsActions = actions();
 	setAreaLayout(AreaLayout.TOP_BOTTOM, serversArea, serversActions, paramsArea, paramsActions);
+	setOkHandler(()->{
+		app.servers.clear();
+		app.servers.addAll(this.servers);
+		app.saveServers();
+		return closing.onAction();
+	    });
 	setCloseHandler(closing);
+    }
+
+    private boolean actNewServer()
+    {
+	final String name = app.getConv().newServerName();
+	if (name == null)
+	    return true;
+	final Server s = new Server();
+	s.name = name.trim();
+	s.searchUrl = "";
+	s.pagesUrl = "";
+	servers.add(s);
+	serversArea.refresh();
+	serversArea.select(s, false);
+	return true;
     }
 }

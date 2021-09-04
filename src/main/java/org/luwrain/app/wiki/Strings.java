@@ -32,7 +32,9 @@ public interface Strings
     String noContent();
     String defaultServerName();
     String serversAreaName();
-    String searchParamsAreaName();
     String serverParamsAreaName();
     String actionServers();
+    String newServerPopupName();
+    String newServerPopupPrefix();
+    String actionNewServer();
 }
