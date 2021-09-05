@@ -32,7 +32,7 @@ import static org.luwrain.controls.ConsoleUtils.*;
 final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<Page>
 {
     private final App app;
-final ConsoleArea area;
+    final ConsoleArea area;
 
     MainLayout(App app)
     {
@@ -43,11 +43,11 @@ final ConsoleArea area;
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
 		    params.clickHandler = this;
-	params.inputPos = ConsoleArea.InputPos.TOP;
+		    params.inputPos = ConsoleArea.InputPos.TOP;
 		}));
 	final Actions actions = actions(
 					action("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
-);
+					);
 	area.setConsoleInputHandler((area,text)->{
 		NullCheck.notNull(text, "text");
 		if (text.trim().isEmpty())
@@ -60,31 +60,31 @@ final ConsoleArea area;
 
     @Override public boolean onConsoleClick(ConsoleArea area, int index, Page obj)
     {
-		if (obj == null || !(obj instanceof Page))
-		    return false;
-		final Page page = (Page)obj;
-Server serv = null;
-		for(Server s: app.servers)
-		    if (page.baseUrl.equals(s.searchUrl))
-		    {
-			serv = s;
-			break;
-		    }
-		if (serv == null || serv.pagesUrl == null || serv.pagesUrl.trim().isEmpty())
-		    return false;
-		try {
-		    String url = serv.pagesUrl;
-		    if (!url.endsWith("/"))
-			url += "/";
-url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
-		    app.getLuwrain().launchApp("reader", new String[]{url});
-		}
-		catch (UnsupportedEncodingException e)
-		{
-		    app.crash(e);
-		}
-		return true;
+	if (obj == null || !(obj instanceof Page))
+	    return false;
+	final Page page = (Page)obj;
+	Server serv = null;
+	for(Server s: app.servers)
+	    if (page.baseUrl.equals(s.searchUrl))
+	    {
+		serv = s;
+		break;
 	    }
+	if (serv == null || serv.pagesUrl == null || serv.pagesUrl.trim().isEmpty())
+	    return false;
+	try {
+	    String url = serv.pagesUrl;
+	    if (!url.endsWith("/"))
+		url += "/";
+	    url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
+	    app.getLuwrain().launchApp("reader", new String[]{url});
+	}
+	catch (UnsupportedEncodingException e)
+	{
+	    app.crash(e);
+	}
+	return true;
+    }
 
     private boolean actServers()
     {
@@ -98,17 +98,17 @@ url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Complet
 	return true;
     }
 
-final class Appearance implements ConsoleArea.Appearance<Page>
+    final class Appearance implements ConsoleArea.Appearance<Page>
     {
-	    @Override public void announceItem(Page item)
-	    {
-		NullCheck.notNull(item, "item");
-		app.setEventResponse(listItem(app.getLuwrain().getSpeakableText(item.toString(), Luwrain.SpeakableTextType.NATURAL)));
-			    }
-	    @Override public String getTextAppearance(Page item)
-	    {
-		NullCheck.notNull(item, "item");
-		return item.toString();
-	    }
-}
+	@Override public void announceItem(Page page)
+	{
+	    NullCheck.notNull(page, "page");
+	    app.setEventResponse(listItem(app.getLuwrain().getSpeakableText(page.toString(), Luwrain.SpeakableTextType.NATURAL)));
+	}
+	@Override public String getTextAppearance(Page page)
+	{
+	    NullCheck.notNull(page, "page");
+	    return page.toString();
+	}
+    }
 }
