@@ -39,6 +39,7 @@ public final class Extension extends EmptyExtension
     @Override public Command[] getCommands(Luwrain luwrain)
     {
 	return new Command[]{
+	    new SimpleShortcutCommand("wiki"),
 	    new SimpleShortcutCommand("download"),
 	    new WebCommand(),
 
@@ -61,17 +62,6 @@ public final class Extension extends EmptyExtension
 				return;
 			    }
 			luwrain.launchApp("wiki", new String[]{text.trim()});
-		}
-	    },
-
-	    	    new Command(){
-	    		@Override public String getName()
-		{
-		    return "wiki";
-		}
-		@Override public void onCommand(Luwrain luwrain)
-		{
-			luwrain.launchApp("wiki");
 		}
 	    },
 
