@@ -28,8 +28,8 @@ public final class Manager implements Task.Callback
     static private final String LOG_COMPONENT = "download";
 
     private final Luwrain luwrain;
-        private final Vector<EntryImpl> entries = new Vector();
-    private final List<Runnable> changesListeners = new Vector();
+        private final List<EntryImpl> entries = new ArrayList<>();
+    private final List<Runnable> changesListeners = new ArrayList<>();
 
     public Manager(Luwrain luwrain)
     {

@@ -20,7 +20,7 @@ import java.util.*;
 
 public abstract class AbstractTokenizer
 {
-    protected final List<Token> output = new LinkedList();
+    protected final List<Token> output = new ArrayList<>();
 
     abstract char getCh();
     abstract public boolean hasCh();
@@ -37,7 +37,7 @@ public abstract class AbstractTokenizer
 		    onLatinToken(ch); else
 		    if ((ch >= 'а' && ch <= 'я') || (ch >= 'А' && ch <= 'Я') || ch == 'ё' || ch == 'Ё')
 			onCyrilToken(ch); else
-			if (Character.isSpace(ch))
+			if (Character.isWhitespace(ch))
 			    onSpaceToken(ch); else
 			    onPuncToken(ch);
 	}
@@ -104,7 +104,7 @@ public abstract class AbstractTokenizer
 	while(hasCh())
 	{
 	    final char nextCh = getCh();
-	    if (Character.isSpace(nextCh))
+	    if (Character.isWhitespace(nextCh))
 	    {
 		b.append(nextCh);
 		continue;

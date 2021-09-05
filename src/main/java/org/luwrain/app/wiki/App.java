@@ -44,7 +44,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     public App(String arg)
     {
-	super(Strings.NAME, Strings.class);
+	super(Strings.NAME, Strings.class, "luwrain.wiki");
 	this.arg = arg;
     }
 

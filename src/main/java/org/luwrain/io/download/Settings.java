@@ -67,7 +67,7 @@ public interface Settings
 	NullCheck.notNull(registry, "registry");
 	registry.addDirectory(DOWNLOAD_PATH);
 	final String[] dirs = registry.getDirectories(DOWNLOAD_PATH);
-	final List<Integer> res = new Vector();
+	final List<Integer> res = new ArrayList<>();
 	for(String s: dirs)
 	{
 	    try {

@@ -23,7 +23,7 @@ import org.luwrain.core.*;
 
 public final class ReaderTokenizer extends AbstractTokenizer
 {
-    final LinkedList<Character> qu = new LinkedList();
+    final LinkedList<Character> qu = new LinkedList<>();
     final Reader reader;
 
     public ReaderTokenizer(Reader reader)
@@ -32,7 +32,7 @@ public final class ReaderTokenizer extends AbstractTokenizer
 	    throw new NullPointerException("reader may not be null");
 	this.reader = reader;
     }
-    
+
     @Override public char getCh()
     {
 	if (qu.isEmpty())

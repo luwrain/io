@@ -37,7 +37,7 @@ public final class PdfCharsExtractor
     {
 	NullCheck.notNull(doc, "doc");
 	int pageNum = 0;
-	final List<PdfPage> res = new LinkedList();
+	final List<PdfPage> res = new ArrayList<>();
 	for (PDPage page : doc.getPages())
 	{
 	    ++pageNum;
@@ -53,7 +53,7 @@ public final class PdfCharsExtractor
 
     final static private class StreamChars extends org.apache.pdfbox.contentstream.PDFStreamEngine
     {
-	final List<PdfChar> output = new java.util.Vector(); 
+	final List<PdfChar> output = new java.util.ArrayList<>(); 
 
 	StreamChars()
 	{

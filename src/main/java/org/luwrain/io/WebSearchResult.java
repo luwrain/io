@@ -99,7 +99,7 @@ public final class WebSearchResult
 	final List items = ScriptUtils.getArray(itemsObj);
 	if (items == null)
 	    return null;
-	final List<Item> res = new LinkedList();
+	final List<Item> res = new ArrayList<>();
 	for(Object o: items)
 	    if (o != null)
 	    {

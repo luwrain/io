@@ -96,7 +96,7 @@ public final class WebCommand implements Command
 	final List items = ScriptUtils.getArray(itemsObj);
 	if (items == null)
 	    return null;
-	final List<WebSearchResult.Item> res = new LinkedList();
+	final List<WebSearchResult.Item> res = new ArrayList<>();
 	for(Object o: items)
 	    if (o != null)
 	    {

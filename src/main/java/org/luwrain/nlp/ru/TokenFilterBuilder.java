@@ -32,10 +32,10 @@ public class TokenFilterBuilder
 	final TokenFilterNotationParser p = new TokenFilterNotationParser(tokens);
 	final ParseTree tree = p.notation();
 	final ParseTreeWalker walker = new ParseTreeWalker();
-	final List<Token[]> resTokens = new LinkedList();
-	final List<Boolean> resOptional = new LinkedList();
+	final List<Token[]> resTokens = new ArrayList<>();
+	final List<Boolean> resOptional = new ArrayList<>();
 	final TokenFilterNotationListener listener = new EmptyTokenFilterNotationListener(){
-		private List<Token> tokens = new LinkedList();
+		private List<Token> tokens = new ArrayList<>();
 		@Override public void exitUnit(TokenFilterNotationParser.UnitContext c)
 		{
 		    resOptional.add(c.getChildCount() == 2?true:false);

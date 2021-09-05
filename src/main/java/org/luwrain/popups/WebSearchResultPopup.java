@@ -66,7 +66,7 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
     static protected Object[] createListItems(WebSearchResult res)
     {
 	NullCheck.notNull(res, "res");
-	final List r = new LinkedList();
+	final List<Object> r = new ArrayList<>();
 	for(WebSearchResult.Item i: res.getItems())
 	{
 	    r.add(i);

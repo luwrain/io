@@ -94,7 +94,7 @@ public final class Extension extends EmptyExtension
 				luwrain.playSound(Sounds.BLOCKED);
 				return;
 			    }
-		    final FutureTask task = new FutureTask(()->{
+		    final FutureTask task = new FutureTask<>(()->{
 			    final Properties props = new Properties();
 			    props.setProperty("kl", "ru-ru");//FIXME:
 			    final InstantAnswer insAnswer = new InstantAnswer();

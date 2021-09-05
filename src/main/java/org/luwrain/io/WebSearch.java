@@ -38,11 +38,11 @@ public class WebSearch
 	this.luwrain = luwrain;
     }
 
-    public void searchAsync(String query, Consumer resultHandler)
+    public void searchAsync(String query, Consumer<Object> resultHandler)
     {
 	NullCheck.notEmpty(query, "qeury");
 	NullCheck.notNull(resultHandler, "resultHandler");
-	luwrain.executeBkg(new FutureTask(()->{
+	luwrain.executeBkg(new FutureTask<>(()->{
 		    final Object res = runWebSearchHook(luwrain, query);
 		    luwrain.runUiSafely(()->resultHandler.accept(res));
 	}, null));

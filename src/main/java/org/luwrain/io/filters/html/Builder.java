@@ -19,8 +19,8 @@ final class Builder extends AttrsBase
     private org.jsoup.nodes.Document jsoupDoc = null;
     private URL docUrl = null;
 
-    private final LinkedList<String> hrefStack = new LinkedList();
-    private final List<String> allHrefs = new LinkedList();
+    private final LinkedList<String> hrefStack = new LinkedList<>();
+    private final List<String> allHrefs = new ArrayList<>();
 
 public org.luwrain.io.textdoc.Document buildDoc(File file, Properties props) throws IOException
     {

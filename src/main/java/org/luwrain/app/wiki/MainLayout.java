@@ -29,7 +29,7 @@ import org.luwrain.io.api.mediawiki.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.controls.ConsoleUtils.*;
 
-final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler
+final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<Page>
 {
     private final App app;
 final ConsoleArea area;
@@ -38,8 +38,8 @@ final ConsoleArea area;
     {
 	super(app);
 	this.app = app;
-	this.area = new ConsoleArea(consoleParams((params)->{
-		    params.model = new ListModel(app.pages);
+	this.area = new ConsoleArea<Page>(consoleParams((params)->{
+		    params.model = new ListModel<Page>(app.pages);
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
 		    params.clickHandler = this;
@@ -58,7 +58,7 @@ final ConsoleArea area;
 	setAreaLayout(area, actions);
     }
 
-    @Override public boolean onConsoleClick(ConsoleArea area, int index, Object obj)
+    @Override public boolean onConsoleClick(ConsoleArea area, int index, Page obj)
     {
 		if (obj == null || !(obj instanceof Page))
 		    return false;
@@ -98,14 +98,14 @@ url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Complet
 	return true;
     }
 
-final class Appearance implements ConsoleArea.Appearance
+final class Appearance implements ConsoleArea.Appearance<Page>
     {
-	    @Override public void announceItem(Object item)
+	    @Override public void announceItem(Page item)
 	    {
 		NullCheck.notNull(item, "item");
-		app.setEventResponse(listItem(item.toString()));
+		app.setEventResponse(listItem(app.getLuwrain().getSpeakableText(item.toString(), Luwrain.SpeakableTextType.NATURAL)));
 			    }
-	    @Override public String getTextAppearance(Object item)
+	    @Override public String getTextAppearance(Page item)
 	    {
 		NullCheck.notNull(item, "item");
 		return item.toString();

@@ -16,7 +16,7 @@ public final class RomanNum
 	final URL url = this.getClass().getClassLoader().getResource(RESOURCE_PATH);
 	if (url == null)
 	    throw new RuntimeException("No resource " + RESOURCE_PATH);
-	final List<String> res = new LinkedList();
+	final List<String> res = new ArrayList<>();
 	res.add("");//for zero
 	try {
 	    final BufferedReader r = new BufferedReader(new InputStreamReader(url.openStream()));

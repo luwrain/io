@@ -37,7 +37,7 @@ public final class Page
     @Override public String toString()
     {
 	if (comment.trim().isEmpty())
-	    return title;
-	return title + ", " + comment;
+	    return title.trim();
+	return title.trim() + ", " + comment.trim();
     }
 }

@@ -154,7 +154,7 @@ public final class TokenFilter extends EmptyHookObject
 	final List l = ScriptUtils.getArray(a1);
 	if (l == null)
 	    return new Integer(0);
-	final List<Token> tokens = new LinkedList();
+	final List<Token> tokens = new ArrayList<>();
 	for(Object o: l)
 	    if (o instanceof Token)
 		tokens.add((Token)o); else

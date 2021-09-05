@@ -20,7 +20,7 @@ import java.util.*;
 
 public final class TokenFilters
 {
-    static private final Map<String, TokenFilter> filters = new HashMap();
+    static private final Map<String, TokenFilter> filters = new HashMap<>();
     static private final TokenFilterBuilder builder = new TokenFilterBuilder();
 
     static public TokenFilter get(String exp)

@@ -27,9 +27,9 @@ import org.luwrain.script.*;
 
 public final class TokenPlaceholder
 {
-    final Set<String> cyrilValues = new HashSet();
-    final Set<String> latinValues = new HashSet();
-    final Set<String> puncValues = new HashSet();
+    final Set<String> cyrilValues = new HashSet<>();
+    final Set<String> latinValues = new HashSet<>();
+    final Set<String> puncValues = new HashSet<>();
     final boolean optional;
 
     TokenPlaceholder(Token[] tokens, boolean optional)
