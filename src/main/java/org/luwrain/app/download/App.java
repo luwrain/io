@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2018 Michael Pozhidaev <michael.pozhidaev@gmail.com>
+   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -21,125 +21,129 @@ import java.util.*;
 import java.io.*;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
-import org.luwrain.controls.*;
-import org.luwrain.core.queries.*;
+import org.luwrain.io.download.Manager.Entry;
+import org.luwrain.app.base.*;
 
-public class App implements Application, MonoApp, Runnable
+public class App extends AppBase<Strings> implements MonoApp, Runnable
 {
-    private Luwrain luwrain = null;
-    private Strings strings = null;
-    private Base base = null;
-    private Actions actions = null;
-    private ListArea listArea = null;
-
     private final org.luwrain.io.download.Manager manager;
+    final List<Entry> entries = new ArrayList<>();
+    private MainLayout mainLayout = null;
 
     public App(org.luwrain.io.download.Manager manager)
     {
+	super(Strings.NAME, Strings.class, "luwrain.download");
 	NullCheck.notNull(manager, "manager");
 	this.manager = manager;
     }
 
-    @Override public InitResult onLaunchApp(Luwrain luwrain)
+    @Override public AreaLayout onAppInit()
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	final Object o = luwrain.i18n().getStrings(Strings.NAME);
-	if (o == null || !(o instanceof Strings))
-	    return new InitResult(InitResult.Type.NO_STRINGS_OBJ, Strings.NAME);
-	this.strings = (Strings)o;
-	this.luwrain = luwrain;
-	this.base = new Base( luwrain, strings, manager);
-	this.actions = new Actions(luwrain, strings, base);
-	createArea();
-	this.manager.addChangesListener(this);
-	return new InitResult();
+		this.manager.addChangesListener(this);
+		return this.mainLayout.getAreaLayout();
     }
 
-    private void createArea()
-    {
-	final ListArea.Params params = new ListArea.Params();
-	params.context = new DefaultControlContext(luwrain);
-		params.model = base.getListModel();
-	params.appearance = new Appearance(luwrain, strings);
-	//	params.clickHandler = (area, index, obj)->onConnect(obj);
-	params.name = strings.appName();
-
-	this.listArea = new ListArea(params){
-		@Override public boolean onInputEvent(InputEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (event.isSpecial() && !event.isModified())
-			switch(event.getSpecial())
-			{
-			case ESCAPE:
-closeApp();
-return true;
-			}
-		    return super.onInputEvent(event);
-		}
-		@Override public boolean onSystemEvent(SystemEvent event)
-		{
-		    NullCheck.notNull(event, "event");
-		    if (event.getType() != SystemEvent.Type.REGULAR )
-			return super.onSystemEvent(event);
-		    switch(event.getCode())
-		    {
-			/*
-		    case ACTION:
-			if (ActionEvent.isAction(event, "disconnect"))
-			    return onDisconnect();
-			return false;
-			*/
-		    case CLIPBOARD_PASTE:
-			return actions.onClipboardPaste();
-		    case CLOSE:
-			closeApp();
-			return true;
-		    default:
-			return super.onSystemEvent(event);
-		    }
-		}
-		@Override public Action[] getAreaActions()
-		{
-		    return new Action[0];
-		}
-		/*
-		@Override protected String noContentStr()
-		{
-		    return base.isScanning()?strings.scanningInProgress():strings.noWifiNetworks();
-		}
-		*/
-	    };
-    }
-
-    //Catches update notifications from the download manager
     @Override public void run()
     {
-	luwrain.runUiSafely(()->{
-		listArea.refresh();
-	    });
+	getLuwrain().runUiSafely(()->this.mainLayout.listArea.refresh());
     }
 
-    @Override public String getAppName()
+    
+    boolean onClipboardPaste()
     {
-	return strings.appName();
+	final Object[] objs = getLuwrain().getClipboard().get();
+	for(Object obj: objs)
+	{
+	    if (obj instanceof URL)
+	    {
+		final URL url = (URL)obj;
+		try {
+		    this.manager.addDownload(url, suggestDestFile(url));
+		}
+		catch(IOException e)
+		{
+		    message(getStrings().downloadAddingError(getLuwrain().i18n().getExceptionDescr(e)), Luwrain.MessageType.ERROR);
+		    return true;
+		}
+		continue;
+	    }
+	    final URL url;
+	    try {
+		url = new URL(obj.toString());
+	    }
+	    catch(MalformedURLException e)
+	    {
+		message(getStrings().unableToMakeUrl(obj.toString()), Luwrain.MessageType.ERROR);
+		return true;
+	    }
+	    try {
+		this.manager.addDownload(url, suggestDestFile(url));
+	    }
+	    catch(IOException e)
+	    {
+		message(getStrings().downloadAddingError(getLuwrain().i18n().getExceptionDescr(e)), Luwrain.MessageType.ERROR);
+		return true;
+	    }
+	}
+	return true;
     }
 
-    @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
+    private File suggestDestFile(URL url)
+    {
+	NullCheck.notNull(url, "url");
+	final File destDir = new File("/tmp");
+	final String path = url.getFile();
+	if (path == null || path.isEmpty())
+	    return new File(destDir, simplify(url.toString()));
+	final int lastSlash = path.lastIndexOf("/");
+	final int lastBackslash = path.lastIndexOf("\\");
+	final int pos = Math.max(lastSlash, lastBackslash);
+	if (pos < 0)
+	    return new File(destDir, path);
+	if (pos + 1 >= path.length())
+	    return new File(destDir, simplify(url.toString()));
+	return new File(destDir, path.substring(pos + 1));
+    }
+
+    private String simplify(String str)
+    {
+	NullCheck.notNull(str, "str");
+	final StringBuilder b = new StringBuilder();
+	boolean wasNonDash = false;
+	for(int i = 0;i < str.length();++i)
+	{
+	    final char c = str.charAt(i);
+	    if (Character.isLetter(c) || Character.isDigit(c))
+	    {
+		b.append("" + c);
+		wasNonDash = true;
+		continue;
+	    }
+	    if (wasNonDash)
+		b.append("-");
+	    wasNonDash = false;
+	}
+	final String res = new String(b);
+	return !res.isEmpty()?res:"-";
+    }
+
+
+        void refreshEntries()
+    {
+	this.entries.clear();
+	this.entries.addAll(Arrays.asList(manager.getAllEntries()));
+    }
+
+        @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
     {
 	NullCheck.notNull(app, "app");
 	return MonoApp.Result.BRING_FOREGROUND;
     }
 
-    @Override public AreaLayout getAreaLayout()
-    {
-	return new AreaLayout(listArea);
-    }
 
     @Override public void closeApp()
     {
 	this.manager.removeChangesListener(this);
-	luwrain.closeApp();
+	super.closeApp();
     }
 }
