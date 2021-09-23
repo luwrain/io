@@ -40,6 +40,8 @@ public class App extends AppBase<Strings> implements MonoApp, Runnable
     @Override public AreaLayout onAppInit()
     {
 		this.manager.addChangesListener(this);
+		this.mainLayout = new MainLayout(this);
+		setAppName(getStrings().appName());
 		return this.mainLayout.getAreaLayout();
     }
 
@@ -48,7 +50,12 @@ public class App extends AppBase<Strings> implements MonoApp, Runnable
 	getLuwrain().runUiSafely(()->this.mainLayout.listArea.refresh());
     }
 
-    
+    @Override public boolean onEscape()
+    {
+	closeApp();
+	return true;
+    }
+
     boolean onClipboardPaste()
     {
 	final Object[] objs = getLuwrain().getClipboard().get();

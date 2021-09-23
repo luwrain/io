@@ -38,10 +38,10 @@ final class MainLayout extends LayoutBase
 	this.app = app;
 	this.listArea = new ListArea(listParams((params)->{
 		    params.model = new ListModel(app.entries);
-	params.appearance = new Appearance();
+		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
 		}) ){
-	    		@Override public boolean onSystemEvent(SystemEvent event)
+		@Override public boolean onSystemEvent(SystemEvent event)
 		{
 		    NullCheck.notNull(event, "event");
 		    if (event.getType() != SystemEvent.Type.REGULAR )
@@ -55,7 +55,10 @@ final class MainLayout extends LayoutBase
 		    }
 		}
 	    };
-	    }
+	final Actions actions = actions(
+					);
+	setAreaLayout(listArea, actions);
+    }
 
 	    static private String getName(Entry entry)
     {
