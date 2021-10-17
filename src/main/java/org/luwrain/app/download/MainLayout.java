@@ -30,14 +30,14 @@ import static org.luwrain.core.DefaultEventResponse.*;
 final class MainLayout extends LayoutBase
 {
     private final App app;
-    final ListArea listArea;
+    final ListArea<Entry> listArea;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	this.listArea = new ListArea(listParams((params)->{
-		    params.model = new ListModel(app.entries);
+	this.listArea = new ListArea<Entry>(listParams((params)->{
+		    params.model = new ListModel<>(app.entries);
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
 		}) ){
@@ -60,7 +60,7 @@ final class MainLayout extends LayoutBase
 	setAreaLayout(listArea, actions);
     }
 
-	    static private String getName(Entry entry)
+    static private String getName(Entry entry)
     {
 	NullCheck.notNull(entry, "entry");
 	final String fileName = entry.getUrl().getFile();
@@ -74,16 +74,12 @@ final class MainLayout extends LayoutBase
 	return entry.getUrl().toString();
     }
 
-
-	private final class Appearance implements ListArea.Appearance
-{
-    @Override public void announceItem(Object item, Set<Flags> flags)
+    private final class Appearance extends ListUtils.AbstractAppearance<Entry>
     {
-	NullCheck.notNull(item, "item");
-	NullCheck.notNull(flags, "flags");
-	if (item instanceof Entry)
+	@Override public void announceItem(Entry entry, Set<Flags> flags)
 	{
-	    final Entry entry = (Entry)item;
+	    NullCheck.notNull(entry, "entry");
+	    NullCheck.notNull(flags, "flags");
 	    final Sounds sound;
 	    final String text;
 	    switch(entry.getStatus())
@@ -105,18 +101,13 @@ final class MainLayout extends LayoutBase
 	    }
 	    if (sound != null)
 		app.setEventResponse(listItem(sound, text, Suggestions.LIST_ITEM)); else
-app.setEventResponse(listItem(text, Suggestions.LIST_ITEM));
+		app.setEventResponse(listItem(text, Suggestions.LIST_ITEM));
 	    return;
 	}
-	app.setEventResponse(listItem(item.toString(), Suggestions.LIST_ITEM));
-    }
-    @Override public String getScreenAppearance(Object item, Set<Flags> flags)
-    {
-	NullCheck.notNull(item, "item");
-	NullCheck.notNull(flags, "flags");
-		if (item instanceof Entry)
+	@Override public String getScreenAppearance(Entry entry, Set<Flags> flags)
 	{
-	    final Entry entry = (Entry)item;
+	    NullCheck.notNull(entry, "entry");
+	    NullCheck.notNull(flags, "flags");
 	    switch(entry.getStatus())
 	    {
 	    case RUNNING:
@@ -126,20 +117,8 @@ app.setEventResponse(listItem(text, Suggestions.LIST_ITEM));
 	    case FAILED:
 		return app.getStrings().statusFailure() + "% " + getName(entry) + " (" + entry.getErrorInfo() + ")";
 	    default:
-			return item.toString();
+		return entry.toString();
 	    }			
 	}
-	return item.toString();
     }
-    @Override public int getObservableLeftBound(Object item)
-    {
-	return 0;
-    }
-    @Override public int getObservableRightBound(Object item)
-    {
-	return getScreenAppearance(item, EnumSet.noneOf(Flags.class)).length();
-    }
-	}
-
-
-    }
+}
