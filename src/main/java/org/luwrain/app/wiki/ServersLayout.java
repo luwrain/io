@@ -37,7 +37,7 @@ static private final String
     PAGES_URL = "pages-url";
 
     private final App app;
-    final ListArea serversArea;
+    final ListArea<Server> serversArea;
     final FormArea paramsArea;
     private final List<Server> servers = new ArrayList<>();
 
@@ -46,8 +46,8 @@ static private final String
 	super(app);
 	this.app = app;
 	this.servers.addAll(app.servers);
-	this.serversArea = new ListArea(listParams((params)->{
-		    params.model = new ListModel(servers);
+	this.serversArea = new ListArea<>(listParams((params)->{
+		    params.model = new ListModel<>(servers);
 		    params.name = app.getStrings().serversAreaName();
 		})) ;
 	final Actions serversActions = actions(

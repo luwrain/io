@@ -171,7 +171,7 @@ public final class CommanderUtilsVfs
 	params.model = new Model(manager);
 	params.appearance = new Appearance(context, manager);
 	params.filter = new CommanderUtils.AllEntriesFilter<FileObject>();
-	params.comparator = new CommanderUtils.ByNameComparator();
+	params.comparator = new CommanderUtils.ByNameComparator<>();
 	return params;
     }
 

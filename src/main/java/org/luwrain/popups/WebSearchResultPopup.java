@@ -23,7 +23,7 @@ import org.luwrain.core.*;
 import org.luwrain.controls.*;
 import org.luwrain.io.*;
 
-public class WebSearchResultPopup extends ListPopupBase implements ListArea.ClickHandler
+public class WebSearchResultPopup extends ListPopupBase<Object> implements ListArea.ClickHandler<Object>
 {
     protected final WebSearchResult webSearchResult;
     protected WebSearchResult.Item result = null;
@@ -48,16 +48,16 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	return this.closing.doOk();
     }
 
-    static protected ListArea.Params createParams(Luwrain luwrain, String name, WebSearchResult res)
+    static protected ListArea.Params<Object> createParams(Luwrain luwrain, String name, WebSearchResult res)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notNull(name, "name");
 	NullCheck.notNull(res, "res");
-	final ListArea.Params params = new ListArea.Params();
+	final ListArea.Params<Object> params = new ListArea.Params<>();
 	params.context = new DefaultControlContext(luwrain);
 	params.flags = EnumSet.of(ListArea.Flags.EMPTY_LINE_TOP);
 	params.name = name;
-	params.model = new ListUtils.FixedModel(createListItems(res));
+	params.model = new ListUtils.FixedModel<>(createListItems(res));
 	params.appearance = new Appearance(params.context);
 	params.transition = new Transition(params.model);
 	return params;
@@ -88,7 +88,7 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	return result;
     }
 
-    static protected class Appearance extends ListUtils.DoubleLevelAppearance
+    static protected class Appearance extends ListUtils.DoubleLevelAppearance<Object>
     {
 	public Appearance(ControlContext context)
 	{
@@ -101,9 +101,9 @@ public class WebSearchResultPopup extends ListPopupBase implements ListArea.Clic
 	}
     }
 
-    static protected class Transition extends ListUtils.DoubleLevelTransition
+    static protected class Transition extends ListUtils.DoubleLevelTransition<Object>
     {
-	public Transition(ListArea.Model model)
+	public Transition(ListArea.Model<Object> model)
 	{
 	    super(model);
 	}
