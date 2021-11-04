@@ -108,6 +108,7 @@ public final class App extends AppBase<Strings> implements MonoApp
         @Override public MonoApp.Result onMonoAppSecondInstance(Application app)
     {
 	NullCheck.notNull(app, "app");
+	mainLayout.area.moveHotPointToInput();
 		return MonoApp.Result.BRING_FOREGROUND;
     }
 
