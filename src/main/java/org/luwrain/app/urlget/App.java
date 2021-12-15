@@ -23,32 +23,27 @@ import com.google.gson.*;
 
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
-import org.luwrain.io.api.mediawiki.*;
+import static org.luwrain.util.TextUtils.*;
 
 public final class App extends AppBase<Strings>
 {
-    static private final String SETTINGS_PATH = "/org/luwrain/app/wiki";
-
-    private final Gson gson = new Gson();
-    private Settings sett = null;
-    private final String arg;
+    private final String argText;
     private Conversations conv = null;
     private MainLayout mainLayout = null;
+    String[] text = new String[0];
 
-    public App()
-    {
-	this(null);
-    }
-
+    public App() { this(null); }
     public App(String arg)
     {
 	super(Strings.NAME, Strings.class, "luwrain.wiki");
-	this.arg = arg;
+	this.argText = arg;
     }
 
     @Override protected AreaLayout onAppInit()
     {
 	this.conv = new Conversations(this);
+	if (argText != null)
+	    this.text = splitLinesAnySeparator(argText);
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return this.mainLayout.getAreaLayout();

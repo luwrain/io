@@ -24,18 +24,24 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
-import org.luwrain.io.api.mediawiki.*;
 
 import static org.luwrain.core.DefaultEventResponse.*;
-import static org.luwrain.controls.ConsoleUtils.*;
 
 final class MainLayout extends LayoutBase
 {
     private final App app;
+    final NavigationArea area;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
+
+	this.area = new NavigationArea(getControlContext()){
+		@Override public int getLineCount() { return app.text.length > 0?app.text.length:1; }
+		@Override public String getLine(int index) { return app.text[index]; }
+		@Override public String getAreaName() { return app.getStrings().appName(); }
+	    };
+    setAreaLayout(area, null);
     }
 }

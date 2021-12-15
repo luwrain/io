@@ -42,6 +42,7 @@ public final class Extension extends EmptyExtension
 	    new SimpleShortcutCommand("wiki"),
 	    new SimpleShortcutCommand("download"),
 	    new WebCommand(),
+	    new org.luwrain.app.urlget.UrlCommand(),
 
 	    new Command(){
 	    		@Override public String getName()
@@ -139,12 +140,10 @@ public final class Extension extends EmptyExtension
     @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
 	return new ExtensionObject[]{
+	    new org.luwrain.app.urlget.UrlJob(luwrain),
 
 	    new Shortcut() {
-		@Override public String getExtObjName()
-		{
-		    return "download";
-		}
+		@Override public String getExtObjName() { return "download"; }
 		@Override public Application[] prepareApp(String[] args)
 		{
 		    NullCheck.notNull(args, "args");
@@ -154,11 +153,19 @@ public final class Extension extends EmptyExtension
 		}
 	    },
 
-new Shortcut() {
-		@Override public String getExtObjName()
+	    new Shortcut() {
+		@Override public String getExtObjName() { return "urlget"; }
+		@Override public Application[] prepareApp(String[] args)
 		{
-		    return "wiki";
+		    NullCheck.notNullItems(args, "args");
+		    if (args.length == 0)
+			return null;
+		    return new Application[]{new org.luwrain.app.urlget.App(args[0])};
 		}
+	    },
+
+new Shortcut() {
+    @Override public String getExtObjName() { return "wiki"; }
 		@Override public Application[] prepareApp(String[] args)
 		{
 		    NullCheck.notNullItems(args, "args");
