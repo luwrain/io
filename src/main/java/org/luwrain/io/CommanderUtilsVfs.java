@@ -125,8 +125,8 @@ public final class CommanderUtilsVfs
 	{
 	    NullCheck.notNull(entry, "entry");
 	    if (entry.getName().getPath().equals("/"))
-		context.setEventResponse(DefaultEventResponse.text(Sounds.COMMANDER_LOCATION, context.getStaticStr("PartitionsPopupItemRoot"))); else
-		context.setEventResponse(DefaultEventResponse.text(Sounds.COMMANDER_LOCATION, context.getSpeakableText(entry.getName().getBaseName(), Luwrain.SpeakableTextType.PROGRAMMING)));
+		context.say(context.getStaticStr("CommanderRoot"), Sounds.COMMANDER_LOCATION); else
+		context.say(context.getSpeakableText(entry.getName().getBaseName(), Luwrain.SpeakableTextType.PROGRAMMING), Sounds.COMMANDER_LOCATION);
 	}
 	@Override public String getEntryText(FileObject entry, EntryType type, boolean marked)
 	{
