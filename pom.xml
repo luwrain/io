@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.luwrain</groupId>
     <artifactId>luwrain-parent</artifactId>
-    <version>1.9.02</version>
+    <version>1.9.3</version>
   </parent>
   <artifactId>luwrain-io</artifactId>
-  <name>The LUWRAIN I/O and NLP utilities</name>
+  <name>LUWRAIN I/O and NLP utilities</name>
   <url>https://luwrain.org/</url>
   <packaging>jar</packaging>
   <dependencies>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
-      <version>2.0.20</version>
+      <version>${pdfbox.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
