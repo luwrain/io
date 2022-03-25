@@ -27,7 +27,9 @@ import org.luwrain.io.api.mediawiki.*;
 
 public final class App extends AppBase<Strings> implements MonoApp
 {
-    static private final String SETTINGS_PATH = "/org/luwrain/app/wiki";
+    static private final String
+	LOG_COMPONENT = "wiki",
+	SETTINGS_PATH = "/org/luwrain/app/wiki";
 
     private final Gson gson = new Gson();
     private Settings sett = null;
@@ -82,7 +84,13 @@ public final class App extends AppBase<Strings> implements MonoApp
 		for(Server s: servers)
 		{
 		    final Mediawiki m = new Mediawiki(s.searchUrl);
+		    try {
 		    res.addAll(Arrays.asList(m.search(query)));
+		    }
+		    catch(Exception e)
+		    {
+			Log.error(LOG_COMPONENT, "unable to fetch wiki pages from " + s.searchUrl);
+		    }
 		}
 		finishedTask(taskId, ()->{
 			pages.clear();
