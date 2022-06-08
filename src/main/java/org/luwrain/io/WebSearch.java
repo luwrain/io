@@ -16,22 +16,20 @@
 
 package org.luwrain.io;
 
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
-import java.io.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 import static org.luwrain.script.Hooks.*;
 import static org.luwrain.script2.ScriptUtils.*;
 
-public class WebSearch 
+public final class WebSearch 
 {
     static public final String
 	HOOK_WEB_SEARCH = "luwrain.web.search";
 
-    protected final Luwrain luwrain;
+    private final Luwrain luwrain;
 
     public WebSearch(Luwrain luwrain)
     {
@@ -44,24 +42,26 @@ public class WebSearch
 	NullCheck.notEmpty(query, "query");
 	NullCheck.notNull(resultHandler, "resultHandler");
 	luwrain.executeBkg(new FutureTask<>(()->{
-		    final Object res = runWebSearchHook(luwrain, query);
+		    final Object res;
+		    try {
+			res = runWebSearchHook(luwrain, query);
+		    }
+		    catch(Throwable e)
+		    {
+			luwrain.crash(e);
+			return;
+		    }
 		    luwrain.runUiSafely(()->resultHandler.accept(res));
 	}, null));
     }
 
     public void searchAsync(String query)
     {
-	NullCheck.notNull(luwrain, "luwrain");
 	NullCheck.notEmpty(query, "query");
 	searchAsync(query, (result)->{
-		if (result != null && (result instanceof Exception))
-		{
-		    luwrain.message(luwrain.i18n().getExceptionDescr((Exception)result), Luwrain.MessageType.ERROR);
-		    return;
-		}
 		if (result == null || !(result instanceof WebSearchResult))
 		{
-		    onNothingFound();
+		    luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
 		    return;
 		}
 		final WebSearchResult webSearchResult = (WebSearchResult)result;
@@ -77,11 +77,6 @@ public class WebSearch
 	NullCheck.notNull(item, "item");
 	if (!item.getClickUrl().isEmpty())
 	    luwrain.openUrl(item.getClickUrl());
-    }
-
-    public void onNothingFound()
-    {
-	luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
     }
 
     private Object runWebSearchHook(Luwrain luwrain, String query)

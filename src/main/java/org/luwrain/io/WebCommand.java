@@ -75,7 +75,7 @@ public final class WebCommand implements Command
 	    return new Boolean(asBoolean(obj));
 	final WebSearchResult.Item[] items = WebSearchResult.getItemsFromHookObj(getMember(obj, "items"));
 	if (items == null)
-	    	    return null;
+	    return null;
 	final String title = asString(getMember(obj, "title"));
 	return new WebSearchResult(title != null?title.trim():"", items);
     }
