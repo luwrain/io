@@ -25,7 +25,7 @@ import static org.luwrain.script2.ScriptUtils.*;
 
 public final class WebCommand implements Command
 {
-    static private final String
+    static public final String
 	HOOK_WEB_OPEN = "luwrain.web.open";
 
     private final Set<String> history = new HashSet<>();

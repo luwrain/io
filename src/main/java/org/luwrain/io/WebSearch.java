@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -23,12 +23,13 @@ import java.io.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
-import org.luwrain.script.*;
+import static org.luwrain.script.Hooks.*;
+import static org.luwrain.script2.ScriptUtils.*;
 
 public class WebSearch 
 {
-    static private final String LOG_COMPONENT = "io";
-    static public final String WEB_SEARCH_HOOK = "luwrain.web.search";
+    static public final String
+	HOOK_WEB_SEARCH = "luwrain.web.search";
 
     protected final Luwrain luwrain;
 
@@ -40,7 +41,7 @@ public class WebSearch
 
     public void searchAsync(String query, Consumer<Object> resultHandler)
     {
-	NullCheck.notEmpty(query, "qeury");
+	NullCheck.notEmpty(query, "query");
 	NullCheck.notNull(resultHandler, "resultHandler");
 	luwrain.executeBkg(new FutureTask<>(()->{
 		    final Object res = runWebSearchHook(luwrain, query);
@@ -80,37 +81,18 @@ public class WebSearch
 
     public void onNothingFound()
     {
-	luwrain.message("Поиск в Интернете не дал результата", Luwrain.MessageType.DONE);
+	luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
     }
 
     private Object runWebSearchHook(Luwrain luwrain, String query)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notEmpty(query, "query");
-	final Object obj;
-	try {
-	    obj = new org.luwrain.script.hooks.ProviderHook(luwrain).run(WEB_SEARCH_HOOK, new Object[]{query});
-	}
-	catch(RuntimeException e)
-	{
-	    return e;
-	}
+	final Object obj = provider(luwrain, HOOK_WEB_SEARCH, new Object[]{query});
 	if (obj == null)
 	    return null;
-	final Object itemsObj = ScriptUtils.getMember(obj, "items");
-	if (itemsObj == null)
-	    return null;
-	final WebSearchResult.Item[] items = WebSearchResult.getItemsFromHookObject(itemsObj);
+	final WebSearchResult.Item[] items = WebSearchResult.getItemsFromHookObj(getMember(obj, "items"));
 	if (items == null)
 	    return null;
-	final String title;
-	final Object titleObj = ScriptUtils.getMember(obj, "title");
-	if(titleObj != null)
-	{
-	    final String value = ScriptUtils.getStringValue(titleObj);
-	    title = value != null?value:"";
-	} else
-	    title = "";
-	return new WebSearchResult(title, items);
+	final String title = asString(getMember(obj, "title"));
+	return new WebSearchResult(title != null?title.trim():"", items);
     }
 }
