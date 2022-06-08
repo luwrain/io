@@ -49,13 +49,14 @@ public final class WebCommand implements Command
 	if (res instanceof Boolean)
 	{
 	    final Boolean bool = (Boolean)res;
-	    if (bool.booleanValue())
+	    if (!bool.booleanValue())
+			    new WebSearch(luwrain).searchAsync(query);
 		return;
 	}
 	if (!(res instanceof WebSearchResult))
 	    return;
-	final WebSearchResult webSearchResult = (WebSearchResult)res;
-	if (webSearchResult.getItemCount() == 0)
+		final WebSearchResult webSearchResult = (WebSearchResult)res;
+	if (webSearchResult.noItems())
 	{
 	    luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
 	    return;
@@ -64,6 +65,7 @@ public final class WebCommand implements Command
 	if (item == null)
 	    return;
 	luwrain.openUrl(item.getClickUrl());
+	return;
     }
 
     private Object runWebOpenHook(Luwrain luwrain, String query)
