@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -13,7 +13,6 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
 */
-
 
 package org.luwrain.popups;
 
@@ -50,9 +49,6 @@ public class WebSearchResultPopup extends ListPopupBase<Object> implements ListA
 
     static protected ListArea.Params<Object> createParams(Luwrain luwrain, String name, WebSearchResult res)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(name, "name");
-	NullCheck.notNull(res, "res");
 	final ListArea.Params<Object> params = new ListArea.Params<>();
 	params.context = new DefaultControlContext(luwrain);
 	params.flags = EnumSet.of(ListArea.Flags.EMPTY_LINE_TOP);
@@ -65,7 +61,6 @@ public class WebSearchResultPopup extends ListPopupBase<Object> implements ListA
 
     static protected Object[] createListItems(WebSearchResult res)
     {
-	NullCheck.notNull(res, "res");
 	final List<Object> r = new ArrayList<>();
 	for(WebSearchResult.Item i: res.getItems())
 	{
@@ -78,8 +73,6 @@ public class WebSearchResultPopup extends ListPopupBase<Object> implements ListA
 
     static public WebSearchResult.Item open(Luwrain luwrain, WebSearchResult webSearchResult)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(webSearchResult, "webSearchResult");
 	final WebSearchResultPopup popup = new WebSearchResultPopup(luwrain, webSearchResult.getTitle(), webSearchResult, Popups.DEFAULT_POPUP_FLAGS);
 	luwrain.popup(popup);
 	if (popup.wasCancelled())
@@ -96,7 +89,6 @@ public class WebSearchResultPopup extends ListPopupBase<Object> implements ListA
 	}
 	@Override public boolean isSectionItem(Object obj)
 	{
-	    NullCheck.notNull(obj, "obj");
 	    return obj instanceof WebSearchResult.Item;
 	}
     }
@@ -109,7 +101,6 @@ public class WebSearchResultPopup extends ListPopupBase<Object> implements ListA
 	}
 	@Override public boolean isSectionItem(Object obj)
 	{
-	    NullCheck.notNull(obj, "obj");
 	    return obj instanceof WebSearchResult.Item;
 	}
     }

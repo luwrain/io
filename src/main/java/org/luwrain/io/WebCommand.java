@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -17,17 +17,18 @@
 package org.luwrain.io;
 
 import java.util.*;
-import java.util.concurrent.*;
-import java.io.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
-import org.luwrain.script.*;
+import static org.luwrain.script.Hooks.*;
+import static org.luwrain.script2.ScriptUtils.*;
 
 public final class WebCommand implements Command
 {
-    static private final String LOG_COMPONENT = "io";
-    static public final String WEB_OPEN_HOOK = "luwrain.web.open";
+    static private final String
+	HOOK_WEB_OPEN = "luwrain.web.open";
+
+    private final Set<String> history = new HashSet<>();
 
     @Override public String getName()
     {
@@ -36,8 +37,7 @@ public final class WebCommand implements Command
 
     @Override public void onCommand(Luwrain luwrain)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	final String query = Popups.text(luwrain, luwrain.i18n().getStaticStr("WebCommandPopupName"), luwrain.i18n().getStaticStr("WebCommandPopupPrefix"), "");
+	final String query = Popups.editWithHistory(luwrain, luwrain.i18n().getStaticStr("WebCommandPopupName"), luwrain.i18n().getStaticStr("WebCommandPopupPrefix"), "", history);
 	if (query == null || query.trim().isEmpty())
 	    return;
 	final Object res = runWebOpenHook(luwrain, query);
@@ -73,59 +73,31 @@ public final class WebCommand implements Command
 
     private Object runWebOpenHook(Luwrain luwrain, String query)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notEmpty(query, "query");
-	final Object obj;
-	try {
-	    obj = new org.luwrain.script.hooks.ProviderHook(luwrain).run(WEB_OPEN_HOOK, new Object[]{query});
-	}
-	catch(RuntimeException e)
-	{
-	    return e;
-	}
-	if (obj == null)
+	final Object obj = provider(luwrain, HOOK_WEB_OPEN, new Object[]{query});
+	if (obj == null || isNull(obj))
 	    return null;
-	if (obj instanceof Boolean)
-	{
-	    final Boolean bool = (Boolean)obj;
-	    return bool.booleanValue()?bool:null;
-	}
-	final Object itemsObj = ScriptUtils.getMember(obj, "items");
-	if (itemsObj == null)
-	    return null;
-	final List items = ScriptUtils.getArray(itemsObj);
+	if (isBoolean(obj))
+	    return new Boolean(asBoolean(obj));
+	final Object[] items = asArray(getMember(obj, "items"));
 	if (items == null)
 	    return null;
 	final List<WebSearchResult.Item> res = new ArrayList<>();
 	for(Object o: items)
 	    if (o != null)
 	    {
-		final Object titleObj = ScriptUtils.getMember(o, "title");
-		final Object snippetObj = ScriptUtils.getMember(o, "snippet");
-		final Object displayUrlObj = ScriptUtils.getMember(o, "displayUrl");
-		final Object clickUrlObj = ScriptUtils.getMember(o, "clickUrl");
-		if (titleObj == null || snippetObj == null ||
-		    displayUrlObj == null || clickUrlObj == null)
+		final String
+		title = asString(getMember(o, "title")),
+		snippet = asString(getMember(o, "snippet")),
+		displayUrl = asString(getMember(o, "displayUrl")),
+		clickUrl = asString(getMember(o, "clickUrl"));
+		if (title == null || title.trim().isEmpty())
 		    continue;
-		final String title = ScriptUtils.getStringValue(titleObj);
-		final String snippet = ScriptUtils.getStringValue(snippetObj);
-		final String displayUrl = ScriptUtils.getStringValue(displayUrlObj);
-		final String clickUrl = ScriptUtils.getStringValue(clickUrlObj);
-		if (title == null || snippet == null ||
-		    clickUrl == null || displayUrl == null)
-		    continue;
-		if (title.isEmpty() || clickUrl.isEmpty())
-		    continue;
-		res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
+		res.add(new WebSearchResult.Item(title.trim(),
+						 snippet != null?snippet.trim():"",
+						 displayUrl != null?displayUrl.trim():"",
+						 clickUrl != null?clickUrl.trim():""));
 	    }
-	final String title;
-	final Object titleObj = ScriptUtils.getMember(obj, "title");
-	if(titleObj != null)
-	{
-	    final String value = ScriptUtils.getStringValue(titleObj);
-	    title = value != null?value:"";
-	} else
-	    title = "";
-	return new WebSearchResult(title, res.toArray(new WebSearchResult.Item[res.size()]));
+	final String title = asString(getMember(obj, "title"));
+	return new WebSearchResult(title != null?title.trim():"", res.toArray(new WebSearchResult.Item[res.size()]));
     }
 }
