@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2019 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -19,7 +19,7 @@ package org.luwrain.io;
 import java.util.*;
 
 import org.luwrain.core.*;
-import org.luwrain.script.*;
+import static org.luwrain.script2.ScriptUtils.*;
 
 public final class WebSearchResult
 {
@@ -52,6 +52,11 @@ public final class WebSearchResult
     public int getItemCount()
     {
 	return items.length;
+    }
+
+    public boolean noItems()
+    {
+	return items.length == 0;
     }
 
     static public final class Item
@@ -93,33 +98,28 @@ public final class WebSearchResult
 	}
     }
 
-    static public Item[] getItemsFromHookObject(Object itemsObj)
+    static public Item[] getItemsFromHookObj(Object itemsObj)
     {
-	NullCheck.notNull(itemsObj, "itemsObj");
-	final List items = ScriptUtils.getArray(itemsObj);
+	if (itemsObj == null)
+	    return null;
+	final Object[] items = asArray(itemsObj);
 	if (items == null)
 	    return null;
 	final List<Item> res = new ArrayList<>();
 	for(Object o: items)
 	    if (o != null)
 	    {
-		final Object titleObj = ScriptUtils.getMember(o, "title");
-		final Object snippetObj = ScriptUtils.getMember(o, "snippet");
-		final Object displayUrlObj = ScriptUtils.getMember(o, "displayUrl");
-		final Object clickUrlObj = ScriptUtils.getMember(o, "clickUrl");
-		if (titleObj == null || snippetObj == null ||
-		    displayUrlObj == null || clickUrlObj == null)
+		final String
+		title = asString(getMember(o, "title")),
+		snippet = asString(getMember(o, "snippet")),
+		displayUrl = asString(getMember(o, "displayUrl")),
+		clickUrl = asString(getMember(o, "clickUrl"));
+		if (title == null || title.trim().isEmpty())
 		    continue;
-		final String title = ScriptUtils.getStringValue(titleObj);
-		final String snippet = ScriptUtils.getStringValue(snippetObj);
-		final String displayUrl = ScriptUtils.getStringValue(displayUrlObj);
-		final String clickUrl = ScriptUtils.getStringValue(clickUrlObj);
-		if (title == null || snippet == null ||
-		    clickUrl == null || displayUrl == null)
-		    continue;
-		if (title.isEmpty() || clickUrl.isEmpty())
-		    continue;
-		res.add(new WebSearchResult.Item(title, snippet, displayUrl, clickUrl));
+		res.add(new Item(title.trim(),
+						 snippet != null?snippet.trim():"",
+						 displayUrl != null?displayUrl.trim():"",
+						 clickUrl != null?clickUrl.trim():""));
 	    }
 	return res.toArray(new WebSearchResult.Item[res.size()]);
     }

@@ -46,11 +46,6 @@ public final class WebCommand implements Command
 	    new WebSearch(luwrain).searchAsync(query);
 	    return;
 	}
-	if (res instanceof Exception)
-	{
-	    luwrain.message(luwrain.i18n().getExceptionDescr((Exception)res), Luwrain.MessageType.ERROR);
-	    return;
-	}
 	if (res instanceof Boolean)
 	{
 	    final Boolean bool = (Boolean)res;
@@ -62,7 +57,7 @@ public final class WebCommand implements Command
 	final WebSearchResult webSearchResult = (WebSearchResult)res;
 	if (webSearchResult.getItemCount() == 0)
 	{
-	    luwrain.message("Поиск в Интернете не дал результатов", Luwrain.MessageType.DONE);
+	    luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
 	    return;
 	}
 	final WebSearchResult.Item item = WebSearchResultPopup.open(luwrain, webSearchResult);
@@ -78,26 +73,10 @@ public final class WebCommand implements Command
 	    return null;
 	if (isBoolean(obj))
 	    return new Boolean(asBoolean(obj));
-	final Object[] items = asArray(getMember(obj, "items"));
+	final WebSearchResult.Item[] items = WebSearchResult.getItemsFromHookObj(getMember(obj, "items"));
 	if (items == null)
-	    return null;
-	final List<WebSearchResult.Item> res = new ArrayList<>();
-	for(Object o: items)
-	    if (o != null)
-	    {
-		final String
-		title = asString(getMember(o, "title")),
-		snippet = asString(getMember(o, "snippet")),
-		displayUrl = asString(getMember(o, "displayUrl")),
-		clickUrl = asString(getMember(o, "clickUrl"));
-		if (title == null || title.trim().isEmpty())
-		    continue;
-		res.add(new WebSearchResult.Item(title.trim(),
-						 snippet != null?snippet.trim():"",
-						 displayUrl != null?displayUrl.trim():"",
-						 clickUrl != null?clickUrl.trim():""));
-	    }
+	    	    return null;
 	final String title = asString(getMember(obj, "title"));
-	return new WebSearchResult(title != null?title.trim():"", res.toArray(new WebSearchResult.Item[res.size()]));
+	return new WebSearchResult(title != null?title.trim():"", items);
     }
 }
