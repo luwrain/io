@@ -16,12 +16,20 @@
 
 package org.luwrain.nlp;
 
+import org.junit.*;
+
 import org.luwrain.core.*;
 
-public interface SpellProblem extends LineMarks.MarkObject
+public class SpellTextTest extends Assert
 {
-    String getComment();
-    String getShortComment();
-    int getStart();
-    int getEnd();
+    private SpellChecker checker = null;
+
+    @Test public void main()
+    {
+    }
+
+    @Before public void  create()
+    {
+	checker = new SpellCheckerFactory().newChecker("ru");
+    }
 }

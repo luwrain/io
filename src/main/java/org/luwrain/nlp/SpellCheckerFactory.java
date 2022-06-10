@@ -16,12 +16,23 @@
 
 package org.luwrain.nlp;
 
-import org.luwrain.core.*;
+import org.luwrain.nlp.ru.spell.*;
 
-public interface SpellProblem extends LineMarks.MarkObject
+public final class SpellCheckerFactory
 {
-    String getComment();
-    String getShortComment();
-    int getStart();
-    int getEnd();
-}
+    static private RuSpellChecker ru = null;
+
+    public SpellChecker newChecker(String lang)
+    {
+	switch(lang.toUpperCase())
+	{
+	case "RU": {
+	    if (ru == null)
+		ru = new RuSpellChecker();
+	    return ru;
+	}
+	    default:
+		throw new IllegalArgumentException("Unknown language: " + lang);
+	}
+    }
+    }

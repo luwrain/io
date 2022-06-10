@@ -18,6 +18,11 @@ package org.luwrain.nlp;
 
 import java.util.*;
 
+import org.luwrain.core.*;
+import org.luwrain.controls.*;
+import org.luwrain.controls.DefaultLineMarks.*;
+import static org.luwrain.util.RangeUtils.*;
+
 public class SpellText
 {
     final String text;
@@ -49,6 +54,24 @@ public class SpellText
 	if (fragments.size() != text.length)
 	    throw new IllegalStateException("the fragments and text arrays have different length");
 	this.problems = checker.check(this.text);
+    }
+
+    public List<List<LineMarks.Mark>> buildMarks()
+    {
+	final List<List<LineMarks.Mark>> res = new ArrayList<>();
+	for(Fragment f: fragments)
+	{
+	    final List<LineMarks.Mark> a = new ArrayList();
+	    for(SpellProblem p: problems)
+	    {
+		final int[] range = commonRangeByBounds(p.getStart(), p.getEnd(), f.posFrom, f.posTo);
+		if (range == null)
+		    continue;
+		a.add(new MarkImpl(LineMarks.Mark.Type.WEAK, range[0] - f.posFrom, range[1] - f.posFrom, p));
+	}
+	    res.add(a);
+    }
+	return res;
     }
 
     static public final class Fragment

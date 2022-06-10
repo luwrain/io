@@ -14,14 +14,29 @@
    General Public License for more details.
 */
 
-package org.luwrain.nlp;
+
+package org.luwrain.nlp.ru.spell;
+
+//https://languagetool.org/development/api/org/languagetool/rules/spelling/SpellingCheckRule.html
+
+
+import java.io.*;
+import java.net.*;
+
+import org.junit.*;
 
 import org.luwrain.core.*;
 
-public interface SpellProblem extends LineMarks.MarkObject
+public class RuSpellCheckerTest extends Assert
 {
-    String getComment();
-    String getShortComment();
-    int getStart();
-    int getEnd();
+    private RuSpellChecker c = null;
+
+    @Test public void main()
+    {
+    }
+
+    @Before public void  create()
+    {
+	c = new RuSpellChecker();
+    }
 }
