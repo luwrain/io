@@ -16,7 +16,7 @@
 
 package org.luwrain.nlp;
 
-import org.luwrain.nlp.ru.spell.*;
+import org.luwrain.nlp.ru.spell.RuSpellChecker;
 
 public final class SpellCheckerFactory
 {

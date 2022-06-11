@@ -26,20 +26,22 @@ import static org.luwrain.util.RangeUtils.*;
 public class SpellText
 {
     final String text;
-    private final List<Fragment> fragments = new ArrayList<>();
-    private List<SpellProblem> problems;
+    final List<Fragment> fragments = new ArrayList<>();
+    final List<SpellProblem> problems;
 
     public SpellText(String[] text, SpellChecker checker)
     {
 	if (text.length == 0)
 	{
 	    this.text = "";
+	    this.problems = Arrays.asList();
 	    return;
 	}
 	if (text.length == 1)
 	{
 	    this.text = text[0];
 	    fragments.add(new Fragment(0, text[0].length()));
+	    	this.problems = checker.check(this.text);
 	    return;
 	}
 	final StringBuilder b = new StringBuilder();

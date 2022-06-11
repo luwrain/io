@@ -16,6 +16,7 @@
 
 package org.luwrain.nlp;
 
+import java.util.*;
 import org.junit.*;
 
 import org.luwrain.core.*;
@@ -24,8 +25,30 @@ public class SpellTextTest extends Assert
 {
     private SpellChecker checker = null;
 
-    @Test public void main()
+    @Test public void shortSent()
     {
+	final String text = "Это было превосходная день!";
+	final SpellText t = new SpellText(new String[]{text}, checker);
+	assertNotNull(t.fragments);
+	assertEquals(1, t.fragments.size());
+	assertNotNull(t.problems);
+	assertEquals(1, t.problems.size());
+		final List<List<LineMarks.Mark>> res = t.buildMarks();
+		assertNotNull(res);
+		assertEquals(1, res.size());
+		List<LineMarks.Mark> marks = res.get(0);
+		assertNotNull(marks);
+		assertEquals(1, marks.size());
+		final LineMarks.Mark mark = marks.get(0);
+		assertNotNull(mark);
+		final SpellProblem problem = (SpellProblem)mark.getMarkObject();
+		assertNotNull(problem);
+		assertEquals("Прилагательное не согласуется с существительным по роду.", problem.getComment());
+		assertEquals("", problem.getShortComment());
+		final int
+		start = problem.getStart(),
+		end = problem.getEnd();
+		assertEquals("превосходная день", text.substring(start, end));
     }
 
     @Before public void  create()

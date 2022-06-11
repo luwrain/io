@@ -41,7 +41,6 @@ public final class RuSpellChecker implements SpellChecker
 	final List<SpellProblem> res = new ArrayList<>();
 	try {
 	    final List<RuleMatch> m = langTool.check(text);
-	    System.out.println("match " + m.size());
 	    for(RuleMatch  mm: m)
 		res.add(new Problem(mm));
 	    return res;

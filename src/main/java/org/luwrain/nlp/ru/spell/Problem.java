@@ -23,22 +23,25 @@ import org.luwrain.nlp.*;
 final class Problem implements SpellProblem
 {
 private final String message, shortMessage;
+    private final int fromPos, toPos;
 
     Problem(RuleMatch match)
     {
 	this.message = match.getMessage();
 	this.shortMessage = match.getShortMessage();
+	this.fromPos = match.getFromPos();
+	this.toPos = match.getToPos();
 	/*
 					List<SuggestedReplacement> repl = r.getSuggestedReplacementObjects();
 				for(SuggestedReplacement rr: repl)
-				    System.out.println(rr);
+rr;
 	*/
     }
 
     @Override public String getComment() { return message; }
     @Override public String getShortComment(){ return shortMessage; }
-    @Override public int getStart(){ return 0; }
-    @Override public int getEnd(){ return 0;}
+    @Override public int getStart(){ return fromPos; }
+    @Override public int getEnd(){ return toPos;}
 
 	@Override public String toString()
     {
