@@ -19,7 +19,7 @@ package org.luwrain.io;
 import java.util.*;
 
 import org.luwrain.core.*;
-import static org.luwrain.script2.ScriptUtils.*;
+import static org.luwrain.script.ScriptUtils.*;
 
 public final class WebSearchResult
 {

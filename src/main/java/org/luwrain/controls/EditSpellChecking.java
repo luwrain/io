@@ -24,6 +24,9 @@ import static org.luwrain.controls.EditUtils.*;
 
 public class EditSpellChecking implements EditArea.ChangeListener
 {
+static private final String
+    LOG_COMPONENT = "spelling";
+
     private final Luwrain luwrain;
     private final SpellChecker checker = new SpellCheckerFactory().newChecker("ru");
     public EditSpellChecking(Luwrain luwrain )
@@ -42,6 +45,7 @@ public class EditSpellChecking implements EditArea.ChangeListener
 
     private void check(EditArea editArea, SortedMap<Integer, String> text)
 {
+    Log.debug(LOG_COMPONENT, "Checking lines: " + text.size());
 	final List<String> textLines = new ArrayList<>();
 	for(Map.Entry<Integer, String> e: text.entrySet())
 	    textLines.add(e.getValue());
@@ -58,7 +62,11 @@ public class EditSpellChecking implements EditArea.ChangeListener
 		{
 		    final int lineIndex = e.getKey().intValue();
 		    lines.setLineMarks(lineIndex, new DefaultLineMarks.Builder(lines.getLineMarks(lineIndex)).addAll(marks.get(index)).build());
-		    index++;
+
+		    Log.debug(LOG_COMPONENT, "Result for line " + lineIndex + ", " + String.valueOf(marks.get(index).size()) + " marks");
+		    for(LineMarks.Mark m: marks.get(index))
+			Log.debug(LOG_COMPONENT, m.getMarkObject().toString());
+					    index++;
 		}
 		return false;
 	    });

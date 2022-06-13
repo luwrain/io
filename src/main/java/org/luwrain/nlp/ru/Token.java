@@ -17,9 +17,8 @@
 package org.luwrain.nlp.ru;
 
 import org.luwrain.core.*;
-import org.luwrain.script.*;
 
-public final class Token extends EmptyHookObject
+public final class Token
 {
     public enum Type {NUM, LATIN, CYRIL, SPACE, PUNC};
 
@@ -47,19 +46,5 @@ public final class Token extends EmptyHookObject
     @Override public String toString()
     {
 	return text;
-    }
-
-    @Override public Object getMember(String name)
-    {
-	NullCheck.notNull(name, "name");
-	switch(name)
-	{
-	case "type":
-	    return type.toString().toLowerCase();
-	case "text":
-	    return text;
-	default:
-	    return super.getMember(name);
-	}
     }
 }

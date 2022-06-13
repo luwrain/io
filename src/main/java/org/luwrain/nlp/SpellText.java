@@ -25,6 +25,9 @@ import static org.luwrain.util.RangeUtils.*;
 
 public class SpellText
 {
+static public final String
+    LOG_COMPONENT = "spelling";
+
     final String text;
     final List<Fragment> fragments = new ArrayList<>();
     final List<SpellProblem> problems;
@@ -41,6 +44,7 @@ public class SpellText
 	{
 	    this.text = text[0];
 	    fragments.add(new Fragment(0, text[0].length()));
+	    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
 	    	this.problems = checker.check(this.text);
 	    return;
 	}
@@ -55,6 +59,7 @@ public class SpellText
 	this.text = new String(b);
 	if (fragments.size() != text.length)
 	    throw new IllegalStateException("the fragments and text arrays have different length");
+		    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
 	this.problems = checker.check(this.text);
     }
 
