@@ -28,12 +28,19 @@ static private final String
     LOG_COMPONENT = "spelling";
 
     private final Luwrain luwrain;
-    private final SpellChecker checker = new SpellCheckerFactory().newChecker("ru");
-    public EditSpellChecking(Luwrain luwrain )
+    private final SpellChecker checker;
+    public EditSpellChecking(Luwrain luwrain , String lang)
     {
 	NullCheck.notNull(luwrain, "luwrain ");
-	this .luwrain = luwrain; 
+	NullCheck.notEmpty(lang, "lang");
+	this .luwrain = luwrain;
+	this.checker = new SpellCheckerFactory().newChecker(luwrain, lang);
 }
+
+        public EditSpellChecking(Luwrain luwrain )
+    {
+	this(luwrain, "ru");
+    }
 
     @Override public void onEditChange(EditArea editArea, MarkedLines lines, HotPoint hotPoint)
     {

@@ -30,10 +30,23 @@ import org.luwrain.nlp.*;
 public final class RuSpellChecker implements SpellChecker
 {
     final JLanguageTool langTool;
+    final Hunspell hunspell;
 
-    public RuSpellChecker()
+    public RuSpellChecker(Luwrain luwrain)
     {
 	this.langTool = new JLanguageTool(new Russian());
+	final File
+	hunspellDataDir = new File(luwrain.getFileProperty(Luwrain.PROP_DIR_DATA), "hunspell"),
+	dictFile = new File(hunspellDataDir, "ru.dict"),
+	affFile = new File(hunspellDataDir, "ru.aff");
+	this.hunspell = new Hunspell(dictFile.getAbsolutePath(), affFile.getAbsolutePath());
+    }
+
+    //Just for unit tests
+RuSpellChecker()
+    {
+		this.langTool = new JLanguageTool(new Russian());
+		this.hunspell = null;
     }
 
     @Override public List<SpellProblem> check(String text)
@@ -50,4 +63,11 @@ public final class RuSpellChecker implements SpellChecker
 	    throw new RuntimeException(e);
 	}
     }
+
+    @Override public List<String> suggestCorrections(String word)
+    {
+	return null;
+    }
+
+    
 }

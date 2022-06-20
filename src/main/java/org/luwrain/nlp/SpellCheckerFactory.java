@@ -16,19 +16,20 @@
 
 package org.luwrain.nlp;
 
+import org.luwrain.core.*;
 import org.luwrain.nlp.ru.spell.RuSpellChecker;
 
 public final class SpellCheckerFactory
 {
     static private RuSpellChecker ru = null;
 
-    public SpellChecker newChecker(String lang)
+    public SpellChecker newChecker(Luwrain luwrain, String lang)
     {
 	switch(lang.toUpperCase())
 	{
 	case "RU": {
 	    if (ru == null)
-		ru = new RuSpellChecker();
+		ru = new RuSpellChecker(luwrain);
 	    return ru;
 	}
 	    default:

@@ -81,6 +81,16 @@ static public final String
 	return res;
     }
 
+    public List<Fragment> getFragments()
+    {
+	return fragments;
+    }
+
+    public List<SpellProblem> getProblems()
+    {
+	return problems;
+    }
+
     static public final class Fragment
     {
 	final int posFrom, posTo;

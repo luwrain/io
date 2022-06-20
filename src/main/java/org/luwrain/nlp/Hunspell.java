@@ -1,6 +1,6 @@
-// * Copyright (C) 2021 Pavel Bakhvalov
+/* Copyright (C) 2021 Pavel Bakhvalov*/
 
-package org.luwrain.io.nlp;
+package org.luwrain.nlp;
 
 import dumonts.hunspell.bindings.HunspellLibrary;
 import org.bridj.Pointer;
@@ -14,27 +14,28 @@ import java.util.stream.Collectors;
 
 public final class Hunspell
 {
-private final Pointer<HunspellLibrary.Hunhandle> handle;
-  private final Charset charset;
+    private final Pointer<HunspellLibrary.Hunhandle> handle;
+    private final Charset charset;
 
-  public Hunspell(Path dictionary, Path affix) 
-{
-    try {
-      Pointer<Byte> aff = Pointer.pointerToCString(affix.toString());
-      Pointer<Byte> dic = Pointer.pointerToCString(dictionary.toString());
-      handle = HunspellLibrary.Hunspell_create(aff, dic);
-      charset = Charset.forName(HunspellLibrary.Hunspell_get_dic_encoding(handle).getCString());
-      if (this.handle == null) {
-        throw new RuntimeException("Unable to create Hunspell instance");
-      }
-    } catch (UnsatisfiedLinkError e) {
-      throw new RuntimeException("Could not create hunspell instance. Please note that LanguageTool supports only 64-bit platforms " +
-          "(Linux, Windows, Mac) and that it requires a 64-bit JVM (Java).", e);
+    public Hunspell(String dictionary, String affix) 
+    {
+	try {
+	    Pointer<Byte> aff = Pointer.pointerToCString(affix);
+	    Pointer<Byte> dic = Pointer.pointerToCString(dictionary);
+	    handle = HunspellLibrary.Hunspell_create(aff, dic);
+	    charset = Charset.forName(HunspellLibrary.Hunspell_get_dic_encoding(handle).getCString());
+	    if (this.handle == null) {
+		throw new RuntimeException("Unable to create Hunspell instance");
+	    }
+	} catch (UnsatisfiedLinkError e) {
+	    throw new RuntimeException("Could not create hunspell instance. Please note that LanguageTool supports only 64-bit platforms " +
+				       "(Linux, Windows, Mac) and that it requires a 64-bit JVM (Java).", e);
+	}
     }
-  }
 
-  public boolean spell(String word) {
-    if (handle == null) {
+  public boolean spell(String word)
+    {
+	if (handle == null) {
       throw new RuntimeException("Attempt to use hunspell instance after closing");
     }
     @SuppressWarnings("unchecked")

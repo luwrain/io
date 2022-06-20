@@ -22,4 +22,5 @@ import java.util.*;
 public interface SpellChecker
 {
     List<SpellProblem> check(String text);
+    List<String> suggestCorrections(String word);
 }
