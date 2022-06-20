@@ -43,9 +43,34 @@ static private final String
 	luwrain.executeBkg(()->check(editArea, text));
     }
 
+public void initialChecking(EditArea editArea)
+    {
+	final SortedMap<Integer, String> text = new TreeMap<>();
+	final Lines lines = editArea.getContent();
+	for(int i = 0;i < lines.getLineCount();i++)
+	    text.put(Integer.valueOf(i), lines.getLine(i));
+	luwrain.executeBkg(()->check(editArea, text));
+    }
+
+    public void eraseSpellingMarks(EditArea editArea)
+    {editArea.update((lines, hotPoint)->{
+		for(int i = 0;i < lines.getLineCount();i++)
+		{
+		    final LineMarks marks = lines.getLineMarks(i);
+		    if (marks == null)
+			continue;
+		    lines.setLineMarks(i, marks.filter((mark)->{
+				return mark.getMarkObject() == null || !(mark.getMarkObject() instanceof SpellProblem);
+			    }));
+		}
+		return false;
+	    });
+    }
+
+
     private void check(EditArea editArea, SortedMap<Integer, String> text)
 {
-    Log.debug(LOG_COMPONENT, "Checking lines: " + text.size());
+    //    Log.debug(LOG_COMPONENT, "Checking lines: " + text.size());
 	final List<String> textLines = new ArrayList<>();
 	for(Map.Entry<Integer, String> e: text.entrySet())
 	    textLines.add(e.getValue());
