@@ -37,8 +37,8 @@ public final class RuSpellChecker implements SpellChecker
 	this.langTool = new JLanguageTool(new Russian());
 	final File
 	hunspellDataDir = new File(luwrain.getFileProperty(Luwrain.PROP_DIR_DATA), "hunspell"),
-	dictFile = new File(hunspellDataDir, "ru.dict"),
-	affFile = new File(hunspellDataDir, "ru.aff");
+	dictFile = new File(hunspellDataDir, "ru_RU.dic"),
+	affFile = new File(hunspellDataDir, "ru_RU.aff");
 	this.hunspell = new Hunspell(dictFile.getAbsolutePath(), affFile.getAbsolutePath());
     }
 
@@ -66,7 +66,9 @@ RuSpellChecker()
 
     @Override public List<String> suggestCorrections(String word)
     {
-	return null;
+	if (hunspell == null)
+	    throw new IllegalStateException("Hunspell not initialized");
+return hunspell.suggest(word);
     }
 
     

@@ -103,4 +103,9 @@ public void initialChecking(EditArea editArea)
 		return false;
 	    });
     }
+
+    public SpellChecker getSpellChecker()
+    {
+	return checker;
+    }
 }

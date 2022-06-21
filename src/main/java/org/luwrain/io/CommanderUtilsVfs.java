@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2021 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -30,7 +30,8 @@ import org.luwrain.controls.CommanderArea.EntryType;
 
 public final class CommanderUtilsVfs
 {
-    static private final String LOG_COMPONENT = "commander-vfs";
+    static private final String
+	LOG_COMPONENT = "commander-vfs";
 
     static public class Model implements CommanderArea.Model<FileObject>
     {
@@ -52,7 +53,7 @@ public final class CommanderUtilsVfs
 		    return EntryType.PARENT;
 		if (entry instanceof org.apache.commons.vfs2.provider.local.LocalFile)
 		{
-		    final Path path = Paths.get(entry.getName().getPath());
+		    final Path path = entry.getPath();
 		    if (Files.isSymbolicLink(path))
 			return Files.isDirectory(path)?EntryType.SYMLINK_DIR:EntryType.SYMLINK;
 		    if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
