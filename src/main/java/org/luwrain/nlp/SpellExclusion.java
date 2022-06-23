@@ -53,6 +53,11 @@ public class SpellExclusion
     {
 	final Gson gson = new Gson();
 	try {
+	    if (!getFile().exists())
+	    {
+		exclusions.clear();
+		return;
+	    }
 	    final List<Exclusion> res; 
 	    try(final BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(getFile()), "UTF-8"))) {
 		res = gson.fromJson(r, EXCLUSION_LIST_TYPE);

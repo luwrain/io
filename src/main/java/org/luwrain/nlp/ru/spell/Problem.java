@@ -27,14 +27,18 @@ private final String message, shortMessage;
 
     Problem(RuleMatch match)
     {
-	this.message = match.getMessage();
-	this.shortMessage = match.getShortMessage();
+	if (match.getMessage() != null)
+	    this.message = match.getMessage().replaceAll("<suggestion>.*</suggestion>", ""); else
+	    this.message = "";
+	if (match.getShortMessage() != null)
+	    this.shortMessage = match.getShortMessage().replaceAll("<suggestion>.*</suggestion>", ""); else
+	    this.shortMessage = "";
 	this.fromPos = match.getFromPos();
 	this.toPos = match.getToPos();
 	/*
-					List<SuggestedReplacement> repl = r.getSuggestedReplacementObjects();
-				for(SuggestedReplacement rr: repl)
-rr;
+	  List<SuggestedReplacement> repl = r.getSuggestedReplacementObjects();
+	  for(SuggestedReplacement rr: repl)
+	  rr;
 	*/
     }
 
