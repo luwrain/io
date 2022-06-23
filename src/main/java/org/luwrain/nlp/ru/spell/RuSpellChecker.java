@@ -31,6 +31,7 @@ public final class RuSpellChecker implements SpellChecker
 {
     final JLanguageTool langTool;
     final Hunspell hunspell;
+    final SpellExclusion exclusion;
 
     public RuSpellChecker(Luwrain luwrain)
     {
@@ -40,6 +41,8 @@ public final class RuSpellChecker implements SpellChecker
 	dictFile = new File(hunspellDataDir, "ru_RU.dic"),
 	affFile = new File(hunspellDataDir, "ru_RU.aff");
 	this.hunspell = new Hunspell(dictFile.getAbsolutePath(), affFile.getAbsolutePath());
+	this.exclusion = new SpellExclusion(luwrain);
+	this.exclusion.load();
     }
 
     //Just for unit tests
@@ -47,6 +50,7 @@ RuSpellChecker()
     {
 		this.langTool = new JLanguageTool(new Russian());
 		this.hunspell = null;
+		this.exclusion = null;
     }
 
     @Override public List<SpellProblem> check(String text)
@@ -71,5 +75,8 @@ RuSpellChecker()
 return hunspell.suggest(word);
     }
 
-    
+    @Override public SpellExclusion getExclusion()
+    {
+	return exclusion;
+    }
 }

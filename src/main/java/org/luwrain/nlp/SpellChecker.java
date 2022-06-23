@@ -18,9 +18,9 @@ package org.luwrain.nlp;
 
 import java.util.*;
 
-
 public interface SpellChecker
 {
     List<SpellProblem> check(String text);
     List<String> suggestCorrections(String word);
+    SpellExclusion getExclusion();
 }

@@ -28,12 +28,14 @@ public class SpellText
 static public final String
     LOG_COMPONENT = "spelling";
 
+    final SpellExclusion exclusion;
     final String text;
     final List<Fragment> fragments = new ArrayList<>();
     final List<SpellProblem> problems;
 
     public SpellText(String[] text, SpellChecker checker)
     {
+	this.exclusion = checker.getExclusion();
 	if (text.length == 0)
 	{
 	    this.text = "";
@@ -93,12 +95,21 @@ static public final String
 
     private List<SpellProblem> filterExclusions(String text, List<SpellProblem> source)
     {
+	if (this.exclusion == null)
+	    return source;
+	//FIXME: Better to do this on class creation
+	final Set<String> wordsToExclude = new HashSet<>();
+	for(SpellExclusion.Exclusion e: exclusion.getExclusions())
+	{
+	    final String word = e.getText().trim();
+	    if (!word.isEmpty())
+		wordsToExclude.add(word.toUpperCase());
+	}
 	final List<SpellProblem> res = new ArrayList<>();
 	for(SpellProblem p: source)
 	{
 	    final String f = text.substring(p.getStart(), p.getEnd()).toUpperCase();
-	    Log.debug("proba", "fragment " + f);
-	    if (f.equals(""))
+	    if (wordsToExclude.contains(f))
 		continue;
 	    res.add(p);
 	}
