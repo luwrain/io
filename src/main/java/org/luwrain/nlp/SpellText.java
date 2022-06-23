@@ -45,7 +45,7 @@ static public final String
 	    this.text = text[0];
 	    fragments.add(new Fragment(0, text[0].length()));
 	    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
-	    	this.problems = checker.check(this.text);
+	    this.problems = filterExclusions(this.text, checker.check(this.text));
 	    return;
 	}
 	final StringBuilder b = new StringBuilder();
@@ -60,7 +60,7 @@ static public final String
 	if (fragments.size() != text.length)
 	    throw new IllegalStateException("the fragments and text arrays have different length");
 		    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
-	this.problems = checker.check(this.text);
+		    this.problems = filterExclusions(this.text, checker.check(this.text));
     }
 
     public List<List<LineMarks.Mark>> buildMarks()
@@ -89,6 +89,20 @@ static public final String
     public List<SpellProblem> getProblems()
     {
 	return problems;
+    }
+
+    private List<SpellProblem> filterExclusions(String text, List<SpellProblem> source)
+    {
+	final List<SpellProblem> res = new ArrayList<>();
+	for(SpellProblem p: source)
+	{
+	    final String f = text.substring(p.getStart(), p.getEnd()).toUpperCase();
+	    Log.debug("proba", "fragment " + f);
+	    if (f.equals(""))
+		continue;
+	    res.add(p);
+	}
+	return res;
     }
 
     static public final class Fragment
