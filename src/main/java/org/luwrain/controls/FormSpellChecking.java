@@ -42,7 +42,7 @@ static private final String
 	this(luwrain, "ru");
     }
 
-    @Override public void onEditChange(FormArea formArea, MarkedLines lines, HotPoint hotPoint)
+    @Override public void onEditChange(FormArea formArea, Event event, MarkedLines lines, HotPoint hotPoint)
     {
 	final SortedMap<Integer, String> text = new TreeMap<>();
 	blockBounds(formArea, hotPoint.getHotPointY(),(line, marks)->(!line.trim().isEmpty()),
