@@ -23,6 +23,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.nlp.*;
 //import static org.luwrain.controls.EditUtils.*;
 
+import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.NullCheck.*;
 
 public class SpellCheckingEditArea extends EditArea
@@ -73,6 +74,19 @@ public class SpellCheckingEditArea extends EditArea
 	    return true;
 	}
 	return true;
+    }
+
+    @Override public void announceLine(int index, String line)
+    {
+	final String text = getSpeakableText(line);
+	if (!hasSpellProblems(index))
+	    	    NavigationArea.defaultLineAnnouncement(context, index, text); else
+	    context.setEventResponse(text(Sounds.SPELLING, text));
+    }
+
+    public String getSpeakableText(String text)
+    {
+	return context.getSpeakableText(text, Luwrain.SpeakableTextType.NATURAL);
     }
 
     public boolean hasSpellProblems(int lineIndex)
