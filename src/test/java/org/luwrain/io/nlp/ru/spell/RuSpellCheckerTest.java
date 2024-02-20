@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,20 +14,17 @@
    General Public License for more details.
 */
 
-
 package org.luwrain.nlp.ru.spell;
-
-//https://languagetool.org/development/api/org/languagetool/rules/spelling/SpellingCheckRule.html
-
 
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.luwrain.core.*;
 import org.luwrain.nlp.*;
 
-public class RuSpellCheckerTest extends Assert
+public class RuSpellCheckerTest
 {
     private RuSpellChecker checker = null;
 
@@ -59,7 +56,7 @@ public class RuSpellCheckerTest extends Assert
 
 
 
-    @Before public void  create()
+    @BeforeEach public void  create()
     {
 	checker = new RuSpellChecker();
     }

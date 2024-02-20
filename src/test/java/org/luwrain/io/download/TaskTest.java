@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -19,17 +19,18 @@ package org.luwrain.io.download;
 import java.io.*;
 import java.net.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.luwrain.core.*;
 
-@Ignore public class TaskTest extends Assert
+public class TaskTest
 {
     static private final String url = "http://download.luwrain.org/pdf/presentation-HongKongOSConference-en-2015-06-27.pdf";
         static private final String noSuchFileUrl = "http://download.luwrain.org/pdf/no-such-file.pdf";
             static private final String noSuchHostUrl = "http://no.such.host/presentation.pdf";
 
-    @Test public void fetch() throws Exception
+    @Disabled @Test public void fetch() throws Exception
     {
 	final TestingTaskCallback callback = new TestingTaskCallback();
 	final File destFile = File.createTempFile("lwriotest", ".pdf");
@@ -39,7 +40,7 @@ import org.luwrain.core.*;
 	assertTrue(callback.fileSize == 77249);
     }
 
-        @Test public void noSuchFile() throws Exception
+        @Disabled @Test public void noSuchFile() throws Exception
     {
 	final TestingTaskCallback callback = new TestingTaskCallback();
 	final File destFile = File.createTempFile("lwriotest", ".pdf");
@@ -47,7 +48,7 @@ import org.luwrain.core.*;
 	task.startSync();
     }
 
-            @Test public void noSuchHost() throws Exception
+            @Disabled @Test public void noSuchHost() throws Exception
     {
 	final TestingTaskCallback callback = new TestingTaskCallback();
 	final File destFile = File.createTempFile("lwriotest", ".pdf");
@@ -57,7 +58,4 @@ import org.luwrain.core.*;
 	assertTrue(callback.throwable != null);
 	assertTrue(callback.throwable instanceof java.net.UnknownHostException);
     }
-
-
-    
 }
