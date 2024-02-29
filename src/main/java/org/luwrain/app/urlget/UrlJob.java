@@ -54,7 +54,7 @@ public class UrlJob implements Job
 		    }
 		    catch(Throwable e)
 		    {
-			instance.setSingleLineState(e.getClass().getName() + ": " + e.getMessage());
+			instance.setInfo("main", Arrays.asList(e.getClass().getName() + ": " + e.getMessage()));
 						    instance.stop(1);
 		    }
 
