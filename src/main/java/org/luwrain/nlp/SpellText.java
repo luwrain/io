@@ -46,7 +46,6 @@ static public final String
 	{
 	    this.text = text[0];
 	    fragments.add(new Fragment(0, text[0].length()));
-	    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
 	    this.problems = filterExclusions(this.text, checker.check(this.text));
 	    return;
 	}
@@ -61,7 +60,6 @@ static public final String
 	this.text = new String(b);
 	if (fragments.size() != text.length)
 	    throw new IllegalStateException("the fragments and text arrays have different length");
-		    Log.debug(LOG_COMPONENT, "Checking '" + this.text + "'");
 		    this.problems = filterExclusions(this.text, checker.check(this.text));
     }
 
