@@ -21,7 +21,7 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.nlp.*;
-//import static org.luwrain.controls.EditUtils.*;
+import org.luwrain.controls.edit.*;
 
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.NullCheck.*;

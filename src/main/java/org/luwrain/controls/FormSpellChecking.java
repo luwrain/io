@@ -20,7 +20,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.nlp.*;
-import static org.luwrain.controls.EditUtils.*;
+import static org.luwrain.controls.edit.EditUtils.*;
 
 public class FormSpellChecking implements FormArea.MultilineEditChangeListener
 {

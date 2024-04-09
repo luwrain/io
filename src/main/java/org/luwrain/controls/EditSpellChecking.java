@@ -20,7 +20,9 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.nlp.*;
-import static org.luwrain.controls.EditUtils.*;
+import org.luwrain.controls.edit.*;
+
+import static org.luwrain.controls.edit.EditUtils.*;
 
 public class EditSpellChecking implements EditArea.ChangeListener
 {
