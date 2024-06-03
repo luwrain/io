@@ -10,5 +10,5 @@ Please visit [luwrain.org](https://luwrain.org/?lang=en) for further information
 
 # как пользоваться:
 * в `query` вводим свой поисковой запрос
-* выбираем метод POST или GET
-* выбираем URL searxng клиента
+* выбираем метод POST или GET (лучше POST)
+* выбираем номер URL searxng клиента из массива
