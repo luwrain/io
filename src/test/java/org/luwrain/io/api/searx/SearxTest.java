@@ -26,8 +26,9 @@ public class SearxTest
         @Test public void main()
     {
 	final var s = new Searx();
-	var res = s.request("TSU");
+	var res = s.request("LUWRAIN");
 	assertNotNull(res);
+	System.out.println(res.query);
 	//	assertFalse(res.isEmpty());
 	//	assertNotNull(res.get(0));
 	//	System.out.println(res.get(0));
