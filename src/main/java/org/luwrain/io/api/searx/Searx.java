@@ -23,15 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Searx {
-
-    private static final Logger logger = LoggerFactory.getLogger(Searx.class);
-    private static final Gson gson = new Gson();
-
-    public static void main(String[] args) {
-        String query = "coffee";
-        String requestMethod = "POST";
-        String[] searxngUrls = {
+public class Searx
+{
+            static public final String[] searxngUrls = {
                 "http://localhost:8080/search", // локальный searxng
                 "https://search.mdosch.de/search",
                 "https://search.projectsegfau.lt/search",
@@ -40,12 +34,21 @@ public class Searx {
                 "https://etsi.me/search",
                 "https://search.in.projectsegfau.lt/search"
         };
+
+    private static final Logger logger = LoggerFactory.getLogger(Searx.class);
+    private static final Gson gson = new Gson();
+
+    /*
+    public static void main(String[] args)
+    {
+        String query = "coffee";
+        String requestMethod = "POST";
         String searxngUrl = searxngUrls[0];
         String payload = "q=" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&format=json";
 
         String[] headers = {
                 "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
-                "Accept: */*",
+                "Accept: *//*",
                 "Accept-Encoding: gzip, deflate",
                 "Connection: keep-alive",
                 "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
@@ -56,19 +59,41 @@ public class Searx {
         String json = gson.toJson(links);
         printLinksAsJson(json);
     }
+*/
 
-    private static List<String> sendRequest(String url, String method, String payload, String[] headers) {
-        List<String> links = new ArrayList<>();
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpRequestBase request = createRequest(method, url, payload, headers);
-            links = executeRequest(httpClient, request);
-        } catch (IOException e) {
-            logger.error("Error occurred while making HTTP request", e);
-        }
-        return links;
+    Response request(String query)
+    {
+        final String
+	requestMethod = "POST",
+	searxngUrl = searxngUrls[3],
+payload = "q=" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&format=json";
+        final String[] headers = {
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
+                "Accept: */*",
+                "Accept-Encoding: gzip, deflate",
+                "Connection: keep-alive",
+                "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
+                "Content-Type: application/x-www-form-urlencoded"
+        };
+return sendRequest(searxngUrl, requestMethod, payload, headers);
     }
 
-    private static HttpRequestBase createRequest(String method, String url, String payload, String[] headers) throws IOException {
+
+    static private Response sendRequest(String url, String method, String payload, String[] headers)
+    {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpRequestBase request = createRequest(method, url, payload, headers);
+return  executeRequest(httpClient, request);
+        }
+	catch (IOException e)
+	{
+            logger.error("Error occurred while making HTTP request", e);
+	    return null;
+        }
+    }
+
+    static private HttpRequestBase createRequest(String method, String url, String payload, String[] headers) throws IOException
+    {
         HttpRequestBase request;
         if ("GET".equalsIgnoreCase(method)) {
             request = new HttpGet(url + "?" + payload);
@@ -79,7 +104,6 @@ public class Searx {
         } else {
             throw new UnsupportedOperationException("Unsupported request method: " + method);
         }
-
         for (String header : headers) {
             String[] headerParts = header.split(": ");
             request.addHeader(headerParts[0], headerParts[1]);
@@ -87,40 +111,42 @@ public class Searx {
         return request;
     }
 
-    private static List<String> executeRequest(CloseableHttpClient httpClient, HttpRequestBase request) throws IOException {
-        List<String> links = new ArrayList<>();
+    private static Response executeRequest(CloseableHttpClient httpClient, HttpRequestBase request) throws IOException
+    {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            links = handleResponse(response);
+	    return gson.fromJson(handleResponse(response), Response.class);
         }
-        return links;
     }
 
-    private static List<String> handleResponse(CloseableHttpResponse response) throws IOException {
+    static private String handleResponse(CloseableHttpResponse response) throws IOException
+    {
         List<String> links = new ArrayList<>();
         HttpEntity entity = response.getEntity();
-        if (entity != null) {
+        if (entity == null)
+	    throw new NullPointerException("entity");
             String responseString = EntityUtils.toString(entity);
-            if (response.getStatusLine().getStatusCode() == 200 && isJson(responseString)) {
-                links = parseAndPrintLinks(responseString);
-            } else {
+            if (response.getStatusLine().getStatusCode() == 200 && isJson(responseString)) 
+		return responseString;
                 logger.error("Received non-JSON response or error code: " + response.getStatusLine());
                 logger.error("Response: " + responseString);
-            }
-        }
-        return links;
-    }
+		return null;
+	}
 
-    private static boolean isJson(String responseString) {
+    static private boolean isJson(String responseString)
+    {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.readTree(responseString);
             return true;
-        } catch (IOException e) {
+        } catch (IOException e)
+	{
             return false;
         }
     }
 
-    private static List<String> parseAndPrintLinks(String jsonResponse) throws IOException {
+    static private List<String> parseAndPrintLinks(String jsonResponse) throws IOException
+    {
+	System.err.println(jsonResponse);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(jsonResponse);
         JsonNode resultsNode = rootNode.path("results");
@@ -136,4 +162,19 @@ public class Searx {
     private static void printLinksAsJson(String json) {
         logger.info(json);
     }
+
+    static public final class Response
+    {
+	public String query;
+	public int number_of_results;
+	public List<Item> results;
+    }
+
+    static public final class Item
+    {
+    public String url, title, content, engine, template, category, thumbnail;
+public List<String> parsed_url, engines;
+    List<Integer> positions;
+    float score;
+}
 }
