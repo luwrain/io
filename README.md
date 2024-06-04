@@ -8,7 +8,7 @@ with the user interface adjusted to the perception of blind people.
 Please visit [luwrain.org](https://luwrain.org/?lang=en) for further information.
 
 
-# как пользоваться:
+# как пользоваться Searx:
 * в `query` вводим свой поисковой запрос
 * выбираем метод POST или GET (лучше POST)
 * выбираем номер URL searxng клиента из массива

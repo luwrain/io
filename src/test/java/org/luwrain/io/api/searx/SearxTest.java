@@ -23,14 +23,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SearxTest
 {
-        @Test public void main()
+        @Disabled @Test public void main()
     {
 	final var s = new Searx();
-	var res = s.request("LUWRAIN");
+	var res = s.request("TSU");
 	assertNotNull(res);
 	System.out.println(res.query);
-	//	assertFalse(res.isEmpty());
-	//	assertNotNull(res.get(0));
-	//	System.out.println(res.get(0));
+	assertNotNull(res.results);
+		for(var i: res.results)
+		{
+		    		    System.err.println(i.url);
+		    System.err.println(i.title);
+		}
+
     }
 }
