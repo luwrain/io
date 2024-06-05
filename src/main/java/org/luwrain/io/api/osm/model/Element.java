@@ -1,8 +1,11 @@
 package org.luwrain.io.api.osm.model;
 
 import java.util.Map;
+import lombok.*;
 
-public abstract class Element {
+@Data
+public abstract class Element
+{
     private long id;
     private Map<String, String> tags;
 
@@ -11,6 +14,7 @@ public abstract class Element {
         this.tags = tags;
     }
 
+    /*
     public long getId() {
         return id;
     }
@@ -18,4 +22,5 @@ public abstract class Element {
     public Map<String, String> getTags() {
         return tags;
     }
+    */
 }

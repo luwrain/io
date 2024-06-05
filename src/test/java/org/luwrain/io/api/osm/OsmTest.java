@@ -24,14 +24,36 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OsmTest
 {
     OsmApiService  s;
-    
-        @Disabled @Test public void main()
+
+    @Test public void byAddr() throws Exception
     {
-	
+	final var r = s.getNodesByAddress("Томск", "проспект Ленина", "36");
+	assertNotNull(r);
+	assertEquals(2, r.size());
+	final var rr = r.get(1);
+	assertNotNull(rr);
+	final var  tags = rr.getTags();
+	assertNotNull(tags);
+	assertEquals(6, tags.size());
+	assertNotNull(tags.get("name"));
+	assertEquals("Университетская роща ТГУ", tags.get("name"));
+    }
+
+    @Test public void byName() throws Exception
+    {
+	final var r = s.getOSMEntityByName("node", "ТГУ");
+	assertNotNull(r);
+	assertEquals(29, r.size());
+	final var rr = r.get(0);
+	assertNotNull(rr);
+	final var tags = rr.getTags();
+	assertNotNull(tags);
+	assertNotNull(tags.get("name"));
+	assertEquals("Научная библиотека ТГУ", tags.get("name"));
     }
 
     @BeforeEach void init()
     {
-	 s = new OsmApiService();
+	s = new OsmApiService();
     }
 }
