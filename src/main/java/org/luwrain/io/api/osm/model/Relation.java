@@ -1,4 +1,4 @@
-package model;
+package org.luwrain.io.api.osm.model;
 
 import java.util.Map;
 import java.util.List;

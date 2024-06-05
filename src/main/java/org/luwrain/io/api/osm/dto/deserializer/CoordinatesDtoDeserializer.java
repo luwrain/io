@@ -1,8 +1,8 @@
-package dto.deserializer;
+package org.luwrain.io.api.osm.dto.deserializer;
 
 import com.google.gson.*;
 import java.lang.reflect.Type;
-import dto.*;
+import org.luwrain.io.api.osm.dto.*;
 
 public class CoordinatesDtoDeserializer implements JsonDeserializer<CoordinatesDto> {
     @Override

@@ -1,12 +1,12 @@
-package service;
+package org.luwrain.io.api.osm;
 
 import com.google.gson.*;
-import dto.deserializer.ElementDtoDeserializer;
+import org.luwrain.io.api.osm.dto.deserializer.ElementDtoDeserializer;
 
-import api.ApiClient;
-import model.*;
-import dto.*;
-import mapper.ElementMapper;
+//import api.ApiClient;
+import org.luwrain.io.api.osm.model.*;
+import org.luwrain.io.api.osm.dto.*;
+//import org.luwrain.io.api.osm.mapper.ElementMapper;
 
 import java.io.IOException;
 import java.net.URLEncoder;

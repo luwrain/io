@@ -1,4 +1,4 @@
-package api;
+package org.luwrain.io.api.osm;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

@@ -1,7 +1,7 @@
-package mapper;
+package org.luwrain.io.api.osm;
 
-import dto.*;
-import model.*;
+import org.luwrain.io.api.osm.dto.*;
+import org.luwrain.io.api.osm.model.*;
 import java.util.List;
 
 public class ElementMapper {

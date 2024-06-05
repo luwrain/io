@@ -1,4 +1,4 @@
-package model;
+package org.luwrain.io.api.osm.model;
 
 public class Address {
     String Type;

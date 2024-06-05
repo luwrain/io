@@ -1,4 +1,4 @@
-package dto;
+package org.luwrain.io.api.osm.dto;
 
 import com.google.gson.annotations.SerializedName;
 

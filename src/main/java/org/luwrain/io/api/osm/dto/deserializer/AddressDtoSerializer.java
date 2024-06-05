@@ -1,10 +1,10 @@
-package dto.deserializer;
+package org.luwrain.io.api.osm.dto.deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import dto.AddressDto;
+import org.luwrain.io.api.osm.dto.AddressDto;
 
 import java.lang.reflect.Type;
 
