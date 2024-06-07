@@ -1,9 +1,6 @@
 package org.luwrain.io.api.yandex_disk;
 
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.FileIsTooBigException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.TooManyRequestsException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.UnauthorizedException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.UnavailableException;
+import org.luwrain.io.api.yandex_disk.exceptions.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

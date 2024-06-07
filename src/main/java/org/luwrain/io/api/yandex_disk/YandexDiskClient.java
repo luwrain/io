@@ -11,10 +11,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.FileIsTooBigException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.TooManyRequestsException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.UnauthorizedException;
-import ru.vorotov.yandex_disk_api_client_lib.exceptions.UnavailableException;
+import org.luwrain.io.api.yandex_disk.exceptions.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
