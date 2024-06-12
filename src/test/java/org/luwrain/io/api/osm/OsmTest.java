@@ -43,7 +43,7 @@ public class OsmTest
     {
 	final var r = s.getOSMEntityByName("node", "ТГУ");
 	assertNotNull(r);
-	assertEquals(29, r.size());
+	assertEquals(30, r.size());
 	final var rr = r.get(0);
 	assertNotNull(rr);
 	final var tags = rr.getTags();
