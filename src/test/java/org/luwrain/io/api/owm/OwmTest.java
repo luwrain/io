@@ -32,6 +32,18 @@ public class OwmTest
     {
 	final var s = loadExample();
 	assertNotNull(s);
+
+	//main
+	assertNotNull(s.main);
+	assertEquals(284.75, s.main.temp);
+		assertEquals(284.24, s.main.feels_like);
+
+		//weather
+		assertNotNull(s.weather);
+		final var w = s.weather.get(0);
+		assertNotNull(w);
+		assertEquals("Rain", w.main);
+				assertEquals("light rain", w.description);
     }
 
     private Status loadExample()
