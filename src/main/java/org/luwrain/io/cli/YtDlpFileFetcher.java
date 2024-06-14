@@ -44,12 +44,12 @@ public final class YtDlpFileFetcher implements FileFetcher
     @Override public Fetching fetchUrl(String url, String destDir, String destFileName)
     {
 	final var fetching = new EmptyFileFetching("", url);
-	final var job = luwrain.newJob("sys", new String[]{ "yt-dlp", url }, destDir, EnumSet.noneOf(Luwrain.JobFlags.class), new JobLauncher.Listener(){
-	@Override public void onStatusChange(JobLauncher.Instance instance)
+	final var job = luwrain.newJob("sys", new String[]{ "yt-dlp", url }, destDir, EnumSet.noneOf(Luwrain.JobFlags.class), new Job.Listener(){
+	@Override public void onStatusChange(Job job)
 	{
 	    fetching.completed();
 	}
-	@Override public void onInfoChange(JobLauncher.Instance instance, String infoType, List<String> value)
+	@Override public void onInfoChange(Job job, String infoType, List<String> value)
 	{
 	}
 				       });
