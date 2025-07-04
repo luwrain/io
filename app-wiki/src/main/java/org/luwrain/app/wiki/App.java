@@ -54,8 +54,8 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     @Override protected AreaLayout onAppInit()
     {
-	getLuwrain().getRegistry().addDirectory(SETTINGS_PATH);
-	this.sett = RegistryProxy.create(getLuwrain().getRegistry(), SETTINGS_PATH, Settings.class);
+	//	getLuwrain().getRegistry().addDirectory(SETTINGS_PATH);
+	this.sett = null;//FIXME:newreg RegistryProxy.create(getLuwrain().getRegistry(), SETTINGS_PATH, Settings.class);
 	final List<Server> serv = gson.fromJson(this.sett.getServers(""), Server.LIST_TYPE);
 	if (serv != null)
 	    this.servers.addAll(serv);

@@ -39,14 +39,14 @@ public final class Manager implements Task.Callback
 
     synchronized public void load()
     {
-	final Registry registry = luwrain.getRegistry();
+	//FIXME:newreg 	final Registry registry = luwrain.getRegistry();
 	entries.clear();
-		final int[] ids = Settings.getIds(luwrain.getRegistry());
+	final int[] ids = null;//FIXME:newreg Settings.getIds(luwrain.getRegistry());
 	for(int i = 0;i < ids.length;++i)
 	    try {
-		entries.add(new EntryImpl(registry, ids[i], this));
+		//FIXME:newreg 		entries.add(new EntryImpl(registry, ids[i], this));
 	    }
-	    catch(IOException ee)
+	    catch(Exception ee)
 	    {
 		Log.error(LOG_COMPONENT, "unable to load an entry:" + ee.getClass().getName() + ":" + ee.getMessage());
 	    }
@@ -74,8 +74,8 @@ public final class Manager implements Task.Callback
 	NullCheck.notNull(srcUrl, "srcUrl");
 	NullCheck.notNull(destFile, "destFile");
 		Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
-	final int id = Settings.addEntry(luwrain.getRegistry(), srcUrl.toString(), destFile.getAbsolutePath());
-	final EntryImpl entry = new EntryImpl(luwrain.getRegistry(), id, this);
+		final int id = 0;//FIXME:newreg Settings.addEntry(luwrain.getRegistry(), srcUrl.toString(), destFile.getAbsolutePath());
+		final EntryImpl entry = null;//FIXME:newreg new EntryImpl(luwrain.getRegistry(), id, this);
 	this.entries.add(entry);
 	entry.task.startAsync();
 	notifyChangesListeners();
