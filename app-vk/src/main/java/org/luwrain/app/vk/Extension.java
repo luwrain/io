@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -59,13 +59,5 @@ public final class Extension extends EmptyExtension
     {
 	i18nExt.addCommandTitle(Lang.EN, "vk", "VK");
 	i18nExt.addCommandTitle(Lang.RU, "vk", "ВКонтакте");
-	try {
-	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.EN, Strings.class));
-	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.RU, Strings.class));
-	}
-	catch(java.io.IOException e)
-	{
-	    throw new RuntimeException(e);
-	}
     }
 }

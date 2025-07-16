@@ -14,7 +14,7 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.weather;
+package org.luwrain.app.gpt;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,8 +25,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(name = "weather", title = {"en=Weather"})
-final class App extends AppBase<Strings>
+@AppNoArgs(title = {"ru=GPTT"}, name = "gpt")
+public final class App extends AppBase<Strings>
 {
     enum Side {LEFT, RIGHT};
 
@@ -34,14 +34,14 @@ final class App extends AppBase<Strings>
     private Conv conv = null;
     private MainLayout mainLayout = null;
 
-    App(String startFrom)
+    public App(String startFrom)
     {
-	super(Strings.class, "luwrain.commander");
+	super(Strings.NAME, Strings.class, "luwrain.commander");
 	if (startFrom != null && !startFrom.isEmpty())
 	    this.startFrom = startFrom; else
 	    this.startFrom = null;
     }
-    App() { this(null); }
+    public App() { this(null); }
 
     @Override public AreaLayout onAppInit()
     {

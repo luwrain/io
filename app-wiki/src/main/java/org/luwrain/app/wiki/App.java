@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -26,7 +26,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.io.api.mediawiki.*;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(name = "wiki", i18n = { "en=Wiki", "ru=Вики" })
+@AppNoArgs(name = "wiki", title = { "en=Wiki", "ru=Вики" })
 public final class App extends AppBase<Strings> implements MonoApp
 {
     static private final String
@@ -48,7 +48,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     public App(String arg)
     {
-	super(Strings.NAME, Strings.class, "luwrain.wiki");
+	super(Strings.class, "luwrain.wiki");
 	this.arg = arg;
     }
 

@@ -14,19 +14,31 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.wiki;
+package org.luwrain.app.gpt;
 
-import org.luwrain.core.annotations.*;
+import java.util.*;
+import java.io.*;
+import java.net.*;
 
-@ResourceStrings(langs = { "en", "ru" })
-public interface Strings
+import org.apache.commons.vfs2.*;
+
+import org.luwrain.core.*;
+import org.luwrain.core.events.*;
+import org.luwrain.core.events.InputEvent.Special;
+import org.luwrain.core.events.InputEvent.Modifiers;
+import org.luwrain.controls.*;
+import org.luwrain.io.*;
+import org.luwrain.popups.*;
+
+import org.luwrain.app.base.*;
+
+final class MainLayout extends LayoutBase
 {
-    String actionNewServer();
-    String actionServers();
-    String appName();
-    String defaultServerName();
-    String newServerPopupName();
-    String newServerPopupPrefix();
-    String serverParamsAreaName();
-    String serversAreaName();
+    private final App app;
+
+    MainLayout(App app)
+    {
+	super(app);
+	this.app = app;
+    }
 }

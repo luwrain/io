@@ -34,9 +34,9 @@ import org.luwrain.app.base.*;
 
 final class MainLayout extends LayoutBase
 {
-    private final OsmApp app;
+    private final App app;
 
-    MainLayout(OsmApp app)
+    MainLayout(App app)
     {
 	super(app);
 	this.app = app;

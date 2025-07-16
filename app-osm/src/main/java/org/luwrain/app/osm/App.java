@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -25,8 +25,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(i18n = {"ru"}, name = "luwrain.app.osm")
-final class OsmApp extends AppBase<Strings>
+@AppNoArgs(name = "osm", title = {"ru=Карты"})
+public final class App extends AppBase<Strings>
 {
     enum Side {LEFT, RIGHT};
 
@@ -34,14 +34,14 @@ final class OsmApp extends AppBase<Strings>
     private Conv conv = null;
     private MainLayout mainLayout = null;
 
-    OsmApp(String startFrom)
+    public App(String startFrom)
     {
 	super(Strings.NAME, Strings.class, "luwrain.commander");
 	if (startFrom != null && !startFrom.isEmpty())
 	    this.startFrom = startFrom; else
 	    this.startFrom = null;
     }
-    OsmApp() { this(null); }
+    public App() { this(null); }
 
     @Override public AreaLayout onAppInit()
     {

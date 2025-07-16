@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,12 +14,25 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.weather;
+package org.luwrain.app.gpt;
 
-import org.luwrain.core.annotations.*;
+import java.util.*;
+import java.io.*;
+import java.nio.file.*;
 
-@ResourceStrings(langs = {"en", "ru"})
-public interface Strings
+import org.luwrain.core.*;
+import org.luwrain.popups.*;
+
+final class Conv
 {
-    String appName();
+    private final Luwrain luwrain;
+    private final Strings strings;
+    private final Set<String> runHistory = new TreeSet<>();
+
+    Conv(App app)
+    {
+	this.luwrain = app.getLuwrain();
+	this.strings = app.getStrings();
     }
+
+}

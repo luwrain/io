@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -14,12 +14,15 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.weather;
+package org.luwrain.app.gpt;
 
-import org.luwrain.core.annotations.*;
+import java.io.*;
+import java.nio.file.*;
 
-@ResourceStrings(langs = {"en", "ru"})
+
 public interface Strings
 {
+    static final String NAME = "luwrain.osm";
+
     String appName();
     }

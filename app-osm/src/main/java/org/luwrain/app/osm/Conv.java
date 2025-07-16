@@ -29,7 +29,7 @@ final class Conv
     private final Strings strings;
     private final Set<String> runHistory = new TreeSet<>();
 
-    Conv(OsmApp app)
+    Conv(App app)
     {
 	this.luwrain = app.getLuwrain();
 	this.strings = app.getStrings();

@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -76,7 +76,7 @@ public final class App extends AppBase<Strings>
 
     public App(Watching watching)
     {
-	super(Strings.NAME, Strings.class, "luwrain.vk");
+	super(Strings.class, "luwrain.vk");
 	notNull(watching, "watching");
 	this.watching = watching;
     }

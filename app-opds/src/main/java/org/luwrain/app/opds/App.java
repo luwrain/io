@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -33,7 +33,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.app.opds.Opds.Entry;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(name = "opds", i18n = { "en=OPDS", "ru=Библиотеки"})
+@AppNoArgs(name = "opds", title = { "en=OPDS", "ru=Библиотеки"})
 public final class App extends AppBase<Strings>
 {
     static final Type LIBRARY_LIST_TYPE = new TypeToken<List<RemoteLibrary>>(){}.getType();
@@ -49,7 +49,7 @@ public final class App extends AppBase<Strings>
 
     public App()
     {
-	super(Strings.NAME, Strings.class);
+	super(Strings.class);
     }
 
     @Override protected AreaLayout onAppInit()
