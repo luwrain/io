@@ -22,5 +22,5 @@ import lombok.*;
 @NoArgsConstructor
 public final class Config
 {
-    private String yandexApiKey;
+    private String yandexFolderId, yandexApiKey;
 }

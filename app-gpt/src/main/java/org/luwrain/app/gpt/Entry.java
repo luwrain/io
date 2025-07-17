@@ -23,5 +23,9 @@ import lombok.*;
 @AllArgsConstructor
 public final class Entry
 {
-    private String message;
+    enum Type {USER, MODEL, FILE};
+
+    private Type type;
+    private String text;
+    private String path;
 }
