@@ -16,13 +16,10 @@
 
 package org.luwrain.app.gpt;
 
-import java.io.*;
-import java.nio.file.*;
+import org.luwrain.core.annotations.*;
 
-
+@ResourceStrings(langs = { "en", "ru" })
 public interface Strings
 {
-    static final String NAME = "luwrain.osm";
-
     String appName();
-    }
+}

@@ -1,15 +1,16 @@
 
 plugins {
   id 'java-library'
+  id 'io.freefair.lombok' version '8.6'
 }
 
 dependencies {
   implementation libraries.base
-    implementation libraries.apacheBase
-    annotationProcessor libraries.autoService
+  implementation libraries.apacheBase
+  annotationProcessor libraries.autoService
   implementation project(':luwrain-base')
-    implementation project(':luwrain')
+  implementation project(':luwrain')
   annotationProcessor project(':luwrain-base')
-  annotationProcessor files('../release/jar/luwrain-base-2.0.0pre2.jar')
+//  annotationProcessor files('../release/jar/luwrain-base-2.0.0pre2.jar')
   testImplementation libraries.junit
 }

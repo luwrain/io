@@ -16,20 +16,12 @@
 
 package org.luwrain.app.gpt;
 
-import java.util.*;
+import lombok.*;
 
-import org.luwrain.core.*;
-import org.luwrain.popups.*;
-
-final class Conv
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public final class Entry
 {
-    private final Luwrain luwrain;
-    private final Strings strings;
-
-    Conv(App app)
-    {
-	this.luwrain = app.getLuwrain();
-	this.strings = app.getStrings();
-    }
-
+    private String message;
 }

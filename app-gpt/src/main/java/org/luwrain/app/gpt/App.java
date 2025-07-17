@@ -36,7 +36,7 @@ public final class App extends AppBase<Strings>
 
     public App(String startFrom)
     {
-	super(Strings.NAME, Strings.class, "luwrain.commander");
+	super(Strings.class, "luwrain.commander");
 	if (startFrom != null && !startFrom.isEmpty())
 	    this.startFrom = startFrom; else
 	    this.startFrom = null;
