@@ -28,28 +28,21 @@ import org.luwrain.core.annotations.*;
 @AppNoArgs(title = {"ru=GPTT"}, name = "gpt")
 public final class App extends AppBase<Strings>
 {
-    enum Side {LEFT, RIGHT};
-
-    final String startFrom;
-    private Conv conv = null;
+    public Conv conv = null;
+    public Config conf = null;
     private MainLayout mainLayout = null;
-
-    public App(String startFrom)
-    {
-	super(Strings.class, "luwrain.commander");
-	if (startFrom != null && !startFrom.isEmpty())
-	    this.startFrom = startFrom; else
-	    this.startFrom = null;
-    }
-    public App() { this(null); }
+    public App() { super(Strings.class, "luwrain.commander"); }
 
     @Override public AreaLayout onAppInit()
     {
-	//	this.sett = Settings.create(getLuwrain());
-	this.conv = new Conv(this);
-	//	this.hooks = new Hooks(this);
-	this.mainLayout = new MainLayout(this);
-	//	this.operationsLayout = new OperationsLayout(this);
+	conf = getLuwrain().loadConf(Config.class);
+	if (conf == null)
+	{
+	    conf = new Config();
+	    getLuwrain().saveConf(conf);
+	}
+	conv = new Conv(this);
+	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
     }
@@ -59,6 +52,4 @@ public final class App extends AppBase<Strings>
 	closeApp();
 	return true;
     }
-
-    Conv getConv() { return this.conv; }
 }

@@ -16,13 +16,11 @@
 
 package org.luwrain.app.gpt;
 
-import org.luwrain.core.annotations.*;
+import lombok.*;
 
-@ResourceStrings(langs = { "en", "ru" })
-public interface Strings
+@Data
+@NoArgsConstructor
+public final class Config
 {
-    String appName();
-    String inputPrefix();
-    String optionsAreaName();
-    String yandexApiKeyEdit();
+    private String yandexApiKey;
 }

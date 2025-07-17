@@ -1,3 +1,4 @@
+
 /*
    Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
@@ -14,15 +15,16 @@
    General Public License for more details.
 */
 
-package org.luwrain.app.gpt;
+package org.luwrain.io.api.yandex_gpt;
 
-import org.luwrain.core.annotations.*;
+import lombok.*;
 
-@ResourceStrings(langs = { "en", "ru" })
-public interface Strings
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public final class CompletionOptions
 {
-    String appName();
-    String inputPrefix();
-    String optionsAreaName();
-    String yandexApiKeyEdit();
+    private boolean stream;
+    private double temperature;
+    private int maxTokens;
 }
