@@ -6,12 +6,14 @@ import java.util.concurrent.*;
 import java.io.*;
 
 import org.luwrain.core.*;
+import org.luwrain.core.annotations.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.edit.*;
 import org.luwrain.speech.*;
 import org.luwrain.app.base.*;
 
+@AppNoArgs(name = "mastodon", title = { "en=Mastodon", "ru=Мастодон"})
 public final class App extends AppBase<Strings>
 {
     static final String
