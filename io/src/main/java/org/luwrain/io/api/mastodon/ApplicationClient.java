@@ -1,13 +1,32 @@
-package com.github.scroogemcfawk.mastodon.api;
+/*
+   Copyright 2024-2025 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2024 Stepan Bylkov <scroogemcfawk@gmail.com>
+   This file is part of LUWRAIN.
+
+   LUWRAIN is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public
+   License as published by the Free Software Foundation; either
+   version 3 of the License, or (at your option) any later version.
+
+   LUWRAIN is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+*/
 
 
-import com.github.scroogemcfawk.mastodon.api.entity.*;
+    
+
+
+
+package org.luwrain.io.api.mastodon;
+
+import org.luwrain.io.api.mastodon.entity.*;
 import com.google.gson.Gson;
 import lombok.NonNull;
 
 import java.io.*;
 import java.util.Objects;
-
 
 public class ApplicationClient
 {
@@ -18,7 +37,8 @@ public class ApplicationClient
     Token accountToken;
     private File storage;
 
-    private void initClientDir() {
+    private void initClientDir()
+    {
         storage = new File(".storage");
         if (!storage.exists()) {
             System.out.println("created dir");
@@ -27,7 +47,8 @@ public class ApplicationClient
         System.out.println(storage.getAbsoluteFile());
     }
 
-    public void loadApp() {
+    public void loadApp()
+    {
         try (BufferedReader br = new BufferedReader(new FileReader(".storage/secret.txt"))) {
             try {
                 app = new Gson().fromJson(br.readLine(), Application.class);

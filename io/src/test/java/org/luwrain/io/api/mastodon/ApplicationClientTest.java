@@ -1,4 +1,5 @@
-package com.github.scroogemcfawk.mastodon.api;
+
+package org.luwrain.io.api.mastodon;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -23,8 +23,8 @@ public final class Extension extends EmptyExtension
 	i18nExt.addCommandTitle(Lang.EN, "mastodon", "Mastodon");
 	i18nExt.addCommandTitle(Lang.RU, "mastodon", "Мастодон");
 	try {
-	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.EN, Strings.class));
-	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(luwrain, getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.RU, Strings.class));
+	    i18nExt.addStrings(Lang.EN, Strings.NAME, new ResourceStringsObj(getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.EN, Strings.class));
+	    i18nExt.addStrings(Lang.RU, Strings.NAME, new ResourceStringsObj(getClass().getClassLoader(), getClass(), "strings.properties").create(Lang.RU, Strings.class));
 	}
 	catch(java.io.IOException e)
 	{

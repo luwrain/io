@@ -3,7 +3,7 @@ package org.luwrain.app.mastodon;
 
 import java.io.*;
 
-import com.github.scroogemcfawk.mastodon.api.*;
+import org.luwrain.io.api.mastodon.*;
 import org.luwrain.core.*;
 
 final class Data
@@ -15,7 +15,7 @@ final class Data
 
     Data(Luwrain luwrain) throws IOException
     {
-	sett = RegistryProxy.create(luwrain.getRegistry(), PATH, Settings.class);
+	sett = null;//RegistryProxy.create(luwrain.getRegistry(), PATH, Settings.class);
 	client = new ApplicationClient(new Configuration());
     }
 
