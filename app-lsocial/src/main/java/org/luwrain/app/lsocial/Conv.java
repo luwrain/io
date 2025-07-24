@@ -21,8 +21,12 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 
+import static org.luwrain.popups.Popups.*;
+
 final class Conv
 {
+    enum NewItemType {PUBL, PRES};
+
     private final Luwrain luwrain;
     private final Strings strings;
 
@@ -30,6 +34,11 @@ final class Conv
     {
 	this.luwrain = app.getLuwrain();
 	this.strings = app.getStrings();
+    }
+
+    NewItemType newMainListItemType()
+    {
+	return (NewItemType)fixedList(luwrain, strings.newMainListItemTypePopupName(), new Object[]{NewItemType.PUBL, NewItemType.PRES});
     }
 
 }

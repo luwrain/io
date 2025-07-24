@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Michael Pozhidaev <msp@luwrain.org>
+ * Copyright 2024-2025 Michael Pozhidaev <msp@luwrain.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -14,30 +14,18 @@
 
 package org.luwrain.io.api.lsocial.presentation;
 
-import java.util.*;
-import lombok.*;
+import java.io.*;
+import static java.util.Objects.*;
 import org.luwrain.io.api.lsocial.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public final class Frame
+public final class ListQuery extends Query<ListQuery, ListResponse>
 {
-    static public final int
-	TYPE_MARKDOWN = 0,
-	TYPE_LATEX = 1,
-	TYPE_EQUATION = 2,
-	TYPE_TABLE = 3,
-	TYPE_METAPOST = 4,
-	TYPE_GNUPLOT = 5,
-	TYPE_PLANTUML = 6,
-	TYPE_LISTING = 7,
-	TYPE_GRAPHVIZ_DOT = 8,
-	TYPE_GRAPHVIZ_NEATO = 9,
-	TYPE_GRAPHVIZ_TWOPI = 10,
-	TYPE_GRAPHVIZ_CIRCO = 11;
+    static public final String
+	ADDR = "/v1/presentation/list/",
+	ARG_OFFSET = "offset",
+	ARG_LIMIT = "limit";
 
-    private int type;
-    private String title, subtitle, label, listingLang;
-    private List<String> source;
+    public ListQuery(String endpoint) { super(Type.GET, endpoint, ADDR, ListResponse.class); }
+    public ListQuery offset(int value) { args.put(ARG_OFFSET, String.valueOf(value)); return this; }
+    public ListQuery limit(String value) { args.put(ARG_LIMIT, String.valueOf(value)); return this; }
 }

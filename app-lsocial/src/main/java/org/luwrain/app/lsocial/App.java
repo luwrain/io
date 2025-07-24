@@ -25,9 +25,13 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(title = {"ru=GPTT"}, name = "gpt")
+import static java.util.Objects.*;
+
+@AppNoArgs(name = "social", title = {"en=LUWRAIN Social"})
 public final class App extends AppBase<Strings>
 {
+    static public final String ENDPOINT = "https://luwrain.social";
+
     public Conv conv = null;
     public Config conf = null;
     private MainLayout mainLayout = null;
@@ -44,6 +48,8 @@ public final class App extends AppBase<Strings>
 	conv = new Conv(this);
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
+	if (!requireNonNull(conf.getAccessToken(), "").trim().isEmpty())
+	    mainLayout.updateMainList();
 	return mainLayout.getAreaLayout();
     }
 

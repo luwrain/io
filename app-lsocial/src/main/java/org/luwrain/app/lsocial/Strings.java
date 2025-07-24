@@ -24,4 +24,20 @@ public interface Strings
     String appName();
     String accessTokenEdit();
     String optionsAreaName();
+    String presentationListSuffix();
+    String publicationListSuffix();
+
+    //context menu items
+    String create();
+
+    //Forms
+    String newPresentationAreaName();
+    String nameEdit();
+    String titleEdit();
+    String authorsEdit();
+    String subjectEdit();
+    String dateEdit();
+
+    //Popups
+    String newMainListItemTypePopupName();
 }

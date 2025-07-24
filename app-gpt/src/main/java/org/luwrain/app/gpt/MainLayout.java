@@ -58,7 +58,7 @@ final class MainLayout extends LayoutBase  implements
 		    p.inputPos = ConsoleArea.InputPos.TOP;
 		    p.inputPrefix = app.getStrings().inputPrefix();
 		}));
-	setPropertiesHandler(area, () -> new OptionsLayout(app, getReturnAction()));
+	setPropertiesHandler(area, a -> new OptionsLayout(app, getReturnAction()));
 	setAreaLayout(area, null);
     }
 

@@ -18,73 +18,108 @@ package org.luwrain.app.lsocial;
 
 import java.util.*;
 import java.io.*;
-//import java.net.*;
-
 import org.apache.logging.log4j.*;
 
 import org.luwrain.core.*;
+import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.console.*;
+import org.luwrain.controls.list.*;
 import org.luwrain.io.api.yandex_gpt.*;
+import org.luwrain.io.api.lsocial.publication.*;
+import org.luwrain.io.api.lsocial.publication.*;
 import org.luwrain.app.lsocial.layouts.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;
-import static org.luwrain.controls.ConsoleArea.*;
+import static org.luwrain.core.events.InputEvent.*;
 import static org.luwrain.util.FileUtils.*;
 
-final class MainLayout extends LayoutBase  implements
-					       ClickHandler<Entry>,
-					       Appearance<Entry>,
-					       InputHandler
+final class MainLayout extends LayoutBase 
 {
     static private final Logger log = LogManager.getLogger();
 
-    final List<Entry> entries = new ArrayList<>();
-    final ConsoleArea<Entry> area;
+    final List<Object> entries = new ArrayList<>();
+    final ListArea<Object> mainList;
     private final App app;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	this.area = new ConsoleArea<Entry>(consoleParams(p ->{
+	final var s = app.getStrings();
+	this.mainList = new ListArea<Object>(listParams(p ->{
 		    p.name = app.getStrings().appName();
-		    p.model = new ListModel<Entry>(entries);
-		    p.appearance = this;
-		    p.inputHandler = this;
-		    p.clickHandler = this;
-		    p.inputPos = ConsoleArea.InputPos.TOP;
+		    		    p.model = new ListModel<Object>(entries);
+		    		    p.appearance = new MainListAppearance(getControlContext());
 		}));
-	setPropertiesHandler(area, () -> new OptionsLayout(app, getReturnAction()));
-	setAreaLayout(area, null);
+		setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
+		final var mainListActions = actions(
+						    action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
+	setAreaLayout(mainList, mainListActions);
     }
 
-    @Override public InputHandler.Result onConsoleInput(ConsoleArea area, String text)
+        private boolean onMainListInsert()
     {
-		return InputHandler.Result.CLEAR_INPUT;
-    }
-
-    @Override public void announceItem(Entry entry)
-    {
-    }
-
-    @Override public String getTextAppearance(Entry entry)
-    {
-	switch(entry.getType())
+	final var type = app.conv.newMainListItemType();
+	if (type == null)
+	    return true;
+	switch(type)
 	{
-	    case USER:
-		case MODEL:
-		    	return entry.getText();
-	case FILE:
-	    return entry.getPath();
-    }
-	return entry.toString();
+	case PRES: {
+	    final var layout = new NewPresentationLayout(app, getReturnAction(), pr -> {
+		    return true;
+	    });
+	    app.setAreaLayout(layout);
+	    getLuwrain().announceActiveArea();
+	}
+	    
+	}
+	return true;
     }
 
-        @Override public boolean onConsoleClick(ConsoleArea area, int index, Entry entry)
+    void updateMainList()
     {
-	return true;
+	final var taskId = app.newTaskId();
+	app.runTask(taskId, ()-> {
+		log.trace("Starting updating the main list");
+				final var res = new ArrayList<Object>();
+		log.trace("Querying presentations");
+		final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
+		log.debug("Response: " + prRes.getStatus());
+				log.debug("Response: " + prRes.getNumTotal());
+		res.addAll(prRes.getEn());
+		log.trace("Querying publications");
+				final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
+				res.addAll(publRes.getEn());
+		app.finishedTask(taskId, ()-> {
+			entries.clear();
+			entries.addAll(res);
+			mainList.refresh();
+		    });
+	    });
+    }
+
+final class MainListAppearance  extends DoubleLevelAppearance<Object>
+    {
+	MainListAppearance(ControlContext context) { super(context); }
+	@Override public boolean isSectionItem(Object obj)
+	{
+	    return false;
+	}
+
+	    @Override public void announceNonSection(Object item)
+	{
+	    final var s = app.getStrings();
+	    if (item instanceof Publication publ)
+		app.setEventResponse(listItem(publ.getName() + " " + s.publicationListSuffix()));
+	}
+
+	    @Override public String getNonSectionScreenAppearance(Object item)
+	{
+	    if (item instanceof Publication publ)
+		return publ.getName();
+	    return item.toString();
+	}
     }
 }
