@@ -55,6 +55,11 @@ public final class NewPresentationLayout extends LayoutBase
 	setAreaLayout(form, null);
 	setOkHandler(() -> {
 		final var p = new org.luwrain.io.api.lsocial.presentation.Presentation();
+		p.setName(form.getEnteredText(NAME));
+		p.setTitle(form.getEnteredText(TITLE));
+		p.setAuthors(form.getEnteredText(AUTHORS));
+		p.setSubject(form.getEnteredText(SUBJECT));
+		p.setDate(form.getEnteredText(DATE));
 		if (okFunc.test(p))
 		    close.onAction();
 		return true;

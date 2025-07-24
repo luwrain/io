@@ -26,7 +26,8 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.io.api.yandex_gpt.*;
-import org.luwrain.io.api.lsocial.publication.*;
+import org.luwrain.io.api.lsocial.publication.Publication;
+import org.luwrain.io.api.lsocial.presentation.Presentation;
 import org.luwrain.io.api.lsocial.publication.*;
 import org.luwrain.app.lsocial.layouts.*;
 
@@ -50,16 +51,16 @@ final class MainLayout extends LayoutBase
 	final var s = app.getStrings();
 	this.mainList = new ListArea<Object>(listParams(p ->{
 		    p.name = app.getStrings().appName();
-		    		    p.model = new ListModel<Object>(entries);
-		    		    p.appearance = new MainListAppearance(getControlContext());
+		    p.model = new ListModel<Object>(entries);
+		    p.appearance = new MainListAppearance(getControlContext());
 		}));
-		setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
-		final var mainListActions = actions(
-						    action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
+	setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
+	final var mainListActions = actions(
+					    action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
 	setAreaLayout(mainList, mainListActions);
     }
 
-        private boolean onMainListInsert()
+    private boolean onMainListInsert()
     {
 	final var type = app.conv.newMainListItemType();
 	if (type == null)
@@ -68,12 +69,28 @@ final class MainLayout extends LayoutBase
 	{
 	case PRES: {
 	    final var layout = new NewPresentationLayout(app, getReturnAction(), pr -> {
-		    return true;
+		    if (pr.getName().trim().isEmpty())
+		    {
+			app.message(app.getStrings().nameCannotBeEmpty(), Luwrain.MessageType.ERROR);
+			return false;
+		    }
+		    final var taskId = app.newTaskId();
+		    return app.runTask(taskId, () -> {
+			    log.trace("Creating new presentation: " + pr);
+			    final var resp = new org.luwrain.io.api.lsocial.presentation.CreateQuery(App.ENDPOINT)
+			    .accessToken(app.conf.getAccessToken())
+			    .name(pr.getName())
+			    .title(pr.getTitle())
+			    .authors(pr.getAuthors())
+			    .subject(pr.getSubject())
+			    .date(pr.getDate())
+			    .exec();
+			    log.trace("Responce is " + resp);
+			});
 	    });
 	    app.setAreaLayout(layout);
 	    getLuwrain().announceActiveArea();
 	}
-	    
 	}
 	return true;
     }
@@ -83,15 +100,15 @@ final class MainLayout extends LayoutBase
 	final var taskId = app.newTaskId();
 	app.runTask(taskId, ()-> {
 		log.trace("Starting updating the main list");
-				final var res = new ArrayList<Object>();
+		final var res = new ArrayList<Object>();
 		log.trace("Querying presentations");
 		final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
 		log.debug("Response: " + prRes.getStatus());
-				log.debug("Response: " + prRes.getNumTotal());
+		log.debug("Response: " + prRes.getNumTotal());
 		res.addAll(prRes.getEn());
 		log.trace("Querying publications");
-				final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
-				res.addAll(publRes.getEn());
+		final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
+		res.addAll(publRes.getEn());
 		app.finishedTask(taskId, ()-> {
 			entries.clear();
 			entries.addAll(res);
@@ -100,7 +117,7 @@ final class MainLayout extends LayoutBase
 	    });
     }
 
-final class MainListAppearance  extends DoubleLevelAppearance<Object>
+    final class MainListAppearance  extends DoubleLevelAppearance<Object>
     {
 	MainListAppearance(ControlContext context) { super(context); }
 	@Override public boolean isSectionItem(Object obj)
@@ -108,17 +125,22 @@ final class MainListAppearance  extends DoubleLevelAppearance<Object>
 	    return false;
 	}
 
-	    @Override public void announceNonSection(Object item)
+	@Override public void announceNonSection(Object item)
 	{
 	    final var s = app.getStrings();
 	    if (item instanceof Publication publ)
-		app.setEventResponse(listItem(publ.getName() + " " + s.publicationListSuffix()));
+		app.setEventResponse(listItem(publ.getName() + " " + s.publicationListSuffix())); else
+		if (item instanceof Presentation pr)
+		    app.setEventResponse(listItem(pr.getName() + " " + s.presentationListSuffix())); else
+		    app.setEventResponse(listItem(item.toString()));
 	}
 
-	    @Override public String getNonSectionScreenAppearance(Object item)
+	@Override public String getNonSectionScreenAppearance(Object item)
 	{
 	    if (item instanceof Publication publ)
 		return publ.getName();
+	    if (item instanceof Presentation pr)
+		return pr.getName();
 	    return item.toString();
 	}
     }

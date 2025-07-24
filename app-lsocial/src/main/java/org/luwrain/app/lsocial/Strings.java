@@ -40,4 +40,7 @@ public interface Strings
 
     //Popups
     String newMainListItemTypePopupName();
+
+    //Messages
+    String nameCannotBeEmpty();
 }
