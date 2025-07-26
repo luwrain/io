@@ -35,6 +35,7 @@ public final class App extends AppBase<Strings>
     public Conv conv = null;
     public Config conf = null;
     private MainLayout mainLayout = null;
+
     public App() { super(Strings.class, "luwrain.commander"); }
 
     @Override public AreaLayout onAppInit()
@@ -46,7 +47,7 @@ public final class App extends AppBase<Strings>
 	    getLuwrain().saveConf(conf);
 	}
 	conv = new Conv(this);
-	mainLayout = new MainLayout(this);
+	mainLayout = new MainLayout(this, true);
 	setAppName(getStrings().appName());
 	if (!requireNonNull(conf.getAccessToken(), "").trim().isEmpty())
 	    mainLayout.updateMainList();

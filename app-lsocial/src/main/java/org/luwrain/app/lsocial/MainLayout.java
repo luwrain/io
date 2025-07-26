@@ -26,9 +26,10 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.io.api.yandex_gpt.*;
-import org.luwrain.io.api.lsocial.publication.Publication;
 import org.luwrain.io.api.lsocial.presentation.Presentation;
-import org.luwrain.io.api.lsocial.publication.*;
+import org.luwrain.io.api.lsocial.presentation.Frame;
+import org.luwrain.io.api.lsocial.publication.Publication;
+import org.luwrain.io.api.lsocial.publication.Section;
 import org.luwrain.app.lsocial.layouts.*;
 
 import static java.util.Objects.*;
@@ -36,29 +37,57 @@ import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.events.InputEvent.*;
 import static org.luwrain.util.FileUtils.*;
 
-final class MainLayout extends LayoutBase 
+public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Object>
 {
     static private final Logger log = LogManager.getLogger();
 
     final List<Object> entries = new ArrayList<>();
-    final ListArea<Object> mainList;
-    private final App app;
+    protected final ListArea<Object> mainList;
+    protected final Actions mainListActions;
+    protected final App app;
+    private LayoutExt ext = null;
 
-    MainLayout(App app)
+    protected MainLayout(App app, boolean setAreas) 
     {
 	super(app);
 	this.app = app;
 	final var s = app.getStrings();
-	this.mainList = new ListArea<Object>(listParams(p ->{
+
+	mainList = new ListArea<Object>(listParams(p ->{
 		    p.name = app.getStrings().appName();
 		    p.model = new ListModel<Object>(entries);
 		    p.appearance = new MainListAppearance(getControlContext());
+		    p.clickHandler = this;
 		}));
 	setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
-	final var mainListActions = actions(
-					    action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
-	setAreaLayout(mainList, mainListActions);
+
+	mainListActions = actions(
+				  action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
+	if (setAreas)
+	    setAreaLayout(mainList, mainListActions);
     }
+
+    @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
+    {
+	if (obj instanceof Publication publ)
+	{
+	    ext = new PublicationLayoutExt(this);
+	    updateAreas();
+	    ext.activateDefaultArea();
+	}
+	return true;
+    }
+
+boolean onSectClick(Section sect)
+    {
+	return true;
+    }
+
+boolean onFrameClick(Frame frame)
+    {
+	return true;
+    }
+
 
     private boolean onMainListInsert()
     {
@@ -93,6 +122,17 @@ final class MainLayout extends LayoutBase
 	}
 	}
 	return true;
+    }
+
+    void updateAreas()
+    {
+	if (ext != null)
+	{
+	    log.debug("Using area layout of " + ext.getClass().getName());
+	    ext.setLayout();
+	} else
+	setAreaLayout(mainList, mainListActions);
+	app.setAreaLayout(this);
     }
 
     void updateMainList()
