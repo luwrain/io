@@ -62,7 +62,8 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
 
 	mainListActions = actions(
-				  action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert),
+				  action("insert", s.create(), new InputEvent(Special.INSERT),
+					 () -> { 	app.setAreaLayout(new NewEntryLayout(app, this, getReturnAction())); return true; }),
 				  action("delete", s.delete(), new InputEvent(Special.DELETE), this::onMainListDelete)
 				  );
 
@@ -129,51 +130,6 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 			//FIXME:
 		    });
 	    });
-    }
-
-    boolean onMainListInsert()
-    {
-	/*
-	final var type = app.conv.newMainListItemType();
-	if (type == null)
-	    return true;
-	switch(type)
-	{
-	case PRES: {
-	    final var layout = new NewPresentationLayout(app, getReturnAction(), pr -> {
-		    if (pr.getName().trim().isEmpty())
-		    {
-			app.message(app.getStrings().nameCannotBeEmpty(), Luwrain.MessageType.ERROR);
-			return false;
-		    }
-		    final var taskId = app.newTaskId();
-		    return app.runTask(taskId, () -> {
-			    log.trace("Creating new presentation: " + pr);
-			    final var resp = new org.luwrain.io.api.lsocial.presentation.CreateQuery(App.ENDPOINT)
-			    .accessToken(app.conf.getAccessToken())
-			    .name(pr.getName())
-			    .title(pr.getTitle())
-			    .authors(pr.getAuthors())
-			    .subject(pr.getSubject())
-			    .date(pr.getDate())
-			    .exec();
-			    log.trace("Responce is " + resp);
-			    final var res = fetchMainListItems();
-			    app.finishedTask(taskId, () -> {
-				    entries.clear();
-				    entries.addAll(res);
-				    mainList.refresh();
-				});
-			});
-	    });
-	    app.setAreaLayout(layout);
-	    getLuwrain().announceActiveArea();
-	}
-	}
-	return true;
-	*/
-	app.setAreaLayout(new NewEntryLayout(app, this, getReturnAction()));
-	return true;
     }
 
     void openExt(LayoutExt ext)

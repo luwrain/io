@@ -43,7 +43,7 @@ public interface Strings
     String paperClickable();
     String bookClickable();
     String thesisClickable();
-    String graduatingWorkClickable();
+    String graduationWorkClickable();
     String courseWorkClickable();
     
 

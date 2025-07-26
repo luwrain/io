@@ -25,9 +25,10 @@ public final class Publication
 {
     static public final int
 	TYPE_PAPER = 0,
-	TYPE_GRADUATE = 1,
+	TYPE_BOOK = 1,
 	TYPE_THESIS = 2,
-	TYPE_TUTORIAL = 3;
+	TYPE_GRADUATION_WORK = 3,
+    TYPE_COURSE_WORK = 4;
 
     private long id;
     private int type;
