@@ -41,20 +41,20 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 {
     static private final Logger log = LogManager.getLogger();
 
-    final List<Object> entries = new ArrayList<>();
-    protected final ListArea<Object> mainList;
-    protected final Actions mainListActions;
-    protected final App app;
+    public final List<Object> entries = new ArrayList<>();
+    public final ListArea<Object> mainList;
+    final Actions mainListActions;
+    final App app;
     private LayoutExt ext = null;
 
-    protected MainLayout(App app, boolean setAreas) 
+    MainLayout(App app) 
     {
 	super(app);
 	this.app = app;
 	final var s = app.getStrings();
 
 	mainList = new ListArea<Object>(listParams(p ->{
-		    p.name = app.getStrings().appName();
+		    p.name = s.appName();
 		    p.model = new ListModel<Object>(entries);
 		    p.appearance = new MainListAppearance(getControlContext());
 		    p.clickHandler = this;
@@ -62,35 +62,78 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
 
 	mainListActions = actions(
-				  action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert));
-	if (setAreas)
-	    setAreaLayout(mainList, mainListActions);
+				  action("insert", s.create(), new InputEvent(Special.INSERT), this::onMainListInsert),
+				  action("delete", s.delete(), new InputEvent(Special.DELETE), this::onMainListDelete)
+				  );
+
+	setAreaLayout(mainList, mainListActions);
     }
 
     @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
     {
 	if (obj instanceof Publication publ)
-	{
-	    ext = new PublicationLayoutExt(this);
-	    updateAreas();
-	    ext.activateDefaultArea();
-	}
-	return true;
+	    return onPublClick(publ);
+	return false;
     }
 
-boolean onSectClick(Section sect)
+    boolean onPublClick(Publication publ)
     {
-	return true;
+	final var taskId = app.newTaskId();
+	return app.runTask(taskId, () -> {
+		final var res = new org.luwrain.io.api.lsocial.publication.GetQuery(App.ENDPOINT)
+		.accessToken(app.conf.getAccessToken())
+		.mode(org.luwrain.io.api.lsocial.publication.GetQuery.MODE_FULL)
+		.publ(publ.getId())
+		.exec();
+		app.finishedTask(taskId, () -> {
+			openExt(new PublicationLayoutExt(this, res.getPubl()));
+		    });
+	    });
     }
 
-boolean onFrameClick(Frame frame)
+    boolean onMainListDelete()
     {
-	return true;
+	final var selected = mainList.selected();
+	if (selected == null)
+	    return false;
+	if (selected instanceof Publication publ)
+	    return onDelete(publ);
+	if (selected instanceof Presentation pr)
+	    return onDelete(pr);
+	return false;
     }
 
-
-    private boolean onMainListInsert()
+    boolean onDelete(Publication publ)
     {
+	final var taskId = app.newTaskId();
+	return app.runTask(taskId, () -> {
+		final var res = new org.luwrain.io.api.lsocial.publication.DeleteQuery(App.ENDPOINT)
+		.accessToken(app.conf.getAccessToken())
+		.publ(publ)
+		.exec();
+		app.finishedTask(taskId, () -> {
+			//FIXME:
+		    });
+	    });
+    }
+
+    boolean onDelete(Presentation pr)
+    {
+	final var taskId = app.newTaskId();
+	return app.runTask(taskId, () -> {
+		final var res = new org.luwrain.io.api.lsocial.presentation.DeleteQuery(App.ENDPOINT)
+		.accessToken(app.conf.getAccessToken())
+		.pr(pr)
+		.exec();
+		app.finishedTask(taskId, () -> {
+			//FIXME:
+		    });
+	    });
+    }
+
+    boolean onMainListInsert()
+    {
+	/*
 	final var type = app.conv.newMainListItemType();
 	if (type == null)
 	    return true;
@@ -115,6 +158,12 @@ boolean onFrameClick(Frame frame)
 			    .date(pr.getDate())
 			    .exec();
 			    log.trace("Responce is " + resp);
+			    final var res = fetchMainListItems();
+			    app.finishedTask(taskId, () -> {
+				    entries.clear();
+				    entries.addAll(res);
+				    mainList.refresh();
+				});
 			});
 	    });
 	    app.setAreaLayout(layout);
@@ -122,33 +171,37 @@ boolean onFrameClick(Frame frame)
 	}
 	}
 	return true;
+	*/
+	app.setAreaLayout(new NewEntryLayout(app, this, getReturnAction()));
+	return true;
     }
 
-    void updateAreas()
+    void openExt(LayoutExt ext)
     {
-	if (ext != null)
-	{
-	    log.debug("Using area layout of " + ext.getClass().getName());
+	this.ext = ext;
 	    ext.setLayout();
-	} else
-	setAreaLayout(mainList, mainListActions);
 	app.setAreaLayout(this);
+	ext.activateDefaultArea();
+    }
+
+    public List<Object> fetchMainListItems() throws IOException
+    {
+	log.trace("Starting updating the main list");
+	final var res = new ArrayList<Object>();
+	log.trace("Querying presentations");
+	final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
+	res.addAll(prRes.getEn());
+	log.trace("Querying publications");
+	final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
+	res.addAll(publRes.getEn());
+	return res;
     }
 
     void updateMainList()
     {
 	final var taskId = app.newTaskId();
 	app.runTask(taskId, ()-> {
-		log.trace("Starting updating the main list");
-		final var res = new ArrayList<Object>();
-		log.trace("Querying presentations");
-		final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
-		log.debug("Response: " + prRes.getStatus());
-		log.debug("Response: " + prRes.getNumTotal());
-		res.addAll(prRes.getEn());
-		log.trace("Querying publications");
-		final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
-		res.addAll(publRes.getEn());
+		final var res = fetchMainListItems();
 		app.finishedTask(taskId, ()-> {
 			entries.clear();
 			entries.addAll(res);

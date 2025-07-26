@@ -14,28 +14,25 @@
 
 package org.luwrain.io.api.lsocial;
 
+import static java.util.Objects.*;
+
 public class QueryException extends java.io.IOException
 {
     public final int httpCode;
     public final Response resp;
 
-    public QueryException(Exception e)
-    {
-	super(e.getMessage(), e);
-	this.httpCode = -1;
-	this.resp = null;
-    }
-
     public QueryException(String message)
     {
 	super(message);
-		this.httpCode = -1;
+	this.httpCode = -1;
 	this.resp = null;
     }
 
     public QueryException(int httpCode, Response resp)
     {
-	super("HTTP code: " + String.valueOf(httpCode + (resp != null?", Error code: " + resp.getErrorCode():"")));
+	super("HTTP code: " + String.valueOf(httpCode) +
+	      ", error code: " + requireNonNullElse(resp.getErrorCode(), "") +
+	      ", message: " + requireNonNullElse(resp.getErrorMessage(), ""));
 	this .httpCode = httpCode;
 	this.resp = resp;
     }

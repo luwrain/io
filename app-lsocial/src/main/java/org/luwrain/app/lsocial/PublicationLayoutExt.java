@@ -25,9 +25,6 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
-import org.luwrain.io.api.yandex_gpt.*;
-import org.luwrain.io.api.lsocial.presentation.Presentation;
-import org.luwrain.io.api.lsocial.presentation.Frame;
 import org.luwrain.io.api.lsocial.publication.Publication;
 import org.luwrain.io.api.lsocial.publication.Section;
 import org.luwrain.app.lsocial.*;
@@ -45,7 +42,7 @@ final class PublicationLayoutExt implements LayoutExt
     final List<Section> sections = new ArrayList<>();
     final ListArea<Section> sectList;
 
-    PublicationLayoutExt(MainLayout mainLayout)
+    PublicationLayoutExt(MainLayout mainLayout, Publication publ)
     {
 	this.mainLayout = mainLayout;
 	final var s = mainLayout.app.getStrings();

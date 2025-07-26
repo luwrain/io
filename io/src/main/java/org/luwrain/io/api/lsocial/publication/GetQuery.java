@@ -40,6 +40,20 @@ public final class GetQuery extends Query<GetQuery, GetResponse>
 	return this;
     }
 
+        public GetQuery publ(long value)
+    {
+	if (value < 0)
+	    throw new IllegalArgumentException("value can't be negative");
+	args.put(ARG_PUBL, String.valueOf(value));
+	return this;
+    }
+
+                    public GetQuery publ(Publication publ)
+    {
+	requireNonNull(publ, "publ can't be null");
+	return publ(publ.getId());
+    }
+
     public GetQuery mode(int mode)
     {
 	if (mode < 1)

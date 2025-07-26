@@ -25,5 +25,14 @@ public final class DeleteQuery extends Query<DeleteQuery, DeleteResponse>
 	ARG_PR = "pr";
 
     public DeleteQuery(String endpoint) { super(Type.GET, endpoint, ADDR, DeleteResponse.class); }
-        public DeleteQuery pr(String value) { args.put(ARG_PR, requireNonNull(value, "value can't be null")); return this; }
+    public DeleteQuery pr(String value) { args.put(ARG_PR, requireNonNull(value, "value can't be null")); return this; }
+    public DeleteQuery pr(Presentation pr) { return pr(pr.getId()); }
+
+    public DeleteQuery pr(long value)
+    {
+	if (value < 0)
+	    throw new IllegalArgumentException("value can't be negative");
+	args.put(ARG_PR, String.valueOf(value));
+	return this;
+    }
 }

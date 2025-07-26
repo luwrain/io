@@ -47,7 +47,7 @@ public final class App extends AppBase<Strings>
 	    getLuwrain().saveConf(conf);
 	}
 	conv = new Conv(this);
-	mainLayout = new MainLayout(this, true);
+	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	if (!requireNonNull(conf.getAccessToken(), "").trim().isEmpty())
 	    mainLayout.updateMainList();
