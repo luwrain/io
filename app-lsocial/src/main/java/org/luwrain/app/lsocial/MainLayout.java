@@ -87,7 +87,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 		.publ(publ.getId())
 		.exec();
 		app.finishedTask(taskId, () -> {
-			openExt(new PublicationLayoutExt(this, res.getPubl()));
+			openExt(new PublLayoutExt(this, res.getPubl()));
 		    });
 	    });
     }
