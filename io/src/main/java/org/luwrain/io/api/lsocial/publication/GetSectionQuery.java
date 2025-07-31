@@ -18,29 +18,25 @@ import java.io.*;
 import static java.util.Objects.*;
 import org.luwrain.io.api.lsocial.*;
 
-public final class GetQuery extends Query<GetQuery, GetResponse>
+public final class GetSectionQuery extends Query<GetSectionQuery, GetSectionResponse>
 {
     static public final String
-	ADDR = "/v1/publication/get/",
+	ADDR = "/v1/publication/section/get/",
 	ARG_PUBL = "publ",
-	ARG_MODE = "mode";
+	ARG_SECT = "sect";
 
-    static public final int
-	MODE_HEADER = 0,
-	MODE_FULL = 10;
-
-    public GetQuery(String endpoint)
+    public GetSectionQuery(String endpoint)
     {
-	super(Type.GET, endpoint, ADDR, GetResponse.class);
+	super(Type.GET, endpoint, ADDR, GetSectionResponse.class);
     }
 
-    public GetQuery publ(String value)
+    public GetSectionQuery publ(String value)
     {
 	args.put(ARG_PUBL, requireNonNull(value, "value can't be null"));
 	return this;
     }
 
-        public GetQuery publ(long value)
+        public GetSectionQuery publ(long value)
     {
 	if (value < 0)
 	    throw new IllegalArgumentException("value can't be negative");
@@ -48,17 +44,17 @@ public final class GetQuery extends Query<GetQuery, GetResponse>
 	return this;
     }
 
-                    public GetQuery publ(Publication publ)
+                    public GetSectionQuery publ(Publication publ)
     {
 	requireNonNull(publ, "publ can't be null");
 	return publ(publ.getId());
     }
 
-    public GetQuery mode(int mode)
+    public GetSectionQuery sect(int value)
     {
-	if (mode < 1)
-	    throw new IllegalArgumentException("mode can't be negative");
-	args.put(ARG_MODE, String.valueOf(mode));
+	if (value < 0)
+	    throw new IllegalArgumentException("value can't be negative");
+	args.put(ARG_SECT, String.valueOf(value));
 	return this;
     }
 }

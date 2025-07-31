@@ -24,7 +24,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.list.*;
+import org.luwrain.controls.edit.*;
 import org.luwrain.io.api.lsocial.publication.Publication;
 import org.luwrain.io.api.lsocial.publication.Section;
 import org.luwrain.app.lsocial.*;
@@ -38,25 +38,33 @@ class PublSectLayoutExt extends PublLayoutExt
 {
     static private final Logger log = LogManager.getLogger();
 
-PublSectLayoutExt(MainLayout mainLayout, Publication publ)
+    final Section sect;
+    final EditArea edit;
+    final Actions editActions;
+
+    PublSectLayoutExt(MainLayout mainLayout, Publication publ, Section sect)
     {
 	super(mainLayout, publ);
+	this.sect = sect;
 
-	/*
-	actions = mainLayout.actions(
-			  mainLayout.action("insert", s.create(), new InputEvent(Special.INSERT), this::onInsert)
+	edit = new EditArea(mainLayout.editParams( p -> {
+
+		}));
+
+	editActions = mainLayout.actions(
+				     //			  mainLayout.action("insert", s.create(), new InputEvent(Special.INSERT), this::onInsert)
 );
-	*/
     }
 
     @Override public void setLayout()
     {
-	mainLayout.setAreaLayout(AreaLayout.LEFT_RIGHT, mainLayout.mainList, mainLayout.mainListActions,
-				 sectList, actions);
+	mainLayout.setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM, mainLayout.mainList, mainLayout.mainListActions,
+				 sectList, actions,
+				 edit, editActions);
     }
 
     @Override public void activateDefaultArea()
     {
-	mainLayout.setActiveArea(sectList);
+	mainLayout.setActiveArea(edit);
     }
 }

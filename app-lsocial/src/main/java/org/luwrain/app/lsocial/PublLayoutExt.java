@@ -80,8 +80,22 @@ class PublLayoutExt implements LayoutExt
 
     boolean onSectClick(Section sect)
     {
-	return true;
-    }
+	final var index = sectList.selectedIndex();
+	if (index < 0)
+	    return false;
+	final var taskId = app.newTaskId();
+	return app.runTask(taskId, () -> {
+		final var res = new org.luwrain.io.api.lsocial.publication.GetSectionQuery(App.ENDPOINT)
+		.accessToken(app.conf.getAccessToken())
+		.publ(publ)
+		.sect(index)
+		.exec();
+		app.finishedTask(taskId, () -> {
+			final var e = new PublSectLayoutExt(mainLayout, publ, res.getSect());
+	mainLayout.openExt(e);
+		    });
+	    });
+	    }
 
     @Override public void setLayout()
     {
