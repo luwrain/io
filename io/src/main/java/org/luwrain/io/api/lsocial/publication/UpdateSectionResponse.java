@@ -20,8 +20,6 @@ import org.luwrain.io.api.lsocial.*;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @NoArgsConstructor
-@AllArgsConstructor
-public class CreateSectionResponse extends Response
+public class UpdateSectionResponse extends Response
 {
-    int sectionIndex, sectionCount;
 }

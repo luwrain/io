@@ -91,7 +91,7 @@ class PublLayoutExt implements LayoutExt
 		.sect(index)
 		.exec();
 		app.finishedTask(taskId, () -> {
-			final var e = new PublSectLayoutExt(this, publ, res.getSect());
+			final var e = new PublSectLayoutExt(this, publ, res.getSect(), index);
 	mainLayout.openExt(e);
 		    });
 	    });
