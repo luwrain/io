@@ -24,6 +24,7 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
+import org.luwrain.io.api.yandex_gpt.*;
 
 import static java.util.Objects.*;
 
@@ -58,5 +59,16 @@ public final class App extends AppBase<Strings>
     {
 	closeApp();
 	return true;
+    }
+
+    List<String> yandexGpt(String query) throws IOException
+    {
+	final var messages = List.of(new Message("user", query));
+	final var g = new YandexGpt(conf.getYandexFolderId(), conf.getYandexApiKey(),
+				    new CompletionOptions(false, 0.7, 4096),
+messages);
+	final var resp = g.doSync();
+	final var a = resp.getResult().getAlternatives();
+	return Arrays.asList(a.get(0).getMessage().getText().split("\n", -1));
     }
 }

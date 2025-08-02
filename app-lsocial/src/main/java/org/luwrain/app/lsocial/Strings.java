@@ -22,7 +22,13 @@ import org.luwrain.core.annotations.*;
 public interface Strings
 {
     String appName();
+
+    //config layout
     String accessTokenEdit();
+        String yandexApiKeyEdit();
+        String yandexFolderIdEdit();
+
+    
     String optionsAreaName();
     String newEntryAreaName();
     String presentationListSuffix();

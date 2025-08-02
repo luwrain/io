@@ -23,4 +23,5 @@ import lombok.*;
 public final class Config
 {
     private String accessToken;
+        private String yandexFolderId, yandexApiKey;
 }

@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2022 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -31,7 +31,7 @@ import static org.luwrain.util.RangeUtils.*;
 public class SpellExclusion
 {
     static private final String
-	NLP_DIR = "luwrain.nlp",
+	NLP_DIR = "var:luwrain.nlp",
 	EXCLUSION_FILE = "spelling-exclusion.json";
     static final Type
 	EXCLUSION_LIST_TYPE = new TypeToken<List<Exclusion>>(){}.getType();
@@ -89,7 +89,7 @@ public class SpellExclusion
 
     private File getFile()
     {
-	return new File(luwrain.getAppDataDir(NLP_DIR).toFile(), EXCLUSION_FILE);
+	return new File(new File(luwrain.getPath(NLP_DIR)), EXCLUSION_FILE);
     }
 
     static public final class Exclusion
