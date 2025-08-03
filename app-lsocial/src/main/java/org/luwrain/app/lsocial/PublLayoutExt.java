@@ -30,6 +30,7 @@ import org.luwrain.io.api.lsocial.publication.Section;
 import org.luwrain.app.lsocial.*;
 
 import static java.util.Objects.*;
+import static java.util.stream.Collectors.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.events.InputEvent.*;
 import static org.luwrain.app.base.LayoutBase.*;
@@ -57,6 +58,7 @@ class PublLayoutExt implements LayoutExt
 	sectList = new ListArea<Section>(mainLayout.listParams(p ->{
 		    p.name = s.appName();
 		    p.model = new ListModel<Section>(sections);
+		    p.appearance = new Appearance();
 		    p.clickHandler = (area, index, sect) -> onSectClick(sect);
 		}));
 
@@ -107,4 +109,63 @@ class PublLayoutExt implements LayoutExt
     {
 	mainLayout.setActiveArea(sectList);
     }
+
+    final class Appearance extends AbstractAppearance<Section>
+    {
+	@Override public void announceItem(Section sect, Set<Flags> flags)
+	{
+	    switch(sect.getType())
+	    {
+	    case Section.TYPE_MARKDOWN:
+	    case Section.TYPE_LATEX:
+		app.getLuwrain().setEventResponse(listItem(sect.getSrc().stream().collect(joining(" "))));
+		return;
+	    case Section.TYPE_METAPOST:
+		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeMetapost() + " "
+							   + captOrSource(sect)));
+		return;
+	    case Section.TYPE_GNUPLOT:
+		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeGnuplot() + " "
+							   + captOrSource(sect)));
+		return;
+	    case Section.TYPE_LISTING:
+		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeListing() + " "
+							   + captOrSource(sect)));
+		return;
+	    default:
+		app.getLuwrain().setEventResponse(listItem(captOrSource(sect)));
+		break;
+	    }
+	}
+
+	@Override public String getScreenAppearance(Section sect, Set<Flags> flags)
+	{
+	    switch(sect.getType())
+	    {
+	    case Section.TYPE_MARKDOWN:
+	    case Section.TYPE_LATEX:
+		if (sect.getSrc().isEmpty())
+		    return "";
+		if (sect.getSrc().size() == 1)
+		    return sect.getSrc().get(0);
+		return sect.getSrc().get(0) + "...";
+	    default:
+	        return captOrSource(sect);
+	    }
+	}
+
+	String captOrSource(Section sect)
+	{
+	    final String capt;
+	    if (sect.getCapt() != null)
+		capt = sect.getCapt().stream().collect(joining("\n")).trim(); else
+		capt = "";
+	    if (!capt.isEmpty())
+		return capt;
+	    if (!sect.getSrc().isEmpty())
+		return sect.getSrc().get(0);
+	    return "";
+	    	}
+    }
+
 }

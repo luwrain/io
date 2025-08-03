@@ -23,6 +23,16 @@ public interface Strings
 {
     String appName();
 
+    //Section types
+    String typeMarkdown();
+    String typeLatex();
+    String typeMetapost();
+    String typeListing();
+    String typeEquation();
+    String typeGnuplot();
+    String typeUml();
+    String typeGraphviz();
+
     //config layout
     String accessTokenEdit();
         String yandexApiKeyEdit();

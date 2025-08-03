@@ -27,6 +27,7 @@ import org.luwrain.core.annotations.*;
 import org.luwrain.io.api.yandex_gpt.*;
 
 import static java.util.Objects.*;
+import static org.luwrain.util.TextUtils.*;
 
 @AppNoArgs(name = "social", title = {"en=LUWRAIN Social"})
 public final class App extends AppBase<Strings>
@@ -36,6 +37,7 @@ public final class App extends AppBase<Strings>
     public Conv conv = null;
     public Config conf = null;
     private MainLayout mainLayout = null;
+    private Set<String> nbspAfterWords = new HashSet<>(Arrays.asList("В", "НА", "ПОД"));
 
     public App() { super(Strings.class, "luwrain.commander"); }
 
@@ -71,4 +73,14 @@ messages);
 	final var a = resp.getResult().getAlternatives();
 	return Arrays.asList(a.get(0).getMessage().getText().split("\n", -1));
     }
+
+    public String translateUserInput(String line, int pos, String text)
+    {
+	final var lastWord = getLastWord(line, pos).toUpperCase();
+	if (text.equals(" ") && nbspAfterWords.contains(lastWord))
+	    return "~";
+	return text;
+    }
+
+    
 }

@@ -58,7 +58,12 @@ class PublSectLayoutExt implements LayoutExt
 	this.sectIndex = sectIndex;
 
 	edit = new EditArea(mainLayout.editParams( p -> {
-
+		    p.editFactory = e -> {
+			e.model = new MultilineEditModelWrap(e.model){
+				@Override public MultilineEdit.ModificationResult putChars(int x, int y, String chars) { return super.putChars(x, y, app.translateUserInput(getLine(getHotPointY()), x, chars)); }
+			    };
+			return new MultilineEdit(e);
+		    };
 		})){
 		@Override public boolean onSystemEvent(org.luwrain.core.events.SystemEvent event)
 		{

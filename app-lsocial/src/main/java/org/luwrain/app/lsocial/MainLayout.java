@@ -83,7 +83,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	return app.runTask(taskId, () -> {
 		final var res = new org.luwrain.io.api.lsocial.publication.GetQuery(App.ENDPOINT)
 		.accessToken(app.conf.getAccessToken())
-		.mode(org.luwrain.io.api.lsocial.publication.GetQuery.MODE_FULL)
+		.mode(org.luwrain.io.api.lsocial.publication.GetQuery.MODE_PREVIEW)
 		.publ(publ.getId())
 		.exec();
 		app.finishedTask(taskId, () -> {

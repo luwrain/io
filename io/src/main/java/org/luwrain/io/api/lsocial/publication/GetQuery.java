@@ -27,7 +27,8 @@ public final class GetQuery extends Query<GetQuery, GetResponse>
 
     static public final int
 	MODE_HEADER = 0,
-	MODE_FULL = 10;
+	MODE_PREVIEW = 500,
+	MODE_FULL = 1000;
 
     public GetQuery(String endpoint)
     {
