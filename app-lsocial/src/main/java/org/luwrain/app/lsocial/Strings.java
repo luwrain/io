@@ -64,6 +64,7 @@ public interface Strings
     
 
     //Popups
+    String newPublSectTypePopupName();
     String newMainListItemTypePopupName();
 
     //Messages

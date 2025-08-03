@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
+import org.luwrain.io.api.lsocial.publication.Section;
 
 import static org.luwrain.popups.Popups.*;
 
@@ -41,4 +42,21 @@ final class Conv
 	return (NewItemType)fixedList(luwrain, strings.newMainListItemTypePopupName(), new Object[]{NewItemType.PUBL, NewItemType.PRES});
     }
 
+    int newPublSectType()
+    {
+	final String res = (String)fixedList(luwrain, strings.newPublSectTypePopupName(), new String[]{
+		strings.typeMarkdown(),
+		strings.typeLatex(),
+		strings.typeMetapost(),
+		strings.typeGnuplot(),
+		strings.typeListing() });
+	if (res == null)
+	    return -1;
+	if (res.equals(strings.typeMarkdown())) return Section.TYPE_MARKDOWN;
+	if (res.equals(strings.typeLatex())) return Section.TYPE_LATEX;
+	if (res.equals(strings.typeMetapost())) return Section.TYPE_METAPOST;
+	if (res.equals(strings.typeGnuplot())) return Section.TYPE_GNUPLOT;
+	if (res.equals(strings.typeListing())) return Section.TYPE_LISTING;
+	return -1;
+    }
 }

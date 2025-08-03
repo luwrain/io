@@ -69,6 +69,9 @@ class PublLayoutExt implements LayoutExt
 
     boolean onInsert()
     {
+	final var type = app.conv.newPublSectType();
+	if (type < 0)
+	    return true;
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
 		new org.luwrain.io.api.lsocial.publication.CreateSectionQuery(App.ENDPOINT)
