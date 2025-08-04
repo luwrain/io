@@ -77,7 +77,7 @@ class PublLayoutExt implements LayoutExt
 		new org.luwrain.io.api.lsocial.publication.CreateSectionQuery(App.ENDPOINT)
 		.accessToken(app.conf.getAccessToken())
 		.publ(String.valueOf(publ.getId()))
-		.type(org.luwrain.io.api.lsocial.publication.Section.TYPE_MARKDOWN)
+		.type(type)
 				.source("")
 		.exec();
 	    });
