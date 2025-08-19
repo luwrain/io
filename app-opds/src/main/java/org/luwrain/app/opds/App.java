@@ -16,19 +16,11 @@
 
 package org.luwrain.app.opds;
 
-import java.lang.reflect.*;
-import java.net.*;
 import java.util.*;
 import java.io.*;
-
-import com.google.gson.*;
-import com.google.gson.reflect.*;
+import java.net.*;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
-import org.luwrain.core.queries.*;
-import org.luwrain.controls.*;
-import org.luwrain.app.opds.Opds.Link;
 import org.luwrain.app.base.*;
 import org.luwrain.app.opds.Opds.Entry;
 import org.luwrain.core.annotations.*;
@@ -36,14 +28,11 @@ import org.luwrain.core.annotations.*;
 @AppNoArgs(name = "opds", title = { "en=OPDS", "ru=Библиотеки"})
 public final class App extends AppBase<Strings>
 {
-    static final Type LIBRARY_LIST_TYPE = new TypeToken<List<RemoteLibrary>>(){}.getType();
-
-    private final Gson gson = new Gson();
     final List<RemoteLibrary> libraries = new ArrayList();
     final List<Entry> entries = new ArrayList<Entry>();
     final LinkedList<HistoryItem> history = new LinkedList<HistoryItem>();
 
-    private Settings sett = null;
+    private Config conf= null;
     private Conversations conv = null;
     private MainLayout mainLayout = null;
 
@@ -54,7 +43,9 @@ public final class App extends AppBase<Strings>
 
     @Override protected AreaLayout onAppInit()
     {
-	this.sett = Settings.create(getLuwrain());
+	conf = getLuwrain().loadConf(Config.class);
+	if (conf == null)
+	    conf = new Config();
 	this.conv = new Conversations(this);
 	loadLibraries();
 	this.mainLayout = new MainLayout(this);
@@ -89,17 +80,15 @@ public final class App extends AppBase<Strings>
     private void loadLibraries()
     {
 	this.libraries.clear();
-	final List<RemoteLibrary> res = gson.fromJson(sett.getLibraries(""), LIBRARY_LIST_TYPE);
-	if (res == null)
-	    return;
-	final RemoteLibrary[] r = res.toArray(new RemoteLibrary[res.size()]);
-	Arrays.sort(r);
-	libraries.addAll(Arrays.asList(r));
+	if (conf.libraries != null)
+	    libraries.addAll(conf.libraries);
+	Collections.sort(libraries);
     }
 
     void saveLibraries()
     {
-	sett.setLibraries(gson.toJson(libraries));
+	conf.libraries = libraries;
+	getLuwrain().saveConf(conf);
     }
 
     URL opened()

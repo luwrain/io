@@ -25,7 +25,4 @@ public interface Strings
     String librariesAreaName();
     String itemsAreaName();
     String detailsAreaName();
-    String catalog();
-    String noSuitableLinksInEntry();
-    String badUrl(String url);
 }

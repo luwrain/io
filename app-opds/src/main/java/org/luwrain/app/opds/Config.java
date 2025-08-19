@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -16,18 +16,9 @@
 
 package org.luwrain.app.opds;
 
-import org.luwrain.core.*;
+import java.util.*;
 
-public interface Settings
+public final class Config
 {
-    static final String PATH = "/org/luwrain/app/opds/libraries";
-
-    String getLibraries(String defValue);
-    void setLibraries(String value);
-
-    static Settings create(Luwrain luwrain)
-    {
-	NullCheck.notNull(luwrain, "luwrain");
-	return null;//FIXME:newreg RegistryProxy.create(luwrain.getRegistry(), PATH, Settings.class);
-    }
+    List<RemoteLibrary> libraries;
 }
