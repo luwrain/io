@@ -34,7 +34,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 	SETTINGS_PATH = "/org/luwrain/app/wiki";
 
     private final Gson gson = new Gson();
-    private Settings sett = null;
+    private Config conf = null;
     private final String arg;
     final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
@@ -54,11 +54,14 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     @Override protected AreaLayout onAppInit()
     {
-	//	getLuwrain().getRegistry().addDirectory(SETTINGS_PATH);
-	this.sett = null;//FIXME:newreg RegistryProxy.create(getLuwrain().getRegistry(), SETTINGS_PATH, Settings.class);
-	final List<Server> serv = gson.fromJson(this.sett.getServers(""), Server.LIST_TYPE);
-	if (serv != null)
-	    this.servers.addAll(serv);
+	conf = getLuwrain().loadConf(Config.class);
+	if (conf == null)
+	{
+	    conf = new Config();
+	    getLuwrain().saveConf(conf);
+	}
+	if (conf.servers != null)
+	    servers.addAll(conf.servers);
 	for(Server s: this.servers)
 	{
 	    if (s.name == null || s.name.trim().isEmpty())
@@ -106,7 +109,8 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     void saveServers()
     {
-	this.sett.setServers(gson.toJson(this.servers));
+	conf.servers = servers;
+	getLuwrain().saveConf(conf);
     }
 
     @Override public boolean onEscape()
@@ -123,10 +127,4 @@ public final class App extends AppBase<Strings> implements MonoApp
     }
 
     Conversations getConv() { return this.conv; }
-
-    private interface Settings
-    {
-	String getServers(String defValue);
-	void setServers(String value);
-    }
 }

@@ -1,22 +1,16 @@
 
 plugins {
-  id 'java'
+  id 'java-library'
 }
 
 
 dependencies {
   implementation libraries.base
-    implementation libraries.apacheBase
-        implementation libraries.graalvm
+  implementation libraries.apacheBase
+  annotationProcessor libraries.autoService
   implementation (project(':luwrain-base'))
-    implementation (project(':luwrain'))
-        implementation (project(':luwrain-io'))
-	        implementation (project(':luwrain-pim'))
-
-  annotationProcessor("com.google.auto.service:auto-service:1.1.1")
-//  annotationProcessor (project(':luwrain-base'))
-  annotationProcessor files('..base/build/libs/luwrain-base2.jar')
-
-
+  annotationProcessor (project(':luwrain-base'))
+  implementation (project(':luwrain'))
+  implementation (project(':luwrain-io'))
   testImplementation libraries.junit
 }
