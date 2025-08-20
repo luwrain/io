@@ -25,7 +25,10 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(title = {"ru=GPTT"}, name = "gpt")
+@AppNoArgs(
+	   name = "gpt",
+	   title = { "en=GPT", "ru=GPT"}, 
+	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>
 {
     public Conv conv = null;

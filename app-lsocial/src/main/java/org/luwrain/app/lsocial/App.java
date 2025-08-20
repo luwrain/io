@@ -29,7 +29,10 @@ import org.luwrain.io.api.yandex_gpt.*;
 import static java.util.Objects.*;
 import static org.luwrain.util.TextUtils.*;
 
-@AppNoArgs(name = "social", title = {"en=LUWRAIN Social"})
+@AppNoArgs(
+	   name = "social",
+	   title = { "en=LUWRAIN Social", "ru=LUWRAIN Social" },
+	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>
 {
     static public final String ENDPOINT = "https://luwrain.social";

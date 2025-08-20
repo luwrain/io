@@ -25,7 +25,9 @@ import org.luwrain.app.base.*;
 import org.luwrain.app.opds.Opds.Entry;
 import org.luwrain.core.annotations.*;
 
-@AppNoArgs(name = "opds", title = { "en=OPDS", "ru=Библиотеки"})
+@AppNoArgs(name = "opds",
+	   title = { "en=Libraries", "ru=Библиотеки"},
+	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>
 {
     final List<RemoteLibrary> libraries = new ArrayList();
