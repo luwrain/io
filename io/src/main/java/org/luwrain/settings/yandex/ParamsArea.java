@@ -59,10 +59,14 @@ SPEECH_KIT_FOLDER_ID = "speech-kit-folder-id",
 
     @Override public boolean saveSectionData()
     {
-		final var l = controlPanel.getCoreInterface();
-	l.updateConf(Config.class, conf -> {
-		//	conf.setDesktopTitle(getEnteredText("desktop-title"));
-
+	final var l = controlPanel.getCoreInterface();
+	l.updateConf(Config.class, c -> {
+		c.setFoundationModelsApiKey(getEnteredText(FOUN_MODELS_API_KEY));
+		c.setFoundationModelsFolderId(getEnteredText(FOUN_MODELS_FOLDER_ID));
+		c.setSpeechKitApiKey(getEnteredText(SPEECH_KIT_API_KEY));
+		c.setSpeechKitFolderId(getEnteredText(SPEECH_KIT_FOLDER_ID));
+		c.setTranslatorApiKey(getEnteredText(TRANSLATOR_API_KEY));
+		c.setTranslatorFolderId(getEnteredText(TRANSLATOR_FOLDER_ID));
 	    });
 	return true;
 	    }

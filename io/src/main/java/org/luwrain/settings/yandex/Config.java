@@ -26,5 +26,4 @@ public final class Config
 	foundationModelsApiKey, foundationModelsFolderId,
 	speechKitApiKey, speechKitFolderId,
 	translatorApiKey, translatorFolderId;
-	
 }
