@@ -47,11 +47,10 @@ public final class Extension extends EmptyExtension
     @Override public ExtensionObject[] getExtObjects(Luwrain luwrain)
     {
 	return new ExtensionObject[]{
-	    new Shortcut(){
-		@Override public String getExtObjName() { return "vk"; }
+	    new DefaultShortcut("vk", org.luwrain.app.vk2.App.class){
 		@Override public Application[] prepareApp(String[] args) { return new Application[]{new org.luwrain.app.vk2.App(watching)}; }
 	    },
-	    new SimpleShortcut("vk-old", App.class),
+	    new DefaultShortcut("vk-old", App.class),
 	};
     }
 
