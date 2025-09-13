@@ -36,7 +36,7 @@ public class Searx
 	    throw new IllegalArgumentException("endpoint can't be empty");
     }
 
-    public Response request(String query)
+    public Response request(String query) throws IOException
     {
         final String
 	requestMethod = "GET",
@@ -54,16 +54,11 @@ public class Searx
 	return sendRequest(url, requestMethod, payload, headers);
     }
 
-    Response sendRequest(String url, String method, String payload, String[] headers)
+    Response sendRequest(String url, String method, String payload, String[] headers) throws IOException
     {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpRequestBase request = createRequest(method, url, payload, headers);
 	    return  executeRequest(httpClient, request);
-        }
-	catch (IOException e)
-	{
-            log.error("Searx request failed: url=" + url + ", payload=" + payload, e);
-	    throw new RuntimeException(e);
         }
     }
 

@@ -16,34 +16,29 @@
 
 package org.luwrain.io.api.searx;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.*;
 import java.io.*;
-import org.apache.logging.log4j.*;
+import com.google.auto.service.*;
 
-import static org.luwrain.io.api.Base.*;
+import org.luwrain.io.websearch.*;
 
-public class SearxTest
+@AutoService(Engine.class)
+public final class EngineImpl implements org.luwrain.io.websearch.Engine
 {
-    static private final Logger log = LogManager.getLogger();
-
-        @Test public void main() throws IOException
+    @Override public Response search(Query query) throws IOException
     {
-	if (!allowApiTests())
-	    return;
 	final var s = new Searx("http://localhost:8888");
-	var res = s.request("TSU");
-	assertNotNull(res);
-	log.info(res.query);
-	assertNotNull(res.results);
-		for(var i: res.results)
-		{
-		    assertNotNull(i.url);
-		    assertNotNull(i.title);
-		    		    log.info("URL: " + i.url);
-		    log.info("Title: " + i.title);
-		}
+	final var resp = s.request(query.getText());
+	final var res = new Response();
+	res.setQuery(query);
+	res.setEntries(resp.results.stream()
+	.map(r -> {
+		final var e = new Entry();
+		e.setTitle(r.title);
+		e.setClickUrl(r.url);
+		e.setDisplayUrl(r.url);
+		e.setSnippet(r.content);
+		return e;
+	    }).toList());
+	return res;
     }
 }
