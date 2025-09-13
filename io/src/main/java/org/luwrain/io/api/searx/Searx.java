@@ -1,4 +1,8 @@
+
 package org.luwrain.io.api.searx;
+
+import java.util.*;
+import java.io.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -13,33 +17,32 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.*;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+
+import static java.util.Objects.*;
 
 public class Searx
 {
-    static public final String[] searxngUrls = {
-	"http://localhost:8080/search", // локальный searxng
-	"https://search.mdosch.de/search",
-	"https://search.projectsegfau.lt/search",
-	"https://search.us.projectsegfau.lt/search",
-	"https://searx.sev.monster/search",
-	"https://etsi.me/search",
-	"https://search.in.projectsegfau.lt/search"
-    };
+    static private final Logger log = LogManager.getLogger();
+    static private final Gson gson = new Gson();
 
-    private static final Logger log = LogManager.getLogger();
-    private static final Gson gson = new Gson();
+    final String endpoint;
 
-    Response request(String query)
+    public Searx(String endpoint)
+    {
+	this.endpoint = requireNonNull(endpoint, "endpoint can't be null");
+	if (endpoint.isEmpty())
+	    throw new IllegalArgumentException("endpoint can't be empty");
+    }
+
+    public Response request(String query)
     {
         final String
-	requestMethod = "POST",
-	searxngUrl = searxngUrls[1],
+	requestMethod = "GET",
+	url = endpoint,
 	payload = "q=" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&format=json";
+	log.trace("Searx request: url=" + url + ", payload=" + payload);
         final String[] headers = {
 	    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
 	    "Accept: */*",
@@ -48,7 +51,7 @@ public class Searx
 	    "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
 	    "Content-Type: application/x-www-form-urlencoded"
         };
-	return sendRequest(searxngUrl, requestMethod, payload, headers);
+	return sendRequest(url, requestMethod, payload, headers);
     }
 
     Response sendRequest(String url, String method, String payload, String[] headers)
@@ -59,24 +62,27 @@ public class Searx
         }
 	catch (IOException e)
 	{
-            log.catching(e);
+            log.error("Searx request failed: url=" + url + ", payload=" + payload, e);
 	    throw new RuntimeException(e);
         }
     }
 
     HttpRequestBase createRequest(String method, String url, String payload, String[] headers) throws IOException
     {
-        HttpRequestBase request;
-        if ("GET".equalsIgnoreCase(method)) {
+        final HttpRequestBase request;
+        if ("GET".equalsIgnoreCase(method))
+	{
             request = new HttpGet(url + "?" + payload);
-        } else if ("POST".equalsIgnoreCase(method)) {
+        } else
+	    if ("POST".equalsIgnoreCase(method))
+	    {
             HttpPost postRequest = new HttpPost(url);
             postRequest.setEntity(new StringEntity(payload, StandardCharsets.UTF_8));
             request = postRequest;
-        } else {
-            throw new UnsupportedOperationException("Unsupported request method: " + method);
-        }
-        for (String header : headers) {
+        } else
+            throw new IllegalArgumentException("Unsupported request method: " + method);
+        for (String header : headers)
+	{
             String[] headerParts = header.split(": ");
             request.addHeader(headerParts[0], headerParts[1]);
         }

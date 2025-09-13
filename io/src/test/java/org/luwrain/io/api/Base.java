@@ -14,35 +14,22 @@
    General Public License for more details.
 */
 
-package org.luwrain.io.api.searx;
+package org.luwrain.io.api;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.*;
 import org.apache.logging.log4j.*;
 
-import static org.luwrain.io.api.Base.*;
-
-public class SearxTest
+public final class Base
 {
+    static final String
+	ENV_ALLOW_API_TESTS = "LWR_ALLOW_API_TESTS",
+	ALLOW_API_TESTS = System.getenv(ENV_ALLOW_API_TESTS);
+
     static private final Logger log = LogManager.getLogger();
 
-        @Test public void main()
+    static public boolean allowApiTests()
     {
-	if (!allowApiTests())
-	    return;
-	final var s = new Searx("http://localhost:8888");
-	var res = s.request("TSU");
-	assertNotNull(res);
-	log.info(res.query);
-	assertNotNull(res.results);
-		for(var i: res.results)
-		{
-		    assertNotNull(i.url);
-		    assertNotNull(i.title);
-		    		    log.info(i.url);
-		    log.info(i.title);
-		}
+	final boolean res = ALLOW_API_TESTS != null && ALLOW_API_TESTS.equalsIgnoreCase("true");
+	log.info("API tests " + (res?"allowed":"not allowed"));
+	return res;
     }
 }

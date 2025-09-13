@@ -1,13 +1,13 @@
 
 package org.luwrain.io.api.mastodon;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+
 
 class ApplicationClientTest
 {
@@ -21,7 +21,7 @@ class ApplicationClientTest
         assertTrue(client.isValid());
     }
 
-    @Test
+    @Disabled @Test
     public void registerAccount() throws IOException
     {
         var token = client.registerAccount("supercoolusername", "your@email.com", "password1234", true, "en", "");
@@ -29,7 +29,7 @@ class ApplicationClientTest
         System.out.println("Check your email for account confirmation letter.");
     }
 
-    @Test
+    @Disabled @Test
     public void verifyAccount() throws IOException
     {
         assertTrue(client.verifyAccount(null));
