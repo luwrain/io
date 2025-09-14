@@ -24,14 +24,14 @@ import org.luwrain.popups.*;
 import static org.luwrain.script.Hooks.*;
 import static org.luwrain.script.ScriptUtils.*;
 
-public final class WebSearch 
+public final class WebSearchOld 
 {
     static public final String
 	HOOK_WEB_SEARCH = "luwrain.web.search";
 
     private final Luwrain luwrain;
 
-    public WebSearch(Luwrain luwrain)
+    public WebSearchOld(Luwrain luwrain)
     {
 	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;

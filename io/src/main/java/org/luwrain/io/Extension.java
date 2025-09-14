@@ -1,5 +1,5 @@
 /*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
+   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
    This file is part of LUWRAIN.
 
@@ -19,11 +19,13 @@ package org.luwrain.io;
 import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
+import com.google.auto.service.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 import org.luwrain.io.api.duckduckgo.*;
 
+@AutoService(org.luwrain.core.Extension.class)
 public final class Extension extends EmptyExtension
 {
     @Override public Command[] getCommands(Luwrain luwrain)

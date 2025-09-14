@@ -71,7 +71,8 @@ public final class WebSearch
 		    luwrain.message(luwrain.getString("static:NothingFound"), Luwrain.MessageType.DONE);
 		    return;
 		}
-		final Entry entry = null;//WebSearchResult.Item item = WebSearchResultPopup.open(luwrain, webSearchResult);
+		log.trace("Obtained " + res.getEntries().size() + " search results");
+		final Entry entry = WebSearchPopup.open(luwrain, res);
 		if (entry == null)
 		    return;
 		onEntryClick(entry);
