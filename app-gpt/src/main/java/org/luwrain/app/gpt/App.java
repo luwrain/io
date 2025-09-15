@@ -33,6 +33,7 @@ public final class App extends AppBase<Strings>
 {
     public Conv conv = null;
     public Config conf = null;
+    org.luwrain.settings.yandex.Config yandexConf;
     private MainLayout mainLayout = null;
     public App() { super(Strings.class, "luwrain.commander"); }
 
@@ -42,6 +43,12 @@ public final class App extends AppBase<Strings>
 	if (conf == null)
 	{
 	    conf = new Config();
+	    getLuwrain().saveConf(conf);
+	}
+	        yandexConf = getLuwrain().loadConf(org.luwrain.settings.yandex.Config.class);
+	if (yandexConf == null)
+	{
+	    yandexConf = new org.luwrain.settings.yandex.Config();
 	    getLuwrain().saveConf(conf);
 	}
 	conv = new Conv(this);

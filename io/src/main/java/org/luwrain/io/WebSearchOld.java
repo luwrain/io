@@ -33,42 +33,7 @@ public final class WebSearchOld
 
     public WebSearchOld(Luwrain luwrain)
     {
-	NullCheck.notNull(luwrain, "luwrain");
 	this.luwrain = luwrain;
-    }
-
-    public void searchAsync(String query, Consumer<Object> resultHandler)
-    {
-	NullCheck.notEmpty(query, "query");
-	NullCheck.notNull(resultHandler, "resultHandler");
-	luwrain.executeBkg(()->{
-		    final Object res = runWebSearchHook(luwrain, query);
-		    luwrain.runUiSafely(()->resultHandler.accept(res));
-	});
-    }
-
-    public void searchAsync(String query)
-    {
-	NullCheck.notEmpty(query, "query");
-	searchAsync(query, (result)->{
-		if (result == null || !(result instanceof WebSearchResult))
-		{
-		    luwrain.message(luwrain.i18n().getStaticStr("NothingFound"), Luwrain.MessageType.DONE);
-		    return;
-		}
-		final WebSearchResult webSearchResult = (WebSearchResult)result;
-		final WebSearchResult.Item item = WebSearchResultPopup.open(luwrain, webSearchResult);
-		if (item == null)
-		    return;
-		onItemClick(item);
-	    });
-    }
-
-    public void onItemClick(WebSearchResult.Item item)
-    {
-	NullCheck.notNull(item, "item");
-	if (!item.getClickUrl().isEmpty())
-	    luwrain.openUrl(item.getClickUrl());
     }
 
     private Object runWebSearchHook(Luwrain luwrain, String query)

@@ -64,16 +64,6 @@ final class MainLayout extends LayoutBase  implements
 
     @Override public InputHandler.Result onConsoleInput(ConsoleArea area, String text)
     {
-	if (requireNonNullElse(app.conf.getYandexFolderId(), "").trim().isEmpty())
-	{
-	    app.message(app.getStrings().errNoYandexFolderId(), Luwrain.MessageType.ERROR);
-	    return InputHandler.Result.OK;
-	}
-		if (requireNonNullElse(app.conf.getYandexApiKey(), "").trim().isEmpty())
-	{
-	    app.message(app.getStrings().errNoYandexApiKey(), Luwrain.MessageType.ERROR);
-	    return InputHandler.Result.OK;
-	}
 	if (text.endsWith("..."))
 	{
 	    entries.add(new Entry(Entry.Type.USER, text.substring(0, text.length() - 3).trim(), null));
@@ -113,7 +103,7 @@ final class MainLayout extends LayoutBase  implements
 		}
 		return new Message(type, e.getText());
 	    }).toList();
-	final var g = new YandexGpt(app.conf.getYandexFolderId(), app.conf.getYandexApiKey(),
+	final var g = new YandexGpt(app.yandexConf.getFoundationModelsFolderId(), app.yandexConf.getFoundationModelsApiKey(),
 				    new CompletionOptions(false, 0.7, 4096),
 messages);
 	final var taskId = app.newTaskId();
