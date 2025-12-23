@@ -1,55 +1,33 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.osm;
 
 import java.util.*;
-import java.util.concurrent.*;
-import java.io.*;
 
 import org.luwrain.core.*;
-import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
+import org.luwrain.io.api.osm.*;
 
-@AppNoArgs(name = "osm", title = {"ru=Карты"})
+@AppNoArgs(name = "osm",
+	   title = {"en=Maps", "ru=Карты"})
 public final class App extends AppBase<Strings>
 {
-    enum Side {LEFT, RIGHT};
+    Conv conv = null;
+    MainLayout mainLayout = null;
+    OsmApiService osm = null;
 
-    final String startFrom;
-    private Conv conv = null;
-    private MainLayout mainLayout = null;
-
-    public App(String startFrom)
+    public App()
     {
-	super(Strings.NAME, Strings.class, "luwrain.commander");
-	if (startFrom != null && !startFrom.isEmpty())
-	    this.startFrom = startFrom; else
-	    this.startFrom = null;
+	super(Strings.class, "luwrain.commander");
     }
-    public App() { this(null); }
 
     @Override public AreaLayout onAppInit()
     {
-	//	this.sett = Settings.create(getLuwrain());
-	this.conv = new Conv(this);
-	//	this.hooks = new Hooks(this);
-	this.mainLayout = new MainLayout(this);
-	//	this.operationsLayout = new OperationsLayout(this);
+	osm = new OsmApiService();
+conv = new Conv(this);
+mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
     }
@@ -59,6 +37,4 @@ public final class App extends AppBase<Strings>
 	closeApp();
 	return true;
     }
-
-    Conv getConv() { return this.conv; }
 }

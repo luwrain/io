@@ -10,6 +10,7 @@ dependencies {
   annotationProcessor libraries.autoService
   implementation project(':luwrain-base')
   implementation project(':luwrain')
+  implementation project(':luwrain-io')
   annotationProcessor project(':luwrain-base')
   testImplementation libraries.junit
 }

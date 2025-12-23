@@ -3,10 +3,8 @@ package org.luwrain.io.api.osm;
 import com.google.gson.*;
 import org.luwrain.io.api.osm.dto.deserializer.ElementDtoDeserializer;
 
-//import api.ApiClient;
 import org.luwrain.io.api.osm.model.*;
 import org.luwrain.io.api.osm.dto.*;
-//import org.luwrain.io.api.osm.mapper.ElementMapper;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -28,7 +26,8 @@ public class OsmApiService {
                 .create();
     }
 
-    public List<Node> getNodesByIds(List<Long> ids) throws IOException {
+    public List<Node> getNodesByIds(List<Long> ids) throws IOException
+    {
         StringBuilder query = new StringBuilder("[out:json];");
         query.append("node(id:");
         for (int i = 0; i < ids.size(); i++) {
@@ -38,21 +37,19 @@ public class OsmApiService {
             }
         }
         query.append(");out body;");
-
         String jsonResponse = client.sendQuery(query.toString());
         OverpassResponseDto response = gson.fromJson(jsonResponse, OverpassResponseDto.class);
-
         List<NodeDto> nodeDtos = response.getElements().stream()
                 .filter(e -> e instanceof NodeDto)
                 .map(e -> (NodeDto) e)
                 .toList();
-
         return nodeDtos.stream()
                 .map(ElementMapper::map)
                 .collect(Collectors.toList());
     }
 
-    public Element getElementById(String type, long id) throws IOException {
+    public Element getElementById(String type, long id) throws IOException
+    {
         String query = "[out:json];" + type + "(" + id + ");out body;";
         String jsonResponse = client.sendQuery(query);
         OverpassResponseDto response = gson.fromJson(jsonResponse, OverpassResponseDto.class);
@@ -83,7 +80,7 @@ public class OsmApiService {
     }
 
 
-    public ArrayList<Node> getNodesByAddress(String city, String street, String housenumber) throws IOException {
+    public List<Node> getNodesByAddress(String city, String street, String housenumber) throws IOException {
         String query =  "[out:json];" +
                 "node[\"addr:city\"=\"" + city + "\"][\"addr:street\"=\"" + street + "\"][\"addr:housenumber\"=\"" + housenumber + "\"];" +
                 "out body;";
@@ -141,15 +138,13 @@ public class OsmApiService {
         return null;
     }
 
-    public ArrayList<Element> getOSMEntityByName(String type, String name) throws IOException {
-        if (!type.equals("node") && !type.equals("relation")  && !type.equals("way")){
+    public List<Element> findByName(String type, String name) throws IOException
+    {
+        if (!type.equals("node") && !type.equals("relation")  && !type.equals("way"))
             throw new IllegalArgumentException("Несуществующий тип");
-        }
-        //Шаблон запроса
         String query =  "[out:json];" +
-                type + "[\"name\"~\"" + name + "\"];" +
-                "out body;";
-
+	type + "[\"name\"~\"" + name + "\"];" +
+	"out body;";
         String jsonResponse = client.sendQuery(query);
         OverpassResponseDto response = gson.fromJson(jsonResponse, OverpassResponseDto.class);
 

@@ -1,18 +1,5 @@
-/*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.osm;
 
@@ -20,25 +7,82 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-import org.apache.commons.vfs2.*;
-
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
-import org.luwrain.core.events.InputEvent.Special;
-import org.luwrain.core.events.InputEvent.Modifiers;
 import org.luwrain.controls.*;
-import org.luwrain.io.*;
+import org.luwrain.controls.console.*;
 import org.luwrain.popups.*;
 
 import org.luwrain.app.base.*;
 
-final class MainLayout extends LayoutBase
+import org.luwrain.io.api.osm.model.*;
+
+import static java.util.Objects.*;
+import static org.luwrain.core.DefaultEventResponse.*;
+
+final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Element>
 {
     private final App app;
-
+    final List<Element> elements = new ArrayList<>();
+    final ConsoleArea<Element> consoleArea;
+    
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
+	consoleArea = new ConsoleArea<Element>(consoleParams(p -> {
+		    p.model = new ListModel<>(elements);
+		    p.clickHandler = (area, index, el) -> onClick(el);
+		    p.inputHandler = (area, text) -> onInput(text);
+		    p.appearance = this;
+		}));
+	setAreaLayout(consoleArea, null);
     }
+
+    boolean onClick(Element el)
+    {
+	return false;
+    }
+
+    ConsoleArea.InputHandler.Result onInput(String text)
+    {
+	if (text.isEmpty())
+	    return ConsoleArea.InputHandler.Result.REJECTED;
+	final var taskId = app.newTaskId();
+	if (app.runTask(taskId, () -> {
+		    final var n = app.osm.findByName("node", text);
+		    app.finishedTask(taskId, () -> {
+			    elements.clear();
+			    if (n != null)
+			    {
+			    elements.addAll(n);
+			    getLuwrain().playSound(Sounds.DONE);
+			    }			     else
+							    app.setEventResponse(text(Sounds.DONE, app.getStrings().nothingFound()));
+			    consoleArea.refresh();
+			});
+		}))
+	    return ConsoleArea.InputHandler.Result.OK;
+	    	    return ConsoleArea.InputHandler.Result.REJECTED;
+    }
+
+        @Override public void announceItem(Element el)
+    {
+	final var tags = el.getTags();
+	if (tags != null)
+	{
+	    final var name = tags.get("name");
+	    if (name != null && !name.trim().isEmpty())
+	    app.setEventResponse(listItem(name));
+	}
+    }
+
+    @Override public String getTextAppearance(Element el)
+    {
+		final var tags = el.getTags();
+	if (tags != null)
+	    return requireNonNullElse(tags.get("name"), "");
+	return "";
+	    }
+
 }

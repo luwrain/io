@@ -9,9 +9,9 @@ dependencies {
   implementation libraries.apacheBase
   implementation libraries.graalvm
   annotationProcessor libraries.autoService
-  implementation (project(':luwrain-base'))
+  implementation project(':luwrain-base')
     annotationProcessor (project(':luwrain-base'))
-  implementation (project(':luwrain'))
+  implementation project(':luwrain')
   implementation 'org.languagetool:languagetool-core:5.5'
   implementation 'org.languagetool:language-ru:5.5'
   implementation 'org.apache.httpcomponents:httpclient:4.5.13'
