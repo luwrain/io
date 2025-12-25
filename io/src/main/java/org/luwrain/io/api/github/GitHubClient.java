@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2025 Fedor Spirin <fspirin8@gmail.com>
+
+
+    
+
 package org.luwrain.io.api.github;
 
 import com.google.gson.Gson;
