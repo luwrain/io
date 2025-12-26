@@ -14,6 +14,9 @@ public class OsmTest
 
     @Disabled @Test public void byAddr() throws Exception
     {
+		if (!allowApiTests())
+	    return;
+
 	final var r = s.getNodesByAddress("Томск", "проспект Ленина", "36");
 	assertNotNull(r);
 	assertEquals(2, r.size());
