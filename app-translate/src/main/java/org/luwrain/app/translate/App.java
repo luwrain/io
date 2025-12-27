@@ -8,13 +8,6 @@ import java.time.*;
 import java.util.concurrent.*;
 import java.io.*;
 
-/*
-import yandex.cloud.sdk.*;
-import yandex.cloud.sdk.auth.*;
-import yandex.cloud.api.ai.translate.v2.*;
-import yandex.cloud.api.ai.translate.v2.TranslationServiceGrpc.*;
-*/
-
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
