@@ -16,6 +16,7 @@ import org.luwrain.controls.edit.*;
 import org.luwrain.io.api.yandex.translate.*;
 import org.luwrain.io.api.yandex.translate.model.*;
 import org.luwrain.app.translate.layouts.*;
+import org.luwrain.util.*;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -78,14 +79,30 @@ final class MainLayout extends LayoutBase
 					final var t = new YandexTranslate(app.yandexConf.getTranslatorApiKey());
 					final var resp = t.request(req);
 		app.finishedTask(taskId, () -> {
+			final EditArea targetArea = 			    (fromFirstArea?secondArea:firstArea);
 			if (resp != null && resp.getTranslations() != null && !resp.getTranslations().isEmpty())
 			{
-			    secondArea.update((lines, hotPoint) -> {
+targetArea.update((lines, hotPoint) -> {
+				    lines.clear();
 				    for(var tr: resp.getTranslations())
-					lines.addLine(requireNonNullElse(tr.getText(), ""));
+				    {
+					try {
+					final var it = new LineIterator(requireNonNullElse(tr.getText(), ""));
+					while(it.hasNext())
+					    lines.add(it.next());
+					lines.add("");
+					}
+					catch(IOException ex)
+					{
+					    app.crash(ex);
+					}
+				    }
 				    return true;
 				});
-			}
+			} else
+targetArea.clear();
+setActiveArea(targetArea);
+			  getLuwrain().playSound(Sounds.DONE);
 		    });		
 	    });
     }
