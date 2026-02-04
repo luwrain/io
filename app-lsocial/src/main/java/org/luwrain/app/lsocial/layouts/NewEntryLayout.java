@@ -1,18 +1,3 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.app.lsocial.layouts;
 
@@ -25,6 +10,9 @@ import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.lsocial.*;
+
+import alpha4.*;
+//import alpha4.json.*;
 
 import static java.util.Objects.*;
 
@@ -103,23 +91,23 @@ public final class NewEntryLayout extends LayoutBase
 		});
 	}
 
-	final int t;
+	final PublicationType t;
 	switch(type)
 	{
 	case PAPER:
-	    t = org.luwrain.io.api.lsocial.publication.Publication.TYPE_PAPER;
+	    t = PublicationType.PAPER;
 	    break;
 	case BOOK:
-	    t = org.luwrain.io.api.lsocial.publication.Publication.TYPE_BOOK;
+	    t = PublicationType.BOOK;
 	    break;
 	case THESIS:
-	    t = org.luwrain.io.api.lsocial.publication.Publication.TYPE_THESIS;
+	    t = PublicationType.THESIS;
 	    break;
 	case GRADUATION:
-	    t = org.luwrain.io.api.lsocial.publication.Publication.TYPE_GRADUATION_WORK;
+	    t = PublicationType.GRADUATION_WORK;
 	    break;
 	case COURSE:
-	    t = org.luwrain.io.api.lsocial.publication.Publication.TYPE_COURSE_WORK;
+	    t = PublicationType.COURSE_WORK;
 	    break;
 	default:
 	    return false;
@@ -127,19 +115,21 @@ public final class NewEntryLayout extends LayoutBase
 
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		final var resp = new org.luwrain.io.api.lsocial.publication.CreateQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.type(t)
-		.name(name)
-		.title(title)
-		.authors(authors)
-		.subject(subject)
-		.date(date)
-		.exec();
-		final var res = mainLayout.fetchMainListItems();
+		final var p = Publication.newBuilder()
+				.setType(t)
+		.setName(name)
+		.setTitle(title)
+		.setAuthors(authors)
+		.setSubject(subject)
+		.setDate(date)
+		.build();
+		final var req = CreatePublicationRequest.newBuilder()
+		.setPubl(p)
+		.build();
+		final var res = app.getPubl().create(req);
 		app.finishedTask(taskId, () -> {
 			mainLayout.entries.clear();
-			mainLayout.entries.addAll(res);
+			//			mainLayout.entries.addAll(res);
 			mainLayout.mainList.refresh();
 			close.onAction();
 		    });

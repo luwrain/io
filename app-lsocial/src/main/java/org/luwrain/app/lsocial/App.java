@@ -1,24 +1,10 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.app.lsocial;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
+import io.grpc.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -28,6 +14,7 @@ import org.luwrain.io.api.yandex_gpt.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.util.TextUtils.*;
+import static alpha4.PublicationsGrpc.*;
 
 @AppNoArgs(
 	   name = "social",
@@ -39,6 +26,7 @@ public final class App extends AppBase<Strings>
 
     public Conv conv = null;
     public Config conf = null;
+    public ManagedChannel channel = null;
     private MainLayout mainLayout = null;
     private Set<String> nbspAfterWords = new HashSet<>(Arrays.asList("В", "НА", "ПОД"));
 
@@ -85,5 +73,24 @@ messages);
 	return text;
     }
 
+public alpha4.Alpha4Credentials getCredentials()
+    {
+	return new alpha4.Alpha4Credentials(conf.getAccessToken());
+    }
+
+    public PublicationsBlockingStub getPubl()
+    {
+return alpha4.PublicationsGrpc.newBlockingStub(channel).withCallCredentials(getCredentials());
+    }
     
+
+
+
+    /*
+    protected ManagedChannel getChannel()
+    {
+	final String target = "localhost:4040";
+	return Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
+    }
+    */
 }

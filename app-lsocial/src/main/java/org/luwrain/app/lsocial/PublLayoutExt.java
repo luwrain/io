@@ -1,18 +1,3 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
 
 package org.luwrain.app.lsocial;
 
@@ -25,8 +10,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
-import org.luwrain.io.api.lsocial.publication.Publication;
-import org.luwrain.io.api.lsocial.publication.Section;
+import alpha4.json.Publication;
+import alpha4.json.Publication.Section;
 import org.luwrain.app.lsocial.*;
 
 import static java.util.Objects.*;
@@ -52,8 +37,8 @@ class PublLayoutExt implements LayoutExt
 	this.mainLayout = mainLayout;
 	this.publ = publ;
 	final var s = mainLayout.app.getStrings();
-	if (publ.getSects() != null)
-	    sections.addAll(publ.getSects());
+	if (publ.getSections() != null)
+	    sections.addAll(publ.getSections());
 
 	sectList = new ListArea<Section>(mainLayout.listParams(p ->{
 		    p.name = s.appName();
@@ -70,16 +55,18 @@ class PublLayoutExt implements LayoutExt
     boolean onInsert()
     {
 	final var type = app.conv.newPublSectType();
-	if (type < 0)
+	if (type == null)
 	    return true;
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
+		/*
 		new org.luwrain.io.api.lsocial.publication.CreateSectionQuery(App.ENDPOINT)
 		.accessToken(app.conf.getAccessToken())
 		.publ(String.valueOf(publ.getId()))
 		.type(type)
 				.source("")
 		.exec();
+		*/
 	    });
     }
 
@@ -90,6 +77,7 @@ class PublLayoutExt implements LayoutExt
 	    return false;
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
+		/*
 		final var res = new org.luwrain.io.api.lsocial.publication.GetSectionQuery(App.ENDPOINT)
 		.accessToken(app.conf.getAccessToken())
 		.publ(publ)
@@ -99,6 +87,7 @@ class PublLayoutExt implements LayoutExt
 			final var e = new PublSectLayoutExt(this, publ, res.getSect(), index);
 	mainLayout.openExt(e);
 		    });
+		*/
 	    });
 	    }
 
@@ -119,19 +108,19 @@ class PublLayoutExt implements LayoutExt
 	{
 	    switch(sect.getType())
 	    {
-	    case Section.TYPE_MARKDOWN:
-	    case Section.TYPE_LATEX:
-		app.getLuwrain().setEventResponse(listItem(sect.getSrc().stream().collect(joining(" "))));
+	    case MARKDOWN:
+	    case LATEX:
+		app.getLuwrain().setEventResponse(listItem(sect.getSource().stream().collect(joining(" "))));
 		return;
-	    case Section.TYPE_METAPOST:
+	    case METAPOST:
 		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeMetapost() + " "
 							   + captOrSource(sect)));
 		return;
-	    case Section.TYPE_GNUPLOT:
+	    case GNUPLOT:
 		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeGnuplot() + " "
 							   + captOrSource(sect)));
 		return;
-	    case Section.TYPE_LISTING:
+	    case LISTING:
 		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeListing() + " "
 							   + captOrSource(sect)));
 		return;
@@ -145,13 +134,13 @@ class PublLayoutExt implements LayoutExt
 	{
 	    switch(sect.getType())
 	    {
-	    case Section.TYPE_MARKDOWN:
-	    case Section.TYPE_LATEX:
-		if (sect.getSrc().isEmpty())
+	    case MARKDOWN:
+	    case LATEX:
+		if (sect.getSource().isEmpty())
 		    return "";
-		if (sect.getSrc().size() == 1)
-		    return sect.getSrc().get(0);
-		return sect.getSrc().get(0) + "...";
+		if (sect.getSource().size() == 1)
+		    return sect.getSource().get(0);
+		return sect.getSource().get(0) + "...";
 	    default:
 	        return captOrSource(sect);
 	    }
@@ -160,13 +149,13 @@ class PublLayoutExt implements LayoutExt
 	String captOrSource(Section sect)
 	{
 	    final String capt;
-	    if (sect.getCapt() != null)
-		capt = sect.getCapt().stream().collect(joining("\n")).trim(); else
+	    if (sect.getCaption() != null)
+		capt = sect.getCaption().stream().collect(joining("\n")).trim(); else
 		capt = "";
 	    if (!capt.isEmpty())
 		return capt;
-	    if (!sect.getSrc().isEmpty())
-		return sect.getSrc().get(0);
+	    if (!sect.getSource().isEmpty())
+		return sect.getSource().get(0);
 	    return "";
 	    	}
     }

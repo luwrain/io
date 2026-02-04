@@ -25,8 +25,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.edit.*;
-import org.luwrain.io.api.lsocial.publication.Publication;
-import org.luwrain.io.api.lsocial.publication.Section;
+import alpha4.json.Publication;
+import alpha4.json.Publication.Section;
 import org.luwrain.app.lsocial.*;
 
 import static java.util.Objects.*;
@@ -78,7 +78,7 @@ class PublSectLayoutExt implements LayoutExt
 		    }
 		}
 	    };
-	final var text = requireNonNullElse(sect.getSrc(), new ArrayList<>());
+	final var text = requireNonNullElse(sect.getSource(), new ArrayList<>());
 	edit.setText(text.toArray(new String[text.size()]));
 
 
@@ -92,6 +92,7 @@ class PublSectLayoutExt implements LayoutExt
 	//FIXME: Check len limit
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
+		/*FIXME:
 		new org.luwrain.io.api.lsocial.publication.UpdateSectionQuery(App.ENDPOINT)
 		.accessToken(app.conf.getAccessToken())
 		.publ(String.valueOf(publ.getId()))
@@ -101,6 +102,7 @@ class PublSectLayoutExt implements LayoutExt
 		app.finishedTask(taskId, () -> {
 			app.getLuwrain().playSound(Sounds.DONE);
 		    });
+		*/
 	    });
     }
 

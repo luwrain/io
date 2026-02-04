@@ -13,9 +13,10 @@ import org.luwrain.controls.list.*;
 import org.luwrain.io.api.yandex_gpt.*;
 import org.luwrain.io.api.lsocial.presentation.Presentation;
 import org.luwrain.io.api.lsocial.presentation.Frame;
-import org.luwrain.io.api.lsocial.publication.Publication;
-import org.luwrain.io.api.lsocial.publication.Section;
+import alpha4.json.Publication;
+import alpha4.json.Publication.Section;
 import org.luwrain.app.lsocial.layouts.*;
+import alpha4.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;
@@ -66,13 +67,18 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
     {
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		final var res = new org.luwrain.io.api.lsocial.publication.GetQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.mode(org.luwrain.io.api.lsocial.publication.GetQuery.MODE_PREVIEW)
-		.publ(publ.getId())
-		.exec();
+			            final var req = GetPublicationRequest.newBuilder()
+				    .setPubl(String.valueOf(publ.getId()))
+	    .build();
+				    final var res = app.getPubl().get(req);
+	    if (!res.getResultType().equals("OK"))
+		throw new IllegalStateException("fixme");
+	    
+
+			
+			
 		app.finishedTask(taskId, () -> {
-			openExt(new PublLayoutExt(this, res.getPubl()));
+			openExt(new PublLayoutExt(this, Publication.fromGrpc(res.getPubl())));
 		    });
 	    });
     }
@@ -93,10 +99,10 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
     {
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		final var res = new org.luwrain.io.api.lsocial.publication.DeleteQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.publ(publ)
-		.exec();
+		            final var req = DeletePublicationRequest.newBuilder()
+			    .setPubl(String.valueOf(publ.getId()))
+	    .build();
+			    final var res = app.getPubl().delete(req);
 		app.finishedTask(taskId, () -> {
 			//FIXME:
 		    });
@@ -129,12 +135,13 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
     {
 	log.trace("Starting updating the main list");
 	final var res = new ArrayList<Object>();
-	log.trace("Querying presentations");
+	final var req = ListPublicationsRequest.newBuilder().build();
+	final var publRes = app.getPubl().list(req);
+	//FIXME: Check OK
+	for(int i = 0;i < publRes.getPublCount();i++)
+	    res.add(Publication.fromGrpc(publRes.getPubl(i)));
 	final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
 	res.addAll(prRes.getEn());
-	log.trace("Querying publications");
-	final var publRes = new org.luwrain.io.api.lsocial.publication.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
-	res.addAll(publRes.getEn());
 	return res;
     }
 
