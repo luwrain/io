@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.lsocial;
 
@@ -5,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
 import io.grpc.*;
+import alpha4.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -17,7 +20,7 @@ import static org.luwrain.util.TextUtils.*;
 import static alpha4.PublicationsGrpc.*;
 
 @AppNoArgs(
-	   name = "social",
+	   name = "a4",
 	   title = { "en=LUWRAIN Social", "ru=LUWRAIN Social" },
 	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>
@@ -41,9 +44,11 @@ public final class App extends AppBase<Strings>
 	    getLuwrain().saveConf(conf);
 	}
 	conv = new Conv(this);
+		final String target = "localhost:4040";
+channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
-	if (!requireNonNull(conf.getAccessToken(), "").trim().isEmpty())
+	if (!requireNonNullElse(conf.getAccessToken(), "").trim().isEmpty())
 	    mainLayout.updateMainList();
 	return mainLayout.getAreaLayout();
     }
@@ -82,15 +87,4 @@ public alpha4.Alpha4Credentials getCredentials()
     {
 return alpha4.PublicationsGrpc.newBlockingStub(channel).withCallCredentials(getCredentials());
     }
-    
-
-
-
-    /*
-    protected ManagedChannel getChannel()
-    {
-	final String target = "localhost:4040";
-	return Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
-    }
-    */
 }

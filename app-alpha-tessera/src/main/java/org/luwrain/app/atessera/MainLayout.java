@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.lsocial;
 
@@ -140,8 +142,10 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	//FIXME: Check OK
 	for(int i = 0;i < publRes.getPublCount();i++)
 	    res.add(Publication.fromGrpc(publRes.getPubl(i)));
+	/*
 	final var prRes = new org.luwrain.io.api.lsocial.presentation.ListQuery(App.ENDPOINT).accessToken(app.conf.getAccessToken()).exec();
 	res.addAll(prRes.getEn());
+	*/
 	return res;
     }
 

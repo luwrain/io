@@ -13,6 +13,7 @@ dependencies {
   implementation libraries.apacheBase
   implementation "io.grpc:grpc-protobuf:${grpcVersion}"
   implementation "io.grpc:grpc-stub:${grpcVersion}"
+  implementation "io.grpc:grpc-netty:${grpcVersion}"
   annotationProcessor libraries.autoService
   implementation project(':luwrain-base')
   implementation project(':luwrain')
