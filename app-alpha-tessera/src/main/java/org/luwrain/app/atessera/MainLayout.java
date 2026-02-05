@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 import java.io.*;
@@ -15,9 +15,8 @@ import org.luwrain.controls.list.*;
 import org.luwrain.io.api.yandex_gpt.*;
 import org.luwrain.io.api.lsocial.presentation.Presentation;
 import org.luwrain.io.api.lsocial.presentation.Frame;
-import alpha4.json.Publication;
-import alpha4.json.Publication.Section;
-import org.luwrain.app.lsocial.layouts.*;
+import org.luwrain.app.atessera.Publication.Section;
+import org.luwrain.app.atessera.layouts.*;
 import alpha4.*;
 
 import static java.util.Objects.*;
@@ -67,19 +66,17 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
     boolean onPublClick(Publication publ)
     {
+	if (!app.isReady())
+	    return false;
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-			            final var req = GetPublicationRequest.newBuilder()
-				    .setPubl(String.valueOf(publ.getId()))
-	    .build();
-				    final var res = app.getPubl().get(req);
-	    if (!res.getResultType().equals("OK"))
-		throw new IllegalStateException("fixme");
-	    
-
-			
-			
+		final var req = GetPublicationRequest.newBuilder()
+		.setPubl(String.valueOf(publ.getId()))
+		.build();
+		final var res = app.getPubl().get(req);
 		app.finishedTask(taskId, () -> {
+			if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
+			    return ;
 			openExt(new PublLayoutExt(this, Publication.fromGrpc(res.getPubl())));
 		    });
 	    });

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -81,6 +81,19 @@ messages);
 public alpha4.Alpha4Credentials getCredentials()
     {
 	return new alpha4.Alpha4Credentials(conf.getAccessToken());
+    }
+
+    boolean okAnswer(String type, String message)
+    {
+	if (type.equals("OK"))
+	return true;
+	message(message, Luwrain.MessageType.ERROR);
+	return false;
+    }
+
+    boolean isReady()
+    {
+	return true;
     }
 
     public PublicationsBlockingStub getPubl()

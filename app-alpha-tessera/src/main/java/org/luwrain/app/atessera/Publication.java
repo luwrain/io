@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package alpha4.json;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 import lombok.*;

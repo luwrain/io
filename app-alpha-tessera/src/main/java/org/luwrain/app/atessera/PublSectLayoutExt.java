@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 import java.io.*;
@@ -12,9 +12,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.edit.*;
-import alpha4.json.Publication;
-import alpha4.json.Publication.Section;
-import org.luwrain.app.lsocial.*;
+import org.luwrain.app.atessera.Publication.Section;
+import org.luwrain.app.atessera.*;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial.layouts;
+package org.luwrain.app.atessera.layouts;
 
 import java.util.*;
 import java.text.*;
@@ -11,7 +11,7 @@ import org.apache.logging.log4j.*;
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
-import org.luwrain.app.lsocial.*;
+import org.luwrain.app.atessera.*;
 
 import alpha4.*;
 //import alpha4.json.*;
@@ -117,7 +117,7 @@ public final class NewEntryLayout extends LayoutBase
 
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		final var p = Publication.newBuilder()
+		final var p = alpha4.Publication.newBuilder()
 				.setType(t)
 		.setName(name)
 		.setTitle(title)

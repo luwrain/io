@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 import java.io.*;
@@ -12,9 +12,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
-import alpha4.json.Publication;
-import alpha4.json.Publication.Section;
-import org.luwrain.app.lsocial.*;
+import org.luwrain.app.atessera.Publication.Section;
+import org.luwrain.app.atessera.*;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -61,15 +60,17 @@ class PublLayoutExt implements LayoutExt
 	    return true;
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		/*
-		new org.luwrain.io.api.lsocial.publication.CreateSectionQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.publ(String.valueOf(publ.getId()))
-		.type(type)
-				.source("")
-		.exec();
-		*/
-	    });
+		final var sect = alpha4.PublicationSection.newBuilder()
+		.setType(type)
+		.build();
+		final var req = alpha4.AddPublicationSectionRequest.newBuilder()
+		.setPubl(String.valueOf(publ.getId()))
+		.setSect(sect)
+		.build();
+		final var res = app.getPubl().addSection(req);
+		if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
+		    return;
+			    });
     }
 
     boolean onSectClick(Section sect)
@@ -95,7 +96,8 @@ class PublLayoutExt implements LayoutExt
 
     @Override public void setLayout()
     {
-	mainLayout.setAreaLayout(AreaLayout.LEFT_RIGHT, mainLayout.mainList, mainLayout.mainListActions,
+	mainLayout.setAreaLayout(AreaLayout.LEFT_RIGHT, mainLayout.mainList,
+				 mainLayout.mainListActions,
 				 sectList, actions);
     }
 

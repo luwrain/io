@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.lsocial;
+package org.luwrain.app.atessera;
 
 import java.util.*;
 
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
-import alpha4.json.*;
-import alpha4.json.Publication.Section;
+import org.luwrain.app.atessera.Publication.Section;
+import alpha4.PublicationSectionType;
 
 import static org.luwrain.popups.Popups.*;
 
@@ -30,7 +30,7 @@ final class Conv
 	return (NewItemType)fixedList(luwrain, strings.newMainListItemTypePopupName(), new Object[]{NewItemType.PUBL, NewItemType.PRES});
     }
 
-    Publication.SectionType newPublSectType()
+    PublicationSectionType newPublSectType()
     {
 	final String res = (String)fixedList(luwrain, strings.newPublSectTypePopupName(), new String[]{
 		strings.typeMarkdown(),
@@ -40,11 +40,11 @@ final class Conv
 		strings.typeListing() });
 	if (res == null)
 	    return null;
-	if (res.equals(strings.typeMarkdown())) return Publication.SectionType.MARKDOWN;
-	if (res.equals(strings.typeLatex())) return Publication.SectionType.LATEX;
-	if (res.equals(strings.typeMetapost())) return Publication.SectionType.METAPOST;
-	if (res.equals(strings.typeGnuplot())) return Publication.SectionType.GNUPLOT;
-	if (res.equals(strings.typeListing())) return Publication.SectionType.LISTING;
+	if (res.equals(strings.typeMarkdown())) return PublicationSectionType.MARKDOWN;
+	if (res.equals(strings.typeLatex())) return PublicationSectionType.LATEX;
+	if (res.equals(strings.typeMetapost())) return PublicationSectionType.METAPOST;
+	if (res.equals(strings.typeGnuplot())) return PublicationSectionType.GNUPLOT;
+	if (res.equals(strings.typeListing())) return PublicationSectionType.LISTING;
 	return null;
     }
 }
