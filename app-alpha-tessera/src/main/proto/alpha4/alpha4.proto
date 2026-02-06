@@ -20,7 +20,20 @@ service Publications {
   rpc create(CreatePublicationRequest) returns (CreatePublicationReply) {}
   rpc delete(DeletePublicationRequest) returns (DeletePublicationReply) {}
   rpc addSection(AddPublicationSectionRequest) returns (AddPublicationSectionReply) {}
+    rpc removeSection(RemovePublicationSectionRequest) returns (RemovePublicationSectionReply) {}
+  rpc updateSection(UpdatePublicationSectionRequest) returns (UpdatePublicationSectionReply) {}
 }
+
+service Presentations {
+  rpc get(GetPresentationRequest) returns (GetPresentationReply) {}
+  rpc list(ListPresentationsRequest) returns (ListPresentationsReply) {}
+  rpc create(CreatePresentationRequest) returns (CreatePresentationReply) {}
+  rpc delete(DeletePresentationRequest) returns (DeletePresentationReply) {}
+  rpc addFrame(AddPresentationFrameRequest) returns (AddPresentationFrameReply) {}
+  rpc removeFrame(RemovePresentationFrameRequest) returns (RemovePresentationFrameReply) {}
+  rpc updateFrame(UpdatePresentationFrameRequest) returns (UpdatePresentationFrameReply) {}
+}
+
 
 enum PublicationType {
   BOOK = 0;
@@ -169,6 +182,7 @@ NOT_FOUND = 2;
 
 message AddPublicationSectionRequest {
   string publ = 1;
+  optional string afterSect = 10;
   PublicationSection sect = 100;
 }
 
@@ -183,8 +197,208 @@ message AddPublicationSectionReply {
   string resultType = 1;
   optional ErrorCode errorCode = 2;
   optional string errorMessage = 3;
-  optional string sect = 100;
+  optional PublicationSection sect = 100;
 }
+
+message RemovePublicationSectionRequest {
+  string publ = 1;
+  string sect = 10;
+}
+
+message RemovePublicationSectionReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    PUBL_NOT_FOUND = 3;
+    SECT_NOT_FOUND = 4;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional PublicationSection sect = 100;
+}
+
+
+message UpdatePublicationSectionRequest {
+  string publ = 1;
+  string sect = 10;
+  PublicationSection newSect = 100;
+}
+
+message UpdatePublicationSectionReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    LIMIT_EXCEEDED = 2;
+    PUBL_NOT_FOUND = 3;
+    SECT_NOT_FOUND = 4;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional PublicationSection sect = 100;
+}
+
+
+
+message Presentation {
+  optional int64 id = 2;
+  optional string shortRef = 3;
+  optional string name = 4;
+  optional string subject = 5;
+  optional string descr = 6;
+  optional string authors = 7;
+  optional string title = 8;
+  optional string subtitle = 9;
+  optional string date = 10;
+  optional string location = 11;
+  optional string keywords = 13;
+  optional string org = 14;
+  repeated PresentationFrame frames = 100;
+  optional int64 creationTimestamp = 500;
+  optional int64 modificationTimestamp = 601;
+  optional int64 publicationTimestamp = 602;
+}
+
+message PresentationFrame {
+  optional PublicationSectionType type = 1;
+  optional int32 index = 2;
+  optional string id = 3;
+  optional string label = 4;
+  optional string listingLang = 5;
+  optional string source = 6;
+  optional string alternativeSource = 7;
+  optional string caption = 8;
+}
+
+message GetPresentationRequest {
+  enum Mode {
+    METADATA = 0;
+    PREVIEW = 1;
+    FULL = 2;
+  }
+  string  pres = 1;
+  optional Mode mode = 100;
+}
+
+message GetPresentationReply {
+  enum ErrorCode {  
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    NOT_FOUND = 2;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional Presentation pres = 100;
+}
+
+message ListPresentationsRequest {
+  optional int32 offset = 1;
+  optional int32 limitCount = 2;
+}
+
+message ListPresentationsReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  repeated Presentation pres = 100;
+}
+
+message CreatePresentationRequest {
+  Presentation pres = 1;
+}
+
+message CreatePresentationReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    LIMIT_EXCEEDED = 2;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional string pres = 10;
+}
+
+message DeletePresentationRequest {
+  string pres = 1;
+}
+
+message DeletePresentationReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    NOT_FOUND = 2;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+}
+
+message AddPresentationFrameRequest {
+  string pres = 1;
+  optional string afterFrame = 10;
+  PresentationFrame frame = 100;
+}
+
+message AddPresentationFrameReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    LIMIT_EXCEEDED = 2;
+    PRES_NOT_FOUND = 3;
+    FRAME_NOT_FOUND = 4;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional PresentationFrame frame = 100;
+}
+
+message RemovePresentationFrameRequest {
+  string pres = 1;
+  string frame = 10;
+}
+
+message RemovePresentationFrameReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    PRES_NOT_FOUND = 3;
+    FRAME_NOT_FOUND = 4;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional PresentationFrame frame = 100;
+}
+
+message UpdatePresentationFrameRequest {
+  string pres = 1;
+  string frame = 10;
+  PresentationFrame newFrame = 100;
+}
+
+message UpdatePresentationFrameReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    LIMIT_EXCEEDED = 2;
+    PRES_NOT_FOUND = 3;
+    FRAME_NOT_FOUND = 4;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional PresentationFrame frame = 100;
+}
+
+ 
 
 message AuthRequest {
   string username = 1;

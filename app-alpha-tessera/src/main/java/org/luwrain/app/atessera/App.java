@@ -78,9 +78,9 @@ messages);
 	return text;
     }
 
-public alpha4.Alpha4Credentials getCredentials()
+private Alpha4Credentials getCredentials()
     {
-	return new alpha4.Alpha4Credentials(conf.getAccessToken());
+	return new Alpha4Credentials(conf.getAccessToken());
     }
 
     boolean okAnswer(String type, String message)

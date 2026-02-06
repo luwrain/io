@@ -49,7 +49,8 @@ class PublLayoutExt implements LayoutExt
 		}));
 
 	actions = mainLayout.actions(
-			  mainLayout.action("insert", s.create(), new InputEvent(Special.INSERT), this::onInsert)
+				     mainLayout.action("insert", s.create(), new InputEvent(Special.INSERT), this::onInsert),
+				     			  mainLayout.action("delete", s.delete(), new InputEvent(Special.DELETE), this::onDelete)
 );
     }
 
@@ -73,25 +74,35 @@ class PublLayoutExt implements LayoutExt
 			    });
     }
 
+        boolean onDelete()
+    {
+	final var sect = sectList.selected();
+	if (sect == null)
+	    return false;
+	final var taskId = app.newTaskId();
+	return app.runTask(taskId, () -> {
+		final var req = alpha4.RemovePublicationSectionRequest.newBuilder()
+		.setPubl(String.valueOf(publ.getId()))
+		.setSect(sect.getId())
+		.build();
+		final var res = app.getPubl().removeSection(req);
+		app.finishedTask(taskId, () -> {
+			if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
+			    return;
+			app.getLuwrain().playSound(Sounds.DONE);
+		    });
+	    });
+	    }
+
+
     boolean onSectClick(Section sect)
     {
 	final var index = sectList.selectedIndex();
 	if (index < 0)
 	    return false;
-	final var taskId = app.newTaskId();
-	return app.runTask(taskId, () -> {
-		/*
-		final var res = new org.luwrain.io.api.lsocial.publication.GetSectionQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.publ(publ)
-		.sect(index)
-		.exec();
-		app.finishedTask(taskId, () -> {
-			final var e = new PublSectLayoutExt(this, publ, res.getSect(), index);
+	final var e = new PublSectLayoutExt(this, publ, publ.getSections().get(index), index);
 	mainLayout.openExt(e);
-		    });
-		*/
-	    });
+	return true;
 	    }
 
     @Override public void setLayout()
@@ -114,7 +125,9 @@ class PublLayoutExt implements LayoutExt
 	    {
 	    case MARKDOWN:
 	    case LATEX:
-		app.getLuwrain().setEventResponse(listItem(sect.getSource().stream().collect(joining(" "))));
+		if (sect.getSource() != null && !sect.getSource().isEmpty())
+		app.getLuwrain().setEventResponse(listItem(sect.getSource().stream().collect(joining(" ")))); else
+		    app.getLuwrain().setEventResponse(hint(Hint.EMPTY_LINE));
 		return;
 	    case METAPOST:
 		app.getLuwrain().setEventResponse(listItem(app.getStrings().typeMetapost() + " "
@@ -140,7 +153,7 @@ class PublLayoutExt implements LayoutExt
 	    {
 	    case MARKDOWN:
 	    case LATEX:
-		if (sect.getSource().isEmpty())
+		if (sect.getSource() == null || sect.getSource().isEmpty())
 		    return "";
 		if (sect.getSource().size() == 1)
 		    return sect.getSource().get(0);

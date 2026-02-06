@@ -44,10 +44,27 @@ public final class Publication
 	private SectionType type;
 	private String id, label, listingLang;
 	private List<String> source, alternativeSource, caption;
+
+	@Override public boolean equals(Object o)
+	{
+	    if (id == null || id.isEmpty())
+		return false;
+	    if (o != null && o instanceof Section sect)
+	    {
+		if (sect.id.isEmpty())
+		    return false;
+		return id.equals(sect.id);
+	    }
+	    return false;
+	}
+
+	@Override public int hashCode()
+	{
+	    if (id == null || id.isEmpty())
+		return 0;
+	    return id.hashCode();
+	}
     }
-
-    
-
 
     static public Publication fromGrpc(alpha4.Publication src)
     {
@@ -95,9 +112,56 @@ public final class Publication
 	res.setPageLeftMargin((src.hasPageLeftMargin() && src.getPageLeftMargin() > 0) ? src.getPageLeftMargin() : -1);
 	res.setPageBottomMargin((src.hasPageBottomMargin() && src.getPageBottomMargin() > 0) ? src.getPageBottomMargin() : -1);
 	res.setPageRightMargin((src.hasPageRightMargin() && src.getPageRightMargin() > 0) ? src.getPageRightMargin() : -1);
+	if (src.getSectsCount() > 0)
+	{
+	    final var num = src.getSectsCount();
+	    final var a = new ArrayList<Section>();
+	    a.ensureCapacity(num);
+	    for(int i = 0;i < num;i++)
+		a.add(fromGrpc(src.getSects(i)));
+	    res.setSections(a);
+	}
 	return res;
     }
 
-    
+    static Section fromGrpc(alpha4.PublicationSection src)
+    {
+	final var res = new Section();
+	if (src.hasType() && src.getType() != null)
+	    switch(src.getType())
+	    {
+	    case  MARKDOWN: res.setType(SectionType.MARKDOWN); break;
+	    case  LATEX: res.setType(SectionType.LATEX); break;
+	    case  EQUATION: res.setType(SectionType.EQUATION); break;
+	    case  TABLE: res.setType(SectionType.TABLE); break;
+	    case  GNUPLOT: res.setType(SectionType.GNUPLOT); break;
+	    case  PLANTUML: res.setType(SectionType.PLANTUML); break;
+	    case  GRAPHVIZ_DOT: res.setType(SectionType.GRAPHVIZ_DOT); break;
+	    case  GRAPHVIZ_NEATO: res.setType(SectionType.GRAPHVIZ_NEATO); break;
+	    case  GRAPHVIZ_TWOPI: res.setType(SectionType.GRAPHVIZ_TWOPI); break;
+	    case  GRAPHVIZ_CIRCO: res.setType(SectionType.GRAPHVIZ_CIRCO); break;
+	    default:
+		throw new IllegalArgumentException("Unknown section type: " + src.getType().toString());
+	    } else
+	    res.setType(null);
+		res.setId((src.hasId() && !src.getId().isEmpty())?src.getId():null);
+	res.setLabel((src.hasLabel() && !src.getLabel().isEmpty())?src.getLabel():null);
+	res.setListingLang((src.hasListingLang() && !src.getListingLang().isEmpty())?src.getListingLang():null);
+	res.setSource(src.hasSource()?splitLInes(src.getSource()):null);
+	res.setAlternativeSource(src.hasAlternativeSource()?splitLInes(src.getAlternativeSource()):null);
+	res.setCaption(src.hasCaption()?splitLInes(src.getCaption()):null);
+	return res;
+    }
 
+    static private List<String> splitLInes(String str)
+    {
+	if (str == null)
+	    return null;
+	if (str.isEmpty())
+	    return null;
+	return Arrays.asList(str
+			     .replaceAll("\r\n", "\n")
+			     .replaceAll("\r", "\n")
+			     .split("\n", -1));
+    }
 }

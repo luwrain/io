@@ -14,6 +14,7 @@ import org.luwrain.controls.*;
 import org.luwrain.controls.edit.*;
 import org.luwrain.app.atessera.Publication.Section;
 import org.luwrain.app.atessera.*;
+import alpha4.*;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -78,17 +79,20 @@ class PublSectLayoutExt implements LayoutExt
 	//FIXME: Check len limit
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
-		/*FIXME:
-		new org.luwrain.io.api.lsocial.publication.UpdateSectionQuery(App.ENDPOINT)
-		.accessToken(app.conf.getAccessToken())
-		.publ(String.valueOf(publ.getId()))
-		.sect(String.valueOf(sectIndex))
-		.source(edit.getTextAsList().stream().collect(joining("\n")))
-		.exec();
+		final var sect = PublicationSection.newBuilder()
+		.setSource(edit.getTextAsList().stream().collect(joining("\n")))
+		.build();
+		final var req = UpdatePublicationSectionRequest.newBuilder()
+		.setPubl(String.valueOf(publ.getId()))
+		.setSect(this.sect.getId())
+		.setNewSect(sect)
+		.build();
+		final var res = app.getPubl().updateSection(req);
 		app.finishedTask(taskId, () -> {
+			if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
+			    return;
 			app.getLuwrain().playSound(Sounds.DONE);
 		    });
-		*/
 	    });
     }
 
