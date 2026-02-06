@@ -56,4 +56,6 @@ public interface Strings
 
     //Messages
     String nameCannotBeEmpty();
+
+    String textNotWrittenYet();
 }

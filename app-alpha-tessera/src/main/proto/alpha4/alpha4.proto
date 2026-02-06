@@ -182,7 +182,7 @@ NOT_FOUND = 2;
 
 message AddPublicationSectionRequest {
   string publ = 1;
-  optional string afterSect = 10;
+  optional string beforeSect = 10;
   PublicationSection sect = 100;
 }
 

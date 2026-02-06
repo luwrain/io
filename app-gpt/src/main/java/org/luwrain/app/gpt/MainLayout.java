@@ -3,7 +3,6 @@ package org.luwrain.app.gpt;
 
 import java.util.*;
 import java.io.*;
-//import java.net.*;
 
 import org.apache.logging.log4j.*;
 

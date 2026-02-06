@@ -134,8 +134,10 @@ public final class Publication
 	    case  LATEX: res.setType(SectionType.LATEX); break;
 	    case  EQUATION: res.setType(SectionType.EQUATION); break;
 	    case  TABLE: res.setType(SectionType.TABLE); break;
+			    case  METAPOST: res.setType(SectionType.METAPOST); break;
 	    case  GNUPLOT: res.setType(SectionType.GNUPLOT); break;
 	    case  PLANTUML: res.setType(SectionType.PLANTUML); break;
+			    case  LISTING: res.setType(SectionType.LISTING); break;
 	    case  GRAPHVIZ_DOT: res.setType(SectionType.GRAPHVIZ_DOT); break;
 	    case  GRAPHVIZ_NEATO: res.setType(SectionType.GRAPHVIZ_NEATO); break;
 	    case  GRAPHVIZ_TWOPI: res.setType(SectionType.GRAPHVIZ_TWOPI); break;

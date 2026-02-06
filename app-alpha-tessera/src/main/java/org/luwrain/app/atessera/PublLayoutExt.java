@@ -4,7 +4,6 @@
 package org.luwrain.app.atessera;
 
 import java.util.*;
-import java.io.*;
 import org.apache.logging.log4j.*;
 
 import org.luwrain.core.*;
@@ -13,7 +12,6 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.app.atessera.Publication.Section;
-import org.luwrain.app.atessera.*;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -28,7 +26,6 @@ class PublLayoutExt implements LayoutExt
     final App app;
     final MainLayout mainLayout;
     final Publication publ;
-    final List<Section> sections = new ArrayList<>();
     final ListArea<Section> sectList;
     final Actions actions;
 
@@ -38,12 +35,11 @@ class PublLayoutExt implements LayoutExt
 	this.mainLayout = mainLayout;
 	this.publ = publ;
 	final var s = mainLayout.app.getStrings();
-	if (publ.getSections() != null)
-	    sections.addAll(publ.getSections());
+	publ.setSections(new ArrayList<>(requireNonNullElse(publ.getSections(), List.of())));
 
 	sectList = new ListArea<Section>(mainLayout.listParams(p ->{
-		    p.name = s.appName();
-		    p.model = new ListModel<Section>(sections);
+		    p.name = requireNonNullElse(publ.getName(), "");
+		    p.model = new ListModel<Section>(publ.getSections());
 		    p.appearance = new Appearance();
 		    p.clickHandler = (area, index, sect) -> onSectClick(sect);
 		}));
@@ -59,6 +55,7 @@ class PublLayoutExt implements LayoutExt
 	final var type = app.conv.newPublSectType();
 	if (type == null)
 	    return true;
+	final var beforeSect = sectList.selected();
 	final var taskId = app.newTaskId();
 	return app.runTask(taskId, () -> {
 		final var sect = alpha4.PublicationSection.newBuilder()
@@ -66,12 +63,26 @@ class PublLayoutExt implements LayoutExt
 		.build();
 		final var req = alpha4.AddPublicationSectionRequest.newBuilder()
 		.setPubl(String.valueOf(publ.getId()))
-		.setSect(sect)
-		.build();
-		final var res = app.getPubl().addSection(req);
-		if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
-		    return;
-			    });
+		.setSect(sect);
+		if (beforeSect != null && !requireNonNullElse(beforeSect.getId(), "").isEmpty())
+		    req.setBeforeSect(beforeSect.getId());
+		final var res = app.getPubl().addSection(req.build());
+		app.finishedTask(taskId, () -> {
+			if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
+			    return;
+			final var newSect = Publication.fromGrpc(res.getSect());
+			if (beforeSect != null)
+			{
+			    final int index = publ.getSections().indexOf(beforeSect);
+			    if (index >= 0)
+				publ.getSections().add(index, newSect); else
+				publ.getSections().add(newSect);
+			}else
+			    publ.getSections().add(newSect);
+			sectList.refresh();
+			sectList.select(newSect, false);
+		    });
+	    });
     }
 
         boolean onDelete()
@@ -89,6 +100,8 @@ class PublLayoutExt implements LayoutExt
 		app.finishedTask(taskId, () -> {
 			if (!app.okAnswer(res.getResultType(), res.getErrorMessage()))
 			    return;
+			publ.getSections().remove(sect);
+			sectList.refresh();
 			app.getLuwrain().playSound(Sounds.DONE);
 		    });
 	    });
@@ -166,14 +179,18 @@ class PublLayoutExt implements LayoutExt
 	String captOrSource(Section sect)
 	{
 	    final String capt;
-	    if (sect.getCaption() != null)
-		capt = sect.getCaption().stream().collect(joining("\n")).trim(); else
+	    if (sect.getCaption() != null && !sect.getCaption().isEmpty())
+		capt = sect.getCaption().stream().collect(joining(" ")).trim(); else
 		capt = "";
 	    if (!capt.isEmpty())
 		return capt;
-	    if (!sect.getSource().isEmpty())
-		return sect.getSource().get(0);
-	    return "";
+	    final String source;
+	    if (sect.getSource() != null && !sect.getSource().isEmpty())
+		source = sect.getSource().stream().collect(joining(" ")).trim(); else
+		source = "";
+	    if (!source.isEmpty())
+		return source;
+	    return app.getStrings().textNotWrittenYet();
 	    	}
     }
 
