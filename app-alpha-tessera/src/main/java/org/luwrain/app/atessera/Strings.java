@@ -48,6 +48,24 @@ public interface Strings
     String authorsEdit();
     String subjectEdit();
     String dateEdit();
+    String locationEdit();
+    String publishedEdit();
+    String orgEdit();
+    String keywordsEdit();
+    String copyrightEdit();
+    String isbnEdit();
+    String udkEdit();
+    String bbkEdit();
+    String spNumEdit();
+    String spNameEdit();
+    String stGroupEdit();
+    String svNameEdit();
+    String svDegreeEdit();
+    String svRankEdit();
+    String titlePageTopNoteEdit();
+    String titlePageBottomNoteEdit();
+    String bookTypeEdit();
+    
 
     //        String titleEdit();
     String subtitleEdit();
