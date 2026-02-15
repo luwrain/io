@@ -20,13 +20,13 @@ public interface Strings
     String typeUml();
     String typeGraphviz();
 
-    //config layout
+    //options layout
+        String optionsAreaName();
     String accessTokenEdit();
-        String yandexApiKeyEdit();
-        String yandexFolderIdEdit();
+    String systemPromptEdit();
 
     
-    String optionsAreaName();
+
     String newEntryAreaName();
     String presentationListSuffix();
     String publicationListSuffix();
@@ -35,6 +35,12 @@ public interface Strings
     String create();
     String delete();
 
+    //Completion
+    String completion();
+    String promptPopupName();
+    String promptPopupPrefix();
+    String aiEngineNotReady();
+
     //Forms and wizards
     String newPresentationAreaName();
     String nameEdit();
@@ -42,6 +48,13 @@ public interface Strings
     String authorsEdit();
     String subjectEdit();
     String dateEdit();
+
+    //        String titleEdit();
+    String subtitleEdit();
+    String descrEdit();
+
+
+    
     String presentationClickable();
     String paperClickable();
     String bookClickable();
@@ -58,4 +71,7 @@ public interface Strings
     String nameCannotBeEmpty();
 
     String textNotWrittenYet();
+
+    String publPropertiesAreaName();
+
 }

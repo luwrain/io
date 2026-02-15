@@ -32,18 +32,30 @@ public final class Completion
 
     public String generate(List<Message> messages)  throws IOException
     {
-		final var m = messages.stream()
-		.map( e-> new org.luwrain.io.api.yandex_gpt.Message(e.getType().toString().toLowerCase(), e.getText()) )
-.toList();
+	final var m = messages.stream()
+	.map( e-> new org.luwrain.io.api.yandex_gpt.Message(e.getType().toString().toLowerCase(), e.getText()) )
+	.toList();
 	final var g = new org.luwrain.io.api.yandex_gpt.YandexGpt(
 								  conf.getFoundationModelsFolderId(),
-conf.getFoundationModelsApiKey(),
-				    new org.luwrain.io.api.yandex_gpt.CompletionOptions(false, 0.7, 4096),
-m);
+								  conf.getFoundationModelsApiKey(),
+								  new org.luwrain.io.api.yandex_gpt.CompletionOptions(false, 0.7, 4096),
+								  m);
 	final var resp = g.doSync();
 	final var a = resp.getResult().getAlternatives();
-		final var mm = a.get(0).getMessage();
-return mm.getText();
-}
+	final var mm = a.get(0).getMessage();
+	return mm.getText();
     }
-    
+
+    public List<String> splitLines(String text)
+    {
+	if (text == null)
+	    return null;
+	if (text.isEmpty())
+	    return List.of();
+	return Arrays.asList(text
+			     .replaceAll("\r\n", "\n")
+			     .replaceAll("\r", "\n")
+			     .split("\n", -1));
+    }
+}
+

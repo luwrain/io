@@ -12,6 +12,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.app.atessera.Publication.Section;
+import org.luwrain.app.base.LayoutBase.ActionInfo;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;

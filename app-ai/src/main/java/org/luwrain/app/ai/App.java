@@ -1,20 +1,7 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
-
-package org.luwrain.app.gpt;
+package org.luwrain.app.ai;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -26,7 +13,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
 @AppNoArgs(
-	   name = "gpt",
+	   name = "ai",
 	   title = { "en=GPT", "ru=GPT"}, 
 	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>

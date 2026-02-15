@@ -14,10 +14,9 @@ import static org.luwrain.popups.Popups.*;
 
 final class Conv
 {
-    enum NewItemType {PUBL, PRES};
-
     private final Luwrain luwrain;
     private final Strings strings;
+    private String prompt = "";
 
     Conv(App app)
     {
@@ -25,10 +24,18 @@ final class Conv
 	this.strings = app.getStrings();
     }
 
-    NewItemType newMainListItemType()
+        String prompt()
     {
-	return (NewItemType)fixedList(luwrain, strings.newMainListItemTypePopupName(), new Object[]{NewItemType.PUBL, NewItemType.PRES});
+final var res = textNotEmpty(luwrain,
+			    strings.promptPopupName(),
+			    strings.promptPopupPrefix(),
+			    prompt);
+if (res == null)
+    return null;
+prompt = res;
+return res.trim();
     }
+
 
     PublicationSectionType newPublSectType()
     {

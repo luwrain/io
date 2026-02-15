@@ -19,6 +19,7 @@ service Publications {
   rpc list(ListPublicationsRequest) returns (ListPublicationsReply) {}
   rpc create(CreatePublicationRequest) returns (CreatePublicationReply) {}
   rpc delete(DeletePublicationRequest) returns (DeletePublicationReply) {}
+    rpc update(UpdatePublicationRequest) returns (UpdatePublicationReply) {}
   rpc addSection(AddPublicationSectionRequest) returns (AddPublicationSectionReply) {}
     rpc removeSection(RemovePublicationSectionRequest) returns (RemovePublicationSectionReply) {}
   rpc updateSection(UpdatePublicationSectionRequest) returns (UpdatePublicationSectionReply) {}
@@ -170,15 +171,35 @@ message DeletePublicationRequest {
 }
 
 message DeletePublicationReply {
-enum ErrorCode {
-NONE = 0;
-ILLEGAL_QUERY = 1;
-NOT_FOUND = 2;
-}
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    NOT_FOUND = 2;
+  }
   string resultType = 1;
   optional ErrorCode errorCode = 2;
   optional string errorMessage = 3;
 }
+
+message UpdatePublicationRequest {
+  string publ = 1;
+  Publication newPubl = 100;
+}
+
+message UpdatePublicationReply {
+  enum ErrorCode {
+    NONE = 0;
+    ILLEGAL_QUERY = 1;
+    NOT_FOUND = 2;
+    LIMIT_EXCEEDED = 3;
+  }
+  string resultType = 1;
+  optional ErrorCode errorCode = 2;
+  optional string errorMessage = 3;
+  optional Publication publ = 100;
+}
+
+
 
 message AddPublicationSectionRequest {
   string publ = 1;

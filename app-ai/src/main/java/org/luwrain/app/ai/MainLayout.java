@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.gpt;
+package org.luwrain.app.ai;
 
 import java.util.*;
 import java.io.*;
@@ -11,7 +13,7 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.console.*;
 import org.luwrain.io.api.yandex_gpt.*;
-import org.luwrain.app.gpt.layouts.*;
+import org.luwrain.app.ai.layouts.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;

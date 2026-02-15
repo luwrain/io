@@ -16,13 +16,16 @@ import org.luwrain.app.atessera.Publication.Section;
 import org.luwrain.app.atessera.*;
 import alpha4.*;
 
+import org.luwrain.app.base.LayoutBase.ActionInfo;
+import org.luwrain.io.ai.Completion.Message;
+
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.events.InputEvent.*;
 import static org.luwrain.app.base.LayoutBase.*;
 
-class PublSectLayoutExt implements LayoutExt
+final class PublSectLayoutExt implements LayoutExt
 {
     static private final Logger log = LogManager.getLogger();
 
@@ -45,12 +48,26 @@ class PublSectLayoutExt implements LayoutExt
 	this.sectIndex = sectIndex;
 
 	edit = new EditArea(mainLayout.editParams( p -> {
+
+		    p.appearance = new DefaultEditAreaAppearance(p.context){
+			    @Override public void announceLine(int index, String line)
+			    {
+				if (line.trim().isEmpty())
+				{
+				    app.setEventResponse(hint(Hint.EMPTY_LINE));
+				    return;
+				}
+				app.setEventResponse(text(app.getLuwrain().getSpeakableText(line, Luwrain.SpeakableTextType.PROGRAMMING)));
+			    }
+			};
+
 		    p.editFactory = e -> {
 			e.model = new MultilineEditModelWrap(e.model){
 				@Override public MultilineEdit.ModificationResult putChars(int x, int y, String chars) { return super.putChars(x, y, app.translateUserInput(getLine(getHotPointY()), x, chars)); }
 			    };
 			return new MultilineEdit(e);
 		    };
+		    
 		})){
 		@Override public boolean onSystemEvent(org.luwrain.core.events.SystemEvent event)
 		{
@@ -70,6 +87,7 @@ class PublSectLayoutExt implements LayoutExt
 
 
 	actions = mainLayout.actions(
+				     actCompletion()
 				     //			  mainLayout.action("insert", s.create(), new InputEvent(Special.INSERT), this::onInsert)
 );
     }
@@ -95,6 +113,41 @@ class PublSectLayoutExt implements LayoutExt
 		    });
 	    });
     }
+
+    ActionInfo actCompletion()
+    {
+	return mainLayout.action("completion", app.getStrings().completion(),
+				 new InputEvent(Special.F5),
+				 () -> {
+				     final var ai = new org.luwrain.io.ai.Completion();
+				     if (!ai.load(app.getLuwrain()))
+				     {
+					 app.message(app.getStrings().aiEngineNotReady(), Luwrain.MessageType.ERROR);
+					 return true;
+				     }
+				     final var prompt = app.conv.prompt();
+				     if (prompt == null)
+					 return true;
+				     final var taskId = app.newTaskId();
+				     app.runTask(taskId, () -> {
+					     final var res = ai.splitLines(ai.generate(List.of(
+											       new Message(Message.Type.SYSTEM, requireNonNullElse(app.conf.getSystemPrompt(), "")),
+											       new Message(Message.Type.USER, prompt)
+											       )));
+					     app.finishedTask(taskId, () -> {
+						     if (res != null && !res.isEmpty())
+							 edit.update((text, hotPoint) -> {
+								 for(var line: res)
+								     text.add(line);
+								 return false;
+							     });
+						     app.getLuwrain().playSound(Sounds.DONE);
+						 });
+					 });
+				     return true;
+				 });
+    }
+
 
     @Override public void setLayout()
     {
