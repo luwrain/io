@@ -46,7 +46,15 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 		    p.appearance = new MainListAppearance(getControlContext());
 		    p.clickHandler = this;
 		}));
-	setPropertiesHandler(mainList, a -> new OptionsLayout(app, getReturnAction()));
+	
+	setPropertiesHandler(mainList, a -> {
+		final var ss = mainList.selected();
+		if (ss == null)
+		    return null;
+		if (ss instanceof Publication publ)
+		return new PublicationPropertiesLayout(app, publ, getReturnAction());
+		return null;
+	    });
 
 	mainListActions = actions(
 				  action("insert", s.create(), new InputEvent(Special.INSERT),

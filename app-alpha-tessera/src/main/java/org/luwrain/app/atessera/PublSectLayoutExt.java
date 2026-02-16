@@ -48,7 +48,6 @@ final class PublSectLayoutExt implements LayoutExt
 	this.sectIndex = sectIndex;
 
 	edit = new EditArea(mainLayout.editParams( p -> {
-
 		    p.appearance = new DefaultEditAreaAppearance(p.context){
 			    @Override public void announceLine(int index, String line)
 			    {
@@ -60,7 +59,6 @@ final class PublSectLayoutExt implements LayoutExt
 				app.setEventResponse(text(app.getLuwrain().getSpeakableText(line, Luwrain.SpeakableTextType.PROGRAMMING)));
 			    }
 			};
-
 		    p.editFactory = e -> {
 			e.model = new MultilineEditModelWrap(e.model){
 				@Override public MultilineEdit.ModificationResult putChars(int x, int y, String chars) { return super.putChars(x, y, app.translateUserInput(getLine(getHotPointY()), x, chars)); }

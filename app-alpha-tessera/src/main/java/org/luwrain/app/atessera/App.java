@@ -30,7 +30,7 @@ public final class App extends AppBase<Strings>
     public Config conf = null;
     public ManagedChannel channel = null;
     private MainLayout mainLayout = null;
-    private Set<String> nbspAfterWords = new HashSet<>(Arrays.asList("В", "НА", "ПОД"));
+    private Set<String> nbspAfterWords = new HashSet<>(Arrays.asList("В", "ВО", "НА", "ПОД", "ПРИ", "ПРО", "О", "ОБ", "НЕ", "НИ", "К", "КО", "ДЛЯ", "С", "СО", "ЕГО", "ЕЁ", "BNИХ"));
 
     public App() { super(Strings.class, "luwrain.commander"); }
 
@@ -71,7 +71,7 @@ private Alpha4Credentials getCredentials()
 	return new Alpha4Credentials(conf.getAccessToken());
     }
 
-    boolean okAnswer(String type, String message)
+    public boolean okAnswer(String type, String message)
     {
 	if (type.equals("OK"))
 	return true;
