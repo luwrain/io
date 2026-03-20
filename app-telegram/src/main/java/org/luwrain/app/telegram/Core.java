@@ -47,7 +47,7 @@ public final class Core
         Client.execute(new TdApi.SetLogVerbosityLevel(0));
 	final String logFile = new File(luwrain.getFileProperty("luwrain.dir.userhome"), "td.log").getAbsolutePath();
 	Log.debug(LOG_COMPONENT, "tdlib log file is " + logFile);
-        if (Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile(logFile, 1 << 27, true))) instanceof TdApi.Error)
+        if (!(Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile(logFile, 1 << 27, true))) instanceof TdApi.Ok))
             throw new IOError(new IOException("Write access to the current directory is required"));
     }
 

@@ -1,9 +1,3 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
@@ -48,8 +42,8 @@ public abstract class Operations
 
     void addContact(String phone, String firstName, String lastName, Runnable onSuccess)
     {
-	final TdApi.Contact contact = new TdApi.Contact(phone, firstName, lastName, "", 0);
-	getClient().send(new ImportContacts(new TdApi.Contact[]{contact}),
+	final var contact = new TdApi.ImportedContact(phone, firstName, lastName, new TdApi.FormattedText("", new TdApi.TextEntity[0]));
+	getClient().send(new ImportContacts(new TdApi.ImportedContact[]{contact}),
 			 new DefaultHandler(TdApi.ImportedContacts.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
 			 }));
@@ -57,17 +51,29 @@ public abstract class Operations
 
     public void sendTextMessage(Chat chat, String text, Runnable onSuccess)
     {
-	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
-        final ReplyMarkup replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
-	final InputMessageContent content = new InputMessageText(new FormattedText(text, null), false, true);
-	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
+	        TdApi.InlineKeyboardButton[] row = {
+            new TdApi.InlineKeyboardButton("https://telegram.org?1", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?2", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
+		//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
+		        final var replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
+			//	final InputMessageContent content = new InputMessageText(new FormattedText(text, null), false, true);
+			        TdApi.InputMessageContent content = new TdApi.InputMessageText(new TdApi.FormattedText(text, null), null, true);
+				//	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
+				getClient().send(new TdApi.SendMessage(chat.id, null, null, null, replyMarkup, content),
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
     }
 
     public void sendPhotoMessage(Chat chat, java.io.File photoFile, String caption, Runnable onSuccess)
     {
-	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
-        final ReplyMarkup replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
+		        TdApi.InlineKeyboardButton[] row = {
+            new TdApi.InlineKeyboardButton("https://telegram.org?1", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?2", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
+
+	//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
+	
+        final var replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
 	final InputMessageContent content = new InputMessagePhoto(new InputFileLocal(photoFile.getPath()), null, null, 0, 0, new FormattedText(caption, null), 0);
 	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
@@ -75,7 +81,12 @@ public abstract class Operations
 
     public void sendAudioMessage(Chat chat, java.io.File audioFile, String caption, String author, String title, Runnable onSuccess)
     {
-	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
+		        TdApi.InlineKeyboardButton[] row = {
+            new TdApi.InlineKeyboardButton("https://telegram.org?1", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?2", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
+
+			//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
         final ReplyMarkup replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
 	final InputMessageContent content = new InputMessageAudio(new InputFileLocal(audioFile.getPath()), null, 0, title, author, new FormattedText(caption, null));
 	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),

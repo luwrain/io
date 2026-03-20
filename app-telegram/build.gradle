@@ -8,7 +8,7 @@ dependencies {
   implementation libraries.base
   implementation libraries.apacheBase
   annotationProcessor libraries.autoService
-  implementation 'org.drinkless:tdlib:1.8.0'
+  implementation 'org.drinkless:tdlib:1.8.62.0'
   implementation project(':luwrain-base')
   implementation project(':luwrain')
   implementation project(':luwrain-io')
