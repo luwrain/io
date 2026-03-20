@@ -1,9 +1,3 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
@@ -18,9 +12,6 @@ import org.luwrain.app.telegram.UpdatesHandler.InputWaiter;
 
 final class AuthLayout extends LayoutBase implements Objects.NewInputWaiterListener
 {
-    static private final String
-	LOG_COMPONENT = Core.LOG_COMPONENT;
-
     private final App app;
     final WizardArea wizardArea;
     private String phoneNumber = "";

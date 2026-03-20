@@ -1,14 +1,11 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.telegram;
 
 import java.util.*;
 import java.io.*;
+import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.*;
 import org.luwrain.core.Log;
@@ -17,18 +14,22 @@ import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
+import org.luwrain.core.annotations.*;
 
+@AppNoArgs(
+	   name = "telegram",
+	   title = { "en=Telegram", "ru=Телеграм"}, 
+	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings> implements MonoApp
 {
+    static private final Logger log = LogManager.getLogger();
+    
     static final InputEvent
 	HOTKEY_MAIN = new InputEvent(InputEvent.Special.F5),
     	HOTKEY_SEARCH_CHATS = new InputEvent(InputEvent.Special.F6),
 	HOTKEY_CONTACTS = new InputEvent(InputEvent.Special.F9);
 
     static private final int CHAT_NUM_LIMIT = 200;
-
-    static final String
-	LOG_COMPONENT = Core.LOG_COMPONENT;
 
     final long startTimeMillis = System.currentTimeMillis();
 
@@ -41,7 +42,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     public App(Core core)
     {
-	super(Strings.NAME, Strings.class, "luwrain.telegram");
+	super(Strings.class, "luwrain.telegram");
 	NullCheck.notNull(core, "core");
 	this.core = core;
     }

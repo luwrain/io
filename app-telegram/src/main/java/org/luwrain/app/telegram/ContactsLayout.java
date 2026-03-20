@@ -1,13 +1,8 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
 import java.util.*;
+import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.TdApi.User;
 import org.drinkless.tdlib.TdApi.Contact;
@@ -23,8 +18,7 @@ import org.luwrain.app.telegram.layouts.*;
 
 final class ContactsLayout extends LayoutBase implements ClickHandler<Contact>, Objects.UsersListener
 {
-    static private final String
-	LOG_COMPONENT = Core.LOG_COMPONENT;
+    static private final Logger log = LogManager.getLogger();
 
     private final App app;
     final ListArea<Contact> contactsArea;

@@ -1,13 +1,8 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
 import java.util.*;
+import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.*;
 import org.drinkless.tdlib.TdApi.*;
@@ -22,8 +17,7 @@ import org.luwrain.app.telegram.layouts.*;
 final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>, ConsoleArea.InputHandler, ConsoleArea.ClickHandler<Message>,
 						     Objects.ChatsListener, Objects.NewMessageListener
 {
-    static private final String
-	LOG_COMPONENT = App.LOG_COMPONENT;
+    static private final Logger log = LogManager.getLogger();
     static private final int
 	CHAT_NUM_LIMIT = 500;
 
@@ -173,7 +167,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	    final Supergroup supergroup = app.getObjects().supergroups.get(supergroupId);
 	    if (supergroup == null)
 	    {
-		org.luwrain.core.Log.error(LOG_COMPONENT, "no supergroup in objects, id = " + supergroupId);
+		log.error("no supergroup in objects, id = " + supergroupId);
 		return false;
 	    }
 	    app.getOperations().callFunc(new GetSupergroupFullInfo(supergroupId), SupergroupFullInfo.CONSTRUCTOR, (obj)->{
@@ -395,7 +389,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	    final Supergroup supergroup = app.getObjects().supergroups.get(supergroupId);
 	    if (supergroup == null)
 	    {
-		org.luwrain.core.Log.error(LOG_COMPONENT, "no supergroup in objects, id = " + supergroupId);
+		log.error("no supergroup in objects, id = " + supergroupId);
 		return false;
 	    }
 	    app.getOperations().callFunc(new GetSupergroupFullInfo(supergroupId), SupergroupFullInfo.CONSTRUCTOR, (obj)->{
@@ -435,7 +429,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 
     @Override public void onChatsUpdate(Chat sourceChat)
     {
-	org.luwrain.core.Log.debug(LOG_COMPONENT, "updating main chat list");
+	log.trace("updating main chat list");
 	final Objects objects = app.getObjects();
 	final ArrayList<Chat> res = new ArrayList<>();
 	synchronized(objects) {

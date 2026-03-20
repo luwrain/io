@@ -1,9 +1,3 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
@@ -23,9 +17,6 @@ import static org.luwrain.core.DefaultEventResponse.*;
 
 final class SearchChatsLayout extends LayoutBase implements InputHandler, ClickHandler<Chat>
 {
-    static private final String
-	LOG_COMPONENT = Core.LOG_COMPONENT;
-
     private final App app;
     final ConsoleArea<Chat> searchArea;
     private final List<Chat> items = new ArrayList<>();

@@ -1,15 +1,9 @@
-//
-// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2020
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
 import java.util.*;
 import java.io.*;
+import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.*;
 import org.drinkless.tdlib.TdApi.*;
@@ -19,8 +13,9 @@ import org.luwrain.core.Log;
 
 abstract class UpdatesHandler implements Client.ResultHandler
 {
+    static private final Logger log = LogManager.getLogger();
+    
     static private final String
-	LOG_COMPONENT = Core.LOG_COMPONENT,
 	PHONE_NUMBER_BANNED = "PHONE_NUMBER_BANNED";
 
     private final Luwrain luwrain;
@@ -47,7 +42,7 @@ abstract class UpdatesHandler implements Client.ResultHandler
     {
 	if (object == null)
 	{
-	    Log.warning(LOG_COMPONENT, "null update object");
+	    log.warn("null update object");
 	    return;
 	}
 	switch (object.getConstructor())
@@ -294,7 +289,7 @@ chat = objects.chats.get(updateChat.chatId);
                     break;
 
 	default:
-	    Log.debug(LOG_COMPONENT, "Unsupported update: " + object);
+	    log.trace("Unsupported update: " + object);
             }
     }
 
@@ -385,7 +380,7 @@ this.authorizationState = authorizationState;
 	case 		 UpdateConnectionState.CONSTRUCTOR:
 	    	    break;
 	default:
-	    Log.error(LOG_COMPONENT, "Unsupported authorization state: " + this.authorizationState);
+	    log.error("Unsupported authorization state: " + this.authorizationState);
         }
     }
 
@@ -403,7 +398,7 @@ this.authorizationState = authorizationState;
 	    {
 	    case TdApi.Error.CONSTRUCTOR: {
 		final TdApi.Error err = (TdApi.Error)object;
-		                    Log.error(LOG_COMPONENT, object.toString());
+		                    log.error(object.toString());
 				    if (err.message.equals(PHONE_NUMBER_BANNED))
 					luwrain.message("Номер телефона заблокирован", Luwrain.MessageType.ERROR); else //FIXME:
 		luwrain.message(err.message, Luwrain.MessageType.ERROR);
@@ -414,7 +409,7 @@ this.authorizationState = authorizationState;
                     // result is already received through UpdateAuthorizationState, nothing to do
                     break;
                 default:
-                    Log.error(LOG_COMPONENT, "Receive wrong response from TDLib: " + object);
+                    log.error("Receive wrong response from TDLib: " + object);
             }
         }
     }
@@ -445,7 +440,7 @@ this.authorizationState = authorizationState;
 		if (j != i)
 		    new_positions[pos++] = chat.positions[j];
 	    if (pos != new_positions.length)
-		Log.warning(LOG_COMPONENT, "updating the chat position: pos != new_positions.length");
+		log.warn("updating the chat position: pos != new_positions.length");
 	    setChatPositions(chat, new_positions);
 	}
     }

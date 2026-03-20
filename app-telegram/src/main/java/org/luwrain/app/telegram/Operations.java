@@ -4,6 +4,7 @@ package org.luwrain.app.telegram;
 import java.util.*;
 import java.util.function.Consumer;
 import java.io.*;
+import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.*;
 import org.drinkless.tdlib.TdApi.*;
@@ -16,8 +17,7 @@ import org.luwrain.app.base.*;
 
 public abstract class Operations
 {
-    static private final String
-	LOG_COMPONENT = Core.LOG_COMPONENT;
+    static private final Logger log = LogManager.getLogger();
 
     interface ChatHistoryCallback { void onChatHistoryMessages(TdApi.Chat chat, TdApi.Messages messages); }
     public interface SupergroupCallback { void onSupergroup(Supergroup supergroup); }
@@ -348,11 +348,11 @@ onSuccess.accept((Chat)obj);
 	    if (object.getConstructor() == TdApi.Error.CONSTRUCTOR)
 	    {
 		final TdApi.Error error = (TdApi.Error)object;
-		org.luwrain.core.Log.error(LOG_COMPONENT, "TdApi error: " + String.valueOf(constructor) + ": " + error.toString());
+		log.error("TdApi error: " + String.valueOf(constructor) + ": " + error.toString());
 		objects.error(error);
 		return;
 	    }
-	    org.luwrain.core.Log.error(LOG_COMPONENT, "the wrong response for " + String.valueOf(constructor) + ": " + object.toString());
+	    log.error("the wrong response for " + String.valueOf(constructor) + ": " + object.toString());
 	}
     }
 
@@ -377,11 +377,11 @@ onSuccess.accept((Chat)obj);
 	    if (object.getConstructor() == TdApi.Error.CONSTRUCTOR)
 	    {
 		final TdApi.Error error = (TdApi.Error)object;
-		org.luwrain.core.Log.error(LOG_COMPONENT, "TdApi error: " + String.valueOf(constructor) + ": " + error.toString());
+		log.error("TdApi error: " + String.valueOf(constructor) + ": " + error.toString());
 		objects.error(error);
 		return;
 	    }
-	    org.luwrain.core.Log.error(LOG_COMPONENT, "the wrong response for " + String.valueOf(constructor) + ": " + object.toString());
+	    log.error("the wrong response for " + String.valueOf(constructor) + ": " + object.toString());
 	}
     }
 
