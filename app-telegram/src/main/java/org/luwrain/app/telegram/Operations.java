@@ -72,11 +72,12 @@ public abstract class Operations
             new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
 
 	//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
-	
+	/*
         final var replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
-	final InputMessageContent content = new InputMessagePhoto(new InputFileLocal(photoFile.getPath()), null, null, 0, 0, new FormattedText(caption, null), 0);
+	final var content = new InputMessagePhoto(new InputFileLocal(photoFile.getPath()), null, null, 0, 0, new FormattedText(caption, null), 0);
 	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
+	*/
     }
 
     public void sendAudioMessage(Chat chat, java.io.File audioFile, String caption, String author, String title, Runnable onSuccess)
@@ -89,7 +90,7 @@ public abstract class Operations
 			//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
         final ReplyMarkup replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
 	final InputMessageContent content = new InputMessageAudio(new InputFileLocal(audioFile.getPath()), null, 0, title, author, new FormattedText(caption, null));
-	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
+	getClient().send(new SendMessage(chat.id, null, null, null, replyMarkup, content),
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
     }
 
@@ -97,9 +98,14 @@ public abstract class Operations
 
     public void editMessageText(Chat chat, Message message, String text, Runnable onSuccess)
     {
-	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
+		        TdApi.InlineKeyboardButton[] row = {
+            new TdApi.InlineKeyboardButton("https://telegram.org?1", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?2", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
+            new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
+	
         final ReplyMarkup replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
-	final InputMessageContent content = new InputMessageText(new FormattedText(text, null), false, true);
+	//	final InputMessageContent content = new InputMessageText(new FormattedText(text, null), false, true);
+				        final var content = new TdApi.InputMessageText(new TdApi.FormattedText(text, null), null, true);
 	getClient().send(new EditMessageText(chat.id, message.id, replyMarkup, content),
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
     }
@@ -224,7 +230,7 @@ public abstract class Operations
 
     void createSupergroupChat(String title, String descr, boolean isChannel, Consumer<Chat> onSuccess)
     {
-	getClient().send(new CreateNewSupergroupChat(title, isChannel, descr, null, false),
+	getClient().send(new CreateNewSupergroupChat(title, false, isChannel, descr, null, 0, false),
 			 new Handler(Chat.CONSTRUCTOR, (obj)->{
 onSuccess.accept((Chat)obj);
 			 }));
@@ -257,7 +263,7 @@ onSuccess.accept((Chat)obj);
 	final long[] ids = new long[messages.length];
 	for(int i = 0;i < messages.length;i++)
 	    ids[i] = messages[i].id;
-	getClient().send(new TdApi.ViewMessages(chat.id, 0, ids, false),
+	getClient().send(new TdApi.ViewMessages(chat.id, ids, null, false),
 			 new DefaultHandler(TdApi.Ok.CONSTRUCTOR, (obj)->{
 			 }));
     }

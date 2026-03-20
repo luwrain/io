@@ -97,7 +97,7 @@ public final class ChatPropertiesLayout extends LayoutBase
 
     private void fillSupergroup(Chat chat, Supergroup supergroup)
     {
-	propsArea.add("Имя: " + supergroup.username);
+	//	propsArea.add("Имя: " + supergroup.username);
 	propsArea.add("Участников: " + supergroup.memberCount);
 	propsArea.add("Канал: " + supergroup.isChannel);
     }

@@ -47,12 +47,14 @@ public final class SupergroupPropertiesLayout extends LayoutBase
 	    formArea.addStatic("Тип: канал"); else
 	    formArea.addStatic("Тип: группа");
 		    formArea.addEdit(EDIT_DESCR, "Описание: ", fullInfo.description);
+		    /*
 	if (fullInfo.canSetUsername)
 	    formArea.addEdit(EDIT_USERNAME, "User name: ", supergroup.username); else
 	formArea.addStatic("Username: " + supergroup.username);
+		    */
 	formArea.addStatic("Description: " + fullInfo.description);
 	formArea.addStatic("Member count: " + supergroup.memberCount);
-	formArea.addStatic("Blocked: " + chat.isBlocked);
+	//	formArea.addStatic("Blocked: " + chat.isBlocked);
 	if (fullInfo.inviteLink != null)
 	    formArea.addStatic("Invite link: " + fullInfo.inviteLink.inviteLink);
 	setAreaLayout(formArea, null);
@@ -62,8 +64,10 @@ public final class SupergroupPropertiesLayout extends LayoutBase
     {
 		if (!formArea.getEnteredText(EDIT_DESCR).equals(fullInfo.description))
 	    app.getOperations().callFunc(new SetChatDescription(chat.id, formArea.getEnteredText(EDIT_DESCR)), Ok.CONSTRUCTOR, (res)->{});
+		/*
 	if (fullInfo.canSetUsername && !formArea.getEnteredText(EDIT_USERNAME).equals(supergroup.username))
 	    app.getOperations().callFunc(new SetSupergroupUsername(supergroup.id, formArea.getEnteredText(EDIT_USERNAME)), Ok.CONSTRUCTOR, (res)->{});
+		*/
 	return true;
 	 }
 }

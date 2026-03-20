@@ -44,11 +44,18 @@ public final class Core
 	this.operations = newOperations();
 		this.updatesHandler = newUpdatesHandler(onReady);
 		this.client = Client.create(updatesHandler, null, null);
+		try {
         Client.execute(new TdApi.SetLogVerbosityLevel(0));
 	final String logFile = new File(luwrain.getFileProperty("luwrain.dir.userhome"), "td.log").getAbsolutePath();
 	Log.debug(LOG_COMPONENT, "tdlib log file is " + logFile);
         if (!(Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile(logFile, 1 << 27, true))) instanceof TdApi.Ok))
             throw new IOError(new IOException("Write access to the current directory is required"));
+			}
+		catch(Exception e)
+		{
+		    throw new RuntimeException(e);
+		}
+
     }
 
     private UpdatesHandler newUpdatesHandler(Runnable onReadyFunc)

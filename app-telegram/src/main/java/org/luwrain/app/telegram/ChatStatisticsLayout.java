@@ -31,9 +31,11 @@ final class ChatStatisticsLayout extends LayoutBase
 	if (stat instanceof ChatStatisticsChannel)
 	{
 	    final ChatStatisticsChannel chan = (ChatStatisticsChannel)stat;
+	    /*
 	    if (chan.recentMessageInteractions != null)
 		for(ChatStatisticsMessageInteractionInfo i:  chan.recentMessageInteractions)
 		    lines.add(i.viewCount + ", " + i.forwardCount);
+	    */
 	}
 	lines.add("");
 	this.textArea = new SimpleArea(getControlContext(), app.getStrings().chatStatAreaName(), lines.toArray(new String[lines.size()]));
