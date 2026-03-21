@@ -27,9 +27,6 @@ abstract class UpdatesHandler implements Client.ResultHandler
 
     UpdatesHandler(Luwrain luwrain, java.io.File tdlibDir, Objects objects)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(tdlibDir, "tdlibDir");
-	NullCheck.notNull(objects, "objects");
 	this.luwrain = luwrain;
 	this.tdlibDir = tdlibDir;
 	this.objects = objects;
@@ -60,6 +57,12 @@ abstract class UpdatesHandler implements Client.ResultHandler
 	    break;
 	}
 
+	case UpdateConnectionState.CONSTRUCTOR: {
+	    final var state = ((UpdateConnectionState)object).state;
+	    connectionStateUpdate(state);
+	    break;
+	}
+	
 	case UpdateAuthorizationState.CONSTRUCTOR:
 	    authStateUpdated(((TdApi.UpdateAuthorizationState) object).authorizationState);
 	    break;
@@ -289,8 +292,12 @@ chat = objects.chats.get(updateChat.chatId);
                     break;
 
 	default:
-	    log.trace("Unsupported update: " + object);
+	    log.warn("Unsupported update: " + object);
             }
+    }
+
+    void connectionStateUpdate(ConnectionState state)
+    {
     }
 
     private void authStateUpdated(TdApi.AuthorizationState authorizationState)
@@ -380,7 +387,7 @@ this.authorizationState = authorizationState;
 	case 		 UpdateConnectionState.CONSTRUCTOR:
 	    	    break;
 	default:
-	    log.error("Unsupported authorization state: " + this.authorizationState);
+	    log.warn("Unsupported authorization state: " + this.authorizationState);
         }
     }
 

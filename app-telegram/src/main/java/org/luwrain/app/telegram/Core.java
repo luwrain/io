@@ -8,6 +8,8 @@ import java.io.*;
 import org.apache.logging.log4j.*;
 
 import org.drinkless.tdlib.*;
+import org.drinkless.tdlib.TdApi.*;
+
 import org.luwrain.core.Log;
 
 import org.luwrain.core.*;
@@ -23,7 +25,7 @@ public final class Core
 
 
     final Luwrain luwrain;
-    final File tdlibDir;
+    final java.io.File tdlibDir;
     final Operations operations;
     final Objects objects;
     final Client client;
@@ -32,32 +34,38 @@ public final class Core
 
     Core(Luwrain luwrain, Runnable onReady)
     {
-	NullCheck.notNull(luwrain, "luwrain");
-	NullCheck.notNull(onReady, "onReady");
 	this.luwrain = luwrain;
-	this.tdlibDir = new File(luwrain.getAppDataDir("luwrain.telegram").toFile(), "tdlib");
+	this.tdlibDir = new java.io.File(new java.io.File(luwrain.getPath("var:luwrain.telegram")), "tdlib");
+	final String logFile = new java.io.File(new java.io.File(luwrain.getPath("var:luwrain.telegram")), "td.log").getAbsolutePath();
 	this.objects = new Objects(luwrain);
 	this.operations = newOperations();
-		this.updatesHandler = newUpdatesHandler(onReady);
-		this.client = Client.create(updatesHandler, null, null);
-		try {
-        Client.execute(new TdApi.SetLogVerbosityLevel(0));
-	final String logFile = new File(luwrain.getFileProperty("luwrain.dir.userhome"), "td.log").getAbsolutePath();
-	log.trace("tdlib log file is " + logFile);
-        if (!(Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile(logFile, 1 << 27, true))) instanceof TdApi.Ok))
-            throw new IOError(new IOException("Write access to the current directory is required"));
-			}
-		catch(Exception e)
-		{
+	this.updatesHandler = newUpdates(onReady);
+	this.client = Client.create(updatesHandler, null, null);
+	try {
+	    Client.setLogMessageHandler(0, new LogMessageHandler());
+	    Client.execute(new TdApi.SetLogVerbosityLevel(0));
+	    log.trace("TD log file {}", logFile);
+	    log.trace("tdlib log file is " + logFile);
+	    if (!(Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile(logFile, 1 << 27, true))) instanceof TdApi.Ok))
+		throw new IOError(new IOException("Write access to the current directory is required"));
+	}
+	catch(Exception e)
+	{
 		    throw new RuntimeException(e);
-		}
-
+	}
     }
 
-    private UpdatesHandler newUpdatesHandler(Runnable onReadyFunc)
+    private UpdatesHandler newUpdates(Runnable onReadyFunc)
     {
-	NullCheck.notNull(onReadyFunc, "onReadyFunc");
 	return new UpdatesHandler(luwrain, tdlibDir, objects){
+
+	    @Override void connectionStateUpdate(ConnectionState state)
+	    {
+		log.info("Connection state  {}", state.getClass().getSimpleName());
+		luwrain.message(state.getClass().getSimpleName());
+	    }
+
+	    
 	    @Override public void onReady()
 	    {
 		Core.this.ready = true;
@@ -66,12 +74,14 @@ public final class Core
 			onReadyFunc.run();
 		    });
 	    }
+	    
 	    @Override Client getClient()
 	    {
 		if (Core.this.client == null)
 		    log.warn("providing a null pointer as a client to the updates handler");
 		return Core.this.client;
 	    }
+	    
 	};
     }
 
@@ -89,4 +99,17 @@ public final class Core
 
     boolean isReady() { return ready; }
     UpdatesHandler.InputWaiter getInputWaiter(){ return updatesHandler.getInputWaiter(); }
+
+        private static class LogMessageHandler implements Client.LogMessageHandler {
+        @Override
+        public void onLogMessage(int verbosityLevel, String message) {
+            if (verbosityLevel == 0)
+	    {
+		log.fatal(message);
+                return;
+            }
+	    log.error(message);
+        }
+    }
+
 }

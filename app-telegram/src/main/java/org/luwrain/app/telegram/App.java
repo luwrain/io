@@ -16,6 +16,8 @@ import org.luwrain.controls.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
+import static org.luwrain.util.ResourceUtils.*;
+
 @AppNoArgs(
 	   name = "telegram",
 	   title = { "en=Telegram", "ru=Телеграм"}, 
@@ -33,18 +35,17 @@ public final class App extends AppBase<Strings> implements MonoApp
 
     final long startTimeMillis = System.currentTimeMillis();
 
-    final Core core;
+    static Core core = null;
     private Conv conv = null;
     private MainLayout mainLayout = null;
     private ContactsLayout contactsLayout = null;
     private AuthLayout authLayout = null;
     private SearchChatsLayout searchChatsLayout = null;
 
-    public App(Core core)
+    public App()
     {
 	super(Strings.class, "luwrain.telegram");
-	NullCheck.notNull(core, "core");
-	this.core = core;
+	initCore();
     }
 
     @Override protected AreaLayout onAppInit()
@@ -122,6 +123,22 @@ mainLayout.setActiveArea(App.this.mainLayout.chatsArea);
             Conv getConv() { return this.conv; }
     public Objects getObjects() { return this.core.objects; }
     public Operations getOperations() { return this.core.operations; }
+
+    static private void initCore()
+    {
+	if (core != null)
+	    return;
+	if (Extension.luwrain == null)
+	    throw new IllegalStateException("No luwrain obj in the extension, unclear  why");
+	try {
+	    extractToTempFile(org.drinkless.tdlib.TdApi.class, "libtdjni.so", true);
+	}
+	catch(IOException ex)
+	{
+	    log.error("Unable to create the Telegram core", ex);
+	}
+	core = new Core(Extension.luwrain, () -> {});
+    }
 
         interface Layouts
 {
