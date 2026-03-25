@@ -23,7 +23,6 @@ public final class Core
     static private final Logger log = LogManager.getLogger();
     static private final int CHAT_NUM_LIMIT = 200;
 
-
     final Luwrain luwrain;
     final java.io.File tdlibDir;
     final Operations operations;

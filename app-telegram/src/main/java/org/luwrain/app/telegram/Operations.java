@@ -113,9 +113,6 @@ public abstract class Operations
 
     void deleteMessage(TdApi.Chat chat, TdApi.Message[] messages, Runnable onSuccess)
     {
-	NullCheck.notNull(chat, "chat");
-	NullCheck.notNullItems(messages, "messages");
-	NullCheck.notNull(onSuccess, "onSuccess");
 	final long[] ids = new long[messages.length];
 	for(int i = 0;i < messages.length;i++)
 	    ids[i] = messages[i].id;
@@ -148,8 +145,6 @@ public abstract class Operations
 
     void openChat(Chat chat, Runnable onSuccess)
     {
-	NullCheck.notNull(chat, "chat");
-	NullCheck.notNull(onSuccess, "onSuccess");
 	getClient().send(new OpenChat(chat.id),
 			 new DefaultHandler(Ok.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
@@ -166,8 +161,6 @@ public abstract class Operations
 
         void closeChat(Chat chat, Runnable onSuccess)
     {
-	NullCheck.notNull(chat, "chat");
-	NullCheck.notNull(onSuccess, "onSuccess");
 	getClient().send(new TdApi.CloseChat(chat.id),
 			 new DefaultHandler(Ok.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
