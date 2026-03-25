@@ -307,8 +307,8 @@ this.authorizationState = authorizationState;
         switch (this.authorizationState.getConstructor())
 	{
 	case AuthorizationStateWaitTdlibParameters.CONSTRUCTOR:
-	    //	    final TdlibParameters parameters = new TdApi.TdlibParameters();
 	                    final var parameters = new TdApi.SetTdlibParameters();
+			    //			    parameters.useTestDc = true;
 	    parameters.databaseDirectory = tdlibDir.getAbsolutePath();
 	    parameters.useMessageDatabase = true;
 	    parameters.useSecretChats = true;
@@ -318,14 +318,8 @@ this.authorizationState = authorizationState;
 	    parameters.deviceModel = "Desktop";
 	    parameters.systemVersion = "Unknown";
 	    parameters.applicationVersion = "1.0";
-	    //	    parameters.enableStorageOptimizer = true;
 	    getClient().send(parameters, new AuthorizationRequestHandler());
 	    break;
-	    /*
-	case TdApi.AuthorizationStateWaitEncryptionKey.CONSTRUCTOR:
-	    getClient().send(new TdApi.CheckDatabaseEncryptionKey(), new AuthorizationRequestHandler());
-	    break;
-	    */
 	case AuthorizationStateWaitPhoneNumber.CONSTRUCTOR: {
 	    this.inputWaiter = new InputWaiter(InputWaiter.Type.PhoneNumber);
 	    objects.newInputWaiter(inputWaiter);
