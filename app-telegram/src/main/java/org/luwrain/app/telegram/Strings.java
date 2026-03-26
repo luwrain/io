@@ -25,6 +25,7 @@ public interface Strings
     String authPhoneNumberInput();
     String authCodeIntro();
     String authContinue();
+    String authAddProxy();
 
     String actionNewChannel();
     String newChannelPopupName();
@@ -67,4 +68,7 @@ public interface Strings
 
     String actionSetChatDescr();
     String setChatDescrAreaName();
+
+    String addProxyPopupName();
+    String addProxyPopupPrefix();
 }

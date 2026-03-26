@@ -2,6 +2,9 @@
 package org.luwrain.app.telegram;
 
 import java.util.*;
+import org.apache.logging.log4j.*;
+
+import org.drinkless.tdlib.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -10,8 +13,12 @@ import org.luwrain.controls.WizardArea.*;
 import org.luwrain.app.base.*;
 import org.luwrain.app.telegram.UpdatesHandler.InputWaiter;
 
+import static org.drinkless.tdlib.TdApi.*;
+
 final class AuthLayout extends LayoutBase implements Objects.NewInputWaiterListener
 {
+    static private final Logger log = LogManager.getLogger();
+    
     private final App app;
     final WizardArea wizardArea;
     private String phoneNumber = "";
@@ -30,7 +37,6 @@ final class AuthLayout extends LayoutBase implements Objects.NewInputWaiterListe
 
     @Override public void onNewInputWaiter(InputWaiter inputWaiter)
     {
-	NullCheck.notNull(inputWaiter, "inputWaiter");
 	switch(inputWaiter.type)
 	{
 	case PhoneNumber: {
@@ -41,7 +47,8 @@ final class AuthLayout extends LayoutBase implements Objects.NewInputWaiterListe
 		    this.phoneNumber = values.getText(0);
 		    inputWaiter.setValue(values.getText(0));
 		    return true;
-		});
+		})
+	    .addClickable(app.getStrings().authAddProxy(), this::onAddProxy);
 	    wizardArea.show(frame);
 	    break;
 	}
@@ -55,9 +62,27 @@ final class AuthLayout extends LayoutBase implements Objects.NewInputWaiterListe
 	    wizardArea.show(frame);
 	    break;
 	}
-
-		    
 	}
     }
 
+    boolean onAddProxy(WizardValues values)
+    {
+	String url = app.conv.addProxy();
+	if (url == null)
+	    return true;
+	final var addr = new ProxyAddr(url.trim());
+	if (!addr.valid)
+	{
+	    getLuwrain().playSound(Sounds.ERROR);
+	    return true;
+	}
+	log.trace("Adding proxy {}", url);
+	app.getOperations().getClient().send(new AddProxy(new Proxy(addr.host, addr.port, new ProxyTypeMtproto(addr.secret)), true), new Client.ResultHandler() {
+		@Override public void onResult(TdApi.Object object)
+		{
+		    log.trace("Setting proxy result is {}", object.getClass().getName());
+		    app.message(object.getClass().getName());
+		}});
+	return true;
+    }
 }
