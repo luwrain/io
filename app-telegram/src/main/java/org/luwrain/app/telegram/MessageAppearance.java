@@ -1,9 +1,3 @@
-//
-// Copyright 2020-2022 Michael Pozhidaev <msp@luwrain.org>
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 package org.luwrain.app.telegram;
 
@@ -20,11 +14,13 @@ import static org.luwrain.core.DefaultEventResponse.*;
 final class MessageAppearance implements ConsoleArea.Appearance<Message>
 {
     private final Luwrain luwrain;
+    private final Strings strings;
     private final Objects objects;
 
-    MessageAppearance(Luwrain luwrain, Objects objects)
+    MessageAppearance(Luwrain luwrain, Strings strings, Objects objects)
     {
 	this.luwrain = luwrain;
+	this.strings = strings;
 	this.objects = objects;
     }
 
@@ -40,6 +36,13 @@ final class MessageAppearance implements ConsoleArea.Appearance<Message>
 	    announceText(message, (MessageText)message.content);
 	    return;
 	}
+		if (message.content instanceof MessageContact contact)
+	{
+	    announce(message, contact.contact);
+	    return;
+	}
+
+	
 	if (message.content instanceof MessageAudio)
 	{
 	    announceMessageAudio(message, (MessageAudio)message.content);
@@ -174,11 +177,36 @@ final class MessageAppearance implements ConsoleArea.Appearance<Message>
 		luwrain.setEventResponse(listItem(Sounds.PICTURE, "ДОКУМЕНТ " + doc.caption.text + ", " + getAnnouncementSuffix(message), Suggestions.CLICKABLE_LIST_ITEM));
     }
 
+            private void announce(Message message, Contact contact)
+    {
+	final var b = new StringBuilder();
+	if (contact.firstName != null && !contact.firstName.trim().isEmpty())
+	    b.append(strings.firstName()).append(": ").append(contact.firstName);
+	if (contact.lastName != null && !contact.lastName.trim().isEmpty())
+	{
+	    if (b.length() > 0)
+		b.append(", ");
+	    	    b.append(strings.lastName()).append(": ").append(contact.lastName);
+	}
+		if (contact.phoneNumber != null && !contact.phoneNumber.trim().isEmpty())
+	{
+	    if (b.length() > 0)
+		b.append(", ");
+	    	    b.append(strings.phoneNumber()).append(": ").append(contact.phoneNumber);
+	}
+
+	
+	    
+	
+		luwrain.setEventResponse(listItem(new String(b)));
+    }
+
+
 
     static final class ForList extends ListUtils.AbstractAppearance<Message>
     {
 	private final MessageAppearance appearance;
-	ForList(App app) { this.appearance = new MessageAppearance(app.getLuwrain(), app.getObjects()); }
+	ForList(App app) { this.appearance = new MessageAppearance(app.getLuwrain(), app.getStrings(), app.getObjects()); }
 	@Override public void announceItem(Message message, Set<Flags> flags) { appearance.announceItem(message); }
 	@Override public String getScreenAppearance(Message message, Set<Flags> flags) { return appearance.getTextAppearance(message); }
     }

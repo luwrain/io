@@ -59,7 +59,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	    };
 	this.consoleArea = new ConsoleArea<Message>(consoleParams((params)->{
 		    params.model = new ConsoleUtils.ArrayModel<>(()->messages);
-		    params.appearance = new MessageAppearance(app.getLuwrain(), app.getObjects());
+		    params.appearance = new MessageAppearance(app.getLuwrain(), app.getStrings(), app.getObjects());
 		    params.name = "Беседа";
 		    params.inputPos = ConsoleArea.InputPos.TOP;
 		    params.inputPrefix = "";

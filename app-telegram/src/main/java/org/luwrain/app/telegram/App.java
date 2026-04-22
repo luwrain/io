@@ -40,7 +40,7 @@ public final class App extends AppBase<Strings> implements MonoApp
     Conv conv = null;
     private MainLayout mainLayout = null;
     private ContactsLayout contactsLayout = null;
-    private AuthLayout authLayout = null;
+    private AuthWizard authWizard = null;
     private SearchChatsLayout searchChatsLayout = null;
 
     public App()
@@ -54,13 +54,13 @@ public final class App extends AppBase<Strings> implements MonoApp
 	this.conv = new Conv(this);
 	this.mainLayout = new MainLayout(this);
 	this.contactsLayout = new ContactsLayout(this);
-	this.authLayout = new AuthLayout(this);
+	this.authWizard = new AuthWizard(this);
 	this.searchChatsLayout = new SearchChatsLayout(this);
 	this.core.objects.errorListeners.add((error)->{
 		message(error.message, Luwrain.MessageType.ERROR);
 	    });
 	setAppName(getStrings().appName());
-	return core.isReady()?mainLayout.getAreaLayout():authLayout.getAreaLayout();
+	return core.isReady()?mainLayout.getAreaLayout():authWizard.getAreaLayout();
     }
 
     private void onReady()

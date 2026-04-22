@@ -71,4 +71,8 @@ public interface Strings
 
     String addProxyPopupName();
     String addProxyPopupPrefix();
+
+    String firstName();
+    String lastName();
+    String phoneNumber();
 }

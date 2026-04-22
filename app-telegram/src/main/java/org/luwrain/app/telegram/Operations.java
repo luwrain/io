@@ -42,7 +42,7 @@ public abstract class Operations
 
     void addContact(String phone, String firstName, String lastName, Runnable onSuccess)
     {
-	final var contact = new TdApi.ImportedContact(phone, firstName, lastName, new TdApi.FormattedText("", new TdApi.TextEntity[0]));
+	final var contact = new ImportedContact(phone, firstName, lastName, new TdApi.FormattedText("", new TdApi.TextEntity[0]));
 	getClient().send(new ImportContacts(new TdApi.ImportedContact[]{contact}),
 			 new DefaultHandler(TdApi.ImportedContacts.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
@@ -70,14 +70,27 @@ public abstract class Operations
             new TdApi.InlineKeyboardButton("https://telegram.org?1", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
             new TdApi.InlineKeyboardButton("https://telegram.org?2", 0, null, new TdApi.InlineKeyboardButtonTypeUrl()),
             new TdApi.InlineKeyboardButton("https://telegram.org?3", 0, null, new TdApi.InlineKeyboardButtonTypeUrl())};
-
-	//	final InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
-	/*
         final var replyMarkup = new ReplyMarkupInlineKeyboard(new InlineKeyboardButton[][]{row, row, row});
-	final var content = new InputMessagePhoto(new InputFileLocal(photoFile.getPath()), null, null, 0, 0, new FormattedText(caption, null), 0);
-	getClient().send(new SendMessage(chat.id, 0, 0, null, replyMarkup, content),
+	final var content = new InputMessagePhoto();
+content.photo = new InputFileLocal(photoFile.getPath());
+content.thumbnail = null;
+content.addedStickerFileIds = null;
+content.width = 0;
+content.height = 0;
+content.caption = new FormattedText(caption, null);
+content.showCaptionAboveMedia = false;
+content.selfDestructType = null;
+content.hasSpoiler = false;
+//new SendMessage(chat.id, 0, 0, null, replyMarkup, content)
+final var sendMessage = new SendMessage();
+sendMessage.chatId = chat.id;
+sendMessage.topicId = null;
+sendMessage.replyTo = null;
+sendMessage.options = null;
+sendMessage.replyMarkup = replyMarkup;
+sendMessage.inputMessageContent = content;
+	getClient().send(sendMessage,
 			 new Handler(Message.CONSTRUCTOR, (obj)->onSuccess.run()));
-	*/
     }
 
     public void sendAudioMessage(Chat chat, java.io.File audioFile, String caption, String author, String title, Runnable onSuccess)
