@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.settings.yandex;
+package org.luwrain.settings.ai;
 
 import lombok.*;
 
@@ -10,7 +10,5 @@ import lombok.*;
 public final class Config
 {
     private String
-	foundationModelsApiKey, foundationModelsFolderId,
-	speechKitApiKey, speechKitFolderId,
-	translatorApiKey, translatorFolderId;
+	openAiEndpoint, openAiApiKey, openAiModel, openAiProject;
 }
