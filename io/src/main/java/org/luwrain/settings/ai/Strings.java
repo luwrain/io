@@ -9,6 +9,7 @@ import org.luwrain.core.annotations.*;
 public interface Strings
 {
     String name();
+    String systemPrompt();
     String openAiApiKey();
     String openAiEndpoint();
     String openAiModel();

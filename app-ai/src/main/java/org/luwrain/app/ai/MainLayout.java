@@ -12,8 +12,9 @@ import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.console.*;
-import org.luwrain.io.api.yandex_gpt.*;
+///import org.luwrain.io.api.yandex_gpt.*;
 import org.luwrain.app.ai.layouts.*;
+import org.luwrain.io.ai.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;
@@ -72,35 +73,27 @@ final class MainLayout extends LayoutBase  implements
 	    app.crash(ex);
 	    return InputHandler.Result.OK;
 	}
-	final var messages = entries.stream()
-	.map( e-> {
-		final String type;
+	final var completion = Completion.newInstance(getLuwrain().loadConf(org.luwrain.settings.ai.Config.class));
+	entries.forEach(e -> {
 		switch(e.getType())
 		{
 		case USER:
-		    		    		case FILE:
-		    type = "user";
+		case FILE:
+		    completion.addUserMessage(e.getText());
 		    break;
 		case MODEL:
-		    type = "assistant";
+		    completion.addAssistantMessage(e.getText());
 		    break;
-		    		default:
-		    throw new IllegalArgumentException("Unknown entry type: " + e.getType().toString());
 		}
-		return new Message(type, e.getText());
-	    }).toList();
-	final var g = new YandexGpt(app.yandexConf.getFoundationModelsFolderId(), app.yandexConf.getFoundationModelsApiKey(),
-				    new CompletionOptions(false, 0.7, 4096),
-messages);
+	    });
 	final var taskId = app.newTaskId();
+	final var res = completion.querySincSingle();
 	app.runTask(taskId, ()-> {
-	final var resp = g.doSync();
-	final var a = resp.getResult().getAlternatives();
-		final var m = a.get(0).getMessage();
 		app.finishedTask(taskId, () -> {
-		entries.add(new Entry(Entry.Type.MODEL, m.getText(), null));
-		area.refresh();
-		app.setEventResponse(text(Sounds.DONE, m.getText()));
+			if (res != null)
+			    entries.add(new Entry(Entry.Type.MODEL, res, null));
+			area.refresh();
+			app.setEventResponse(text(Sounds.DONE, res));
 		    });
 	    });
 	return InputHandler.Result.CLEAR_INPUT;

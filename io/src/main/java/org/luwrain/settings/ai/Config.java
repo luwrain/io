@@ -10,5 +10,5 @@ import lombok.*;
 public final class Config
 {
     private String
-	openAiEndpoint, openAiApiKey, openAiModel, openAiProject;
+	systemPrompt, openAiEndpoint, openAiApiKey, openAiModel, openAiProject;
 }
