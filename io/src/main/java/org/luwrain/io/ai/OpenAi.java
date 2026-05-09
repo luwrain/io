@@ -5,6 +5,7 @@ package org.luwrain.io.ai;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
+import org.apache.logging.log4j.*;
 
 import com.openai.client.*;
 import com.openai.client.okhttp.*;
@@ -16,6 +17,8 @@ import static java.util.Objects.*;
 public class OpenAi implements Completion
 {
     protected String endpoint, apiKey, model, project;
+    static private final Logger log = LogManager.getLogger();
+    
             final List<ChatCompletionMessageParam> messages = new ArrayList<>();
 
     @Override public OpenAi endpoint(String endpoint)
@@ -50,6 +53,7 @@ public class OpenAi implements Completion
                         .content(content)
                         .build()
         ));
+		log.trace("The system prompt added ({}).", content.length() > 80?content.substring(0, 80):content);
 		return this;
     }
 
@@ -61,6 +65,7 @@ public class OpenAi implements Completion
                         .content(content)
                         .build()
         ));
+				log.trace("The user message added ({}).", content.length() > 80?content.substring(0, 80):content);
 		return this;
     }
 
@@ -78,6 +83,7 @@ public class OpenAi implements Completion
 
     @Override public String querySincSingle()
     {
+	log.trace("Querying in sink mode the {} model at {}", model, endpoint);
         final var client = OpenAIOkHttpClient.builder()
 	.baseUrl(endpoint)
                 .apiKey(apiKey)
@@ -86,7 +92,7 @@ public class OpenAi implements Completion
                 .model(model) 
                 .messages(messages)
                 .temperature(0.5)
-                .maxTokens(512)
+                .maxTokens(1048576)
                 .build();
 final var completion = client.chat().completions().create(params);
 final var res = new AtomicReference<String>();
@@ -94,7 +100,11 @@ final var res = new AtomicReference<String>();
                     .findFirst()
                     .ifPresent(choice -> res.set(choice.message().content().orElse("")));
 	    if (res.get() != null)
+	    {
+		log.trace("Getting the response: {}", res.get().length() > 80?res.get().substring(0, 80):res.get());
 		addAssistantMessage(res.get());
+	    } else
+		log.trace("No text in response");
 	    return res.get();
     }
 }
