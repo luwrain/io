@@ -20,6 +20,7 @@ public class OpenAi implements Completion
     static private final Logger log = LogManager.getLogger();
     
             final List<ChatCompletionMessageParam> messages = new ArrayList<>();
+    double temperature = 0.5;
 
     @Override public OpenAi endpoint(String endpoint)
     {
@@ -36,6 +37,12 @@ public class OpenAi implements Completion
             @Override public OpenAi model(String model)
     {
 	this.model = requireNonNull(model, "model can't be null");
+	return this;
+    }
+
+                @Override public OpenAi temperature(double temperature)
+    {
+	this.temperature = temperature;
 	return this;
     }
 
@@ -91,7 +98,7 @@ public class OpenAi implements Completion
         final var params = ChatCompletionCreateParams.builder()
                 .model(model) 
                 .messages(messages)
-                .temperature(0.5)
+                .temperature(temperature)
                 .maxTokens(1048576)
                 .build();
 final var completion = client.chat().completions().create(params);

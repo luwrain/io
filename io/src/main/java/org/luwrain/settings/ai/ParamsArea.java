@@ -10,20 +10,19 @@ import org.luwrain.cpanel.*;
 import org.luwrain.io.json.*;
 
 import static java.util.Objects.*;
+import static org.luwrain.util.TextUtils.*;
 
 final class ParamsArea extends FormArea implements SectionArea
 {
 static private final String
     SYSTEM_PROMPT = "system-prompt",
+    TEMPERATURE = "temperature",
+    TIMEOUT = "timeout",
+    OUTPUT_LEN_LIMIT = "output-len-limit",
             OPEN_AI_ENDPOINT = "open-ai-endpoint",
     OPEN_AI_API_KEY = "open-ai-api-key",
         OPEN_AI_MODEL = "open-ai-model",
-            OPEN_AI_PROJECT = "open-ai-project",
-    
-        SPEECH_KIT_API_KEY = "speech-kit-api-key",
-SPEECH_KIT_FOLDER_ID = "speech-kit-folder-id",
-            TRANSLATOR_API_KEY = "translator-api-key",
-    TRANSLATOR_FOLDER_ID = "translator-folder-id";
+    OPEN_AI_PROJECT = "open-ai-project";
 
     private final ControlPanel controlPanel;
 
@@ -45,17 +44,25 @@ SPEECH_KIT_FOLDER_ID = "speech-kit-folder-id",
     	addEdit(OPEN_AI_API_KEY, s.openAiApiKey(), requireNonNullElse(c.getOpenAiApiKey(), ""));
     addEdit(OPEN_AI_MODEL, s.openAiModel(), requireNonNullElse(c.getOpenAiModel(), ""));
     addEdit(OPEN_AI_PROJECT, s.openAiProject(), requireNonNullElse(c.getOpenAiProject(), ""));
+    addEdit(TEMPERATURE, s.temperature(), String.format("%.2f", requireNonNullElse(c.getTemperature(), Double.valueOf(Config.DEFAULT_TEMPERATURE))));
     }
 
     @Override public boolean saveSectionData()
     {
 	final var l = controlPanel.getCoreInterface();
+		final var s = l.i18n().getStrings(Strings.class);
+	final var temperature = parseDoubleInBounds(l, getEnteredText(TEMPERATURE), 0.0, 1.0,
+						    s.noTemperature(), s.invalidTemperatureValue(),
+						    s.tooSmallTemperature(), s.tooLargeTemperature());
+	if (temperature == null)
+	    return false;
 	l.updateConf(Config.class, c -> {
 				c.setSystemPrompt(getEnteredText(SYSTEM_PROMPT));
 		c.setOpenAiEndpoint(getEnteredText(OPEN_AI_ENDPOINT));
 				c.setOpenAiApiKey(getEnteredText(OPEN_AI_API_KEY));
 						c.setOpenAiModel(getEnteredText(OPEN_AI_MODEL));
 								c.setOpenAiProject(getEnteredText(OPEN_AI_PROJECT));
+								c.setTemperature(temperature);
 	    });
 	return true;
 	    }

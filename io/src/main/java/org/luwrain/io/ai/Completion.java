@@ -11,6 +11,7 @@ public interface Completion
     Completion endpoint(String endpoint);
     Completion apiKey(String apiKey);
     Completion model(String model);
+        Completion temperature(double value);
     Completion project(String project);
     Completion addSystemPrompt(String content );
     Completion addUserMessage(String completion);
@@ -45,6 +46,8 @@ final Logger log = LogManager.getLogger();
 			o.model(model);
 		    if (!project.isEmpty())
 			o.project(project);
+		    if (conf.getTemperature() != null)
+			o.temperature(conf.getTemperature());
 		    if (!systemPrompt.isEmpty())
 			o.addSystemPrompt(systemPrompt);
 	}

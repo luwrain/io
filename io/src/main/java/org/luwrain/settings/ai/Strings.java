@@ -10,6 +10,11 @@ public interface Strings
 {
     String name();
     String systemPrompt();
+    String temperature();
+    String noTemperature();
+    String invalidTemperatureValue();
+    String tooSmallTemperature();
+    String tooLargeTemperature();
     String openAiApiKey();
     String openAiEndpoint();
     String openAiModel();

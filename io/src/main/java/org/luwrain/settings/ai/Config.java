@@ -9,6 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 public final class Config
 {
+    static public final double DEFAULT_TEMPERATURE = 0.5;
+    
     private String
 	systemPrompt, openAiEndpoint, openAiApiKey, openAiModel, openAiProject;
+    private Double temperature;
+    private Integer timeout, outputLenLimit;
 }
