@@ -30,12 +30,14 @@ final class MainLayout extends LayoutBase  implements
 
     final List<Entry> entries = new ArrayList<>();
     final ConsoleArea<Entry> area;
+    final SimpleArea messageArea;
     private final App app;
 
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
+	this.messageArea = new SimpleArea(getControlContext(), app.getStrings().appName());
 	this.area = new ConsoleArea<Entry>(consoleParams(p ->{
 		    p.name = app.getStrings().appName();
 		    p.model = new ListModel<Entry>(entries);
@@ -91,7 +93,11 @@ final class MainLayout extends LayoutBase  implements
 	app.runTask(taskId, ()-> {
 		app.finishedTask(taskId, () -> {
 			if (res != null)
+			{
 			    entries.add(new Entry(Entry.Type.MODEL, res, null));
+			    messageArea.clear();
+			    messageArea.add(res);
+			}
 			area.refresh();
 			app.setEventResponse(text(Sounds.DONE, res));
 		    });
