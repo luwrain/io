@@ -1,0 +1,45 @@
+@startuml
+class org.luwrain.app.bs.App {
+  - mainLayout: org.luwrain.app.bs.MainLayout
+  - followingsLayout: org.luwrain.app.bs.FollowingsELayout
+}
+
+class org.luwrain.app.bs.MainLayout {
+  - records: java.util.List
+  - recordsArea: org.luwrain.controls.ListArea
+  - quickPostArea: org.luwrain.controls.edit.EditArea
+}
+
+class org.luwrain.app.bs.FollowingsLayout {
+  - followings: java.util.List
+  - followingsArea: org.luwrain.controls.ListArea
+}
+
+class org.luwrain.app.bs.UserLayout {
+  - records: java.util.List
+  - followings: java.util.List
+  - followers: java.util.List
+  - recordsArea: org.luwrain.controls.ListArea
+  - followingsArea: org.luwrain.controls.ListArea
+  - followersArea: org.luwrain.controls.ListArea
+}
+
+class org.luwrain.app.bs.model.Record {
+}
+
+class org.luwrain.app.bs.model.User {
+}
+
+class org.luwrain.app.bs.model.Following {
+}
+
+
+
+
+
+
+
+org.luwrain.app.bs.App *-- org.luwrain.app.bs.MainLayout : содержит >
+org.luwrain.app.bs.App *-- org.luwrain.app.bs.FollowingsLayout : содержит >
+App *-- MainLayout : содержит >
+@enduml
