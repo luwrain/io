@@ -15,6 +15,8 @@ import org.luwrain.controls.edit.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.app.bs.model.*;
 
+import org.luwrain.app.bs.model.Record;
+
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.luwrain.core.DefaultEventResponse.*;
@@ -37,18 +39,18 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Reco
 	this.app = app;
 	final var s = app.getStrings();
 
-	recordsArea = new ListArea<Object>(listParams(p -> {
+	recordsArea = new ListArea<Record>(listParams(p -> {
 		    p.name = s.mainAreaName();
-		    p.model = new ListModel<Object>(records);
+		    p.model = new ListModel<>(records);
 		    p.appearance = new RecordListAppearance(getControlContext());
 		    p.clickHandler = this;
 		}));
 
 	setPropertiesHandler(recordsArea, a -> {
-		final var sel = recordsArea.selected();
-		if (sel == null)
+		final var r = recordsArea.selected();
+		if (r == null)
 		    return null;
-		if (sel instanceof org.luwrain.app.bs.model.Record r && r.getAuthorDid() != null)
+		if (r.getAuthorDid() != null)
 		    return new UserLayout(app, r.getAuthorDid(), r.getAuthorHandle(), getReturnAction());
 		return null;
 	    });
@@ -126,16 +128,9 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Reco
 	return true;
     }
 
-    @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
+    @Override public boolean onListClick(ListArea<Record> area, int index, Record record)
     {
-	if (obj instanceof org.luwrain.app.bs.model.Record record)
-	    return onRecordClick(record);
-	return false;
-    }
-
-    boolean onRecordClick(org.luwrain.app.bs.model.Record record)
-    {
-	if (record.getAuthorDid() != null)
+		if (record.getAuthorDid() != null)
 	{
 	    final var userLayout = new UserLayout(app, record.getAuthorDid(), record.getAuthorHandle(), getReturnAction());
 	    app.setAreaLayout(userLayout);
@@ -165,38 +160,29 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Reco
 	return List.of();
     }
 
-    final class RecordListAppearance extends DoubleLevelAppearance<Object>
+    final class RecordListAppearance extends DoubleLevelAppearance<Record>
     {
 	RecordListAppearance(ControlContext context) { super(context); }
 
-	@Override public boolean isSectionItem(Object obj)
+	@Override public boolean isSectionItem(Record r)
 	{
 	    return false;
 	}
 
-	@Override public void announceNonSection(Object item)
+	@Override public void announceNonSection(Record r)
 	{
-	    if (item instanceof org.luwrain.app.bs.model.Record r)
-	    {
 		final var author = requireNonNullElse(r.getAuthorDisplayName(),
 						      requireNonNullElse(r.getAuthorHandle(), ""));
 		final var text = requireNonNullElse(r.getText(), "");
 		app.setEventResponse(listItem(author + " " + text));
-	    }
-	    else
-		app.setEventResponse(listItem(item.toString()));
 	}
 
-	@Override public String getNonSectionScreenAppearance(Object item)
+	@Override public String getNonSectionScreenAppearance(Record r)
 	{
-	    if (item instanceof org.luwrain.app.bs.model.Record r)
-	    {
 		final var author = requireNonNullElse(r.getAuthorDisplayName(),
 						      requireNonNullElse(r.getAuthorHandle(), ""));
 		final var text = requireNonNullElse(r.getText(), "");
 		return author + ": " + text;
-	    }
-	    return item.toString();
 	}
     }
 }
