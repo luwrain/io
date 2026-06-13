@@ -24,6 +24,10 @@ class org.luwrain.app.bs.UserLayout {
   - followersArea: org.luwrain.controls.ListArea
 }
 
+class org.luwrain.app.bs.SettingsLayout {
+- form: org.luwrain.controls.FormArea
+}
+
 class org.luwrain.app.bs.model.Record {
 }
 
@@ -32,14 +36,4 @@ class org.luwrain.app.bs.model.User {
 
 class org.luwrain.app.bs.model.Following {
 }
-
-
-
-
-
-
-
-org.luwrain.app.bs.App *-- org.luwrain.app.bs.MainLayout : содержит >
-org.luwrain.app.bs.App *-- org.luwrain.app.bs.FollowingsLayout : содержит >
-App *-- MainLayout : содержит >
 @enduml
