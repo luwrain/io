@@ -16,15 +16,16 @@ import org.luwrain.controls.list.*;
 import org.luwrain.app.bs.model.*;
 
 import static java.util.Objects.*;
+import static java.util.stream.Collectors.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.core.events.InputEvent.*;
 
-public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Object>
+public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Record>
 {
     static private final Logger log = LogManager.getLogger();
 
-    public final List<Object> records = new ArrayList<>();
-    public final ListArea<Object> recordsArea;
+    public final List<Record> records = new ArrayList<>();
+    public final ListArea<Record> recordsArea;
     public final EditArea quickPostArea;
     final Actions recordsActions;
     final Actions quickPostActions;
@@ -47,18 +48,18 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 		final var sel = recordsArea.selected();
 		if (sel == null)
 		    return null;
-		if (sel instanceof Record r && r.getAuthorDid() != null)
+		if (sel instanceof org.luwrain.app.bs.model.Record r && r.getAuthorDid() != null)
 		    return new UserLayout(app, r.getAuthorDid(), r.getAuthorHandle(), getReturnAction());
 		return null;
 	    });
 
 	recordsActions = actions(
 				 action("create", s.post(), new InputEvent(Special.INSERT),
-					() -> { app.setActiveArea(quickPostArea); return true; }),
+					() -> { /*setActiveArea(quickPostArea);*/ return true; }),
 				 action("refresh", s.refresh(), new InputEvent(Special.F5),
 					this::onRefresh),
 				 action("followings", s.followingsAreaName(), new InputEvent(Special.F6),
-					() -> { app.setAreaLayout(app.getFollowingsLayout().getAreaLayout());
+					() -> { app.setAreaLayout(app.getFollowingsLayout());
 					    return true; })
 				 );
 
@@ -100,7 +101,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
     boolean onQuickPost()
     {
-	final var text = quickPostArea.getText();
+	final var text = quickPostArea.getTextAsList().stream().collect(joining("\n"));
 	if (text.trim().isEmpty())
 	    return false;
 	if (!app.isReady())
@@ -112,7 +113,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	return app.runTask(taskId, () -> {
 		// FIXME: call BlueSky API createRecord
 		app.finishedTask(taskId, () -> {
-			quickPostArea.setText("");
+			//			quickPostArea.setText("");
 			app.message(app.getStrings().recordPosted(), Luwrain.MessageType.OK);
 			updateRecords();
 		    });
@@ -127,17 +128,17 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
     @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
     {
-	if (obj instanceof Record record)
+	if (obj instanceof org.luwrain.app.bs.model.Record record)
 	    return onRecordClick(record);
 	return false;
     }
 
-    boolean onRecordClick(Record record)
+    boolean onRecordClick(org.luwrain.app.bs.model.Record record)
     {
 	if (record.getAuthorDid() != null)
 	{
 	    final var userLayout = new UserLayout(app, record.getAuthorDid(), record.getAuthorHandle(), getReturnAction());
-	    app.setAreaLayout(userLayout.getAreaLayout());
+	    app.setAreaLayout(userLayout);
 	    return true;
 	}
 	return false;
@@ -158,7 +159,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	    });
     }
 
-    List<Record> fetchRecords()
+    List<org.luwrain.app.bs.model.Record> fetchRecords()
     {
 	// FIXME: call BlueSky API getTimeline
 	return List.of();
@@ -175,7 +176,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public void announceNonSection(Object item)
 	{
-	    if (item instanceof Record r)
+	    if (item instanceof org.luwrain.app.bs.model.Record r)
 	    {
 		final var author = requireNonNullElse(r.getAuthorDisplayName(),
 						      requireNonNullElse(r.getAuthorHandle(), ""));
@@ -188,7 +189,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public String getNonSectionScreenAppearance(Object item)
 	{
-	    if (item instanceof Record r)
+	    if (item instanceof org.luwrain.app.bs.model.Record r)
 	    {
 		final var author = requireNonNullElse(r.getAuthorDisplayName(),
 						      requireNonNullElse(r.getAuthorHandle(), ""));

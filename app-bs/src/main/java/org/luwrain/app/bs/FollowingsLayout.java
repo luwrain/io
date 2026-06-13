@@ -80,7 +80,7 @@ public class FollowingsLayout extends LayoutBase implements ListArea.ClickHandle
     @Override public boolean onListClick(ListArea<Following> area, int index, Following item)
     {
 	final var userLayout = new UserLayout(app, item.getDid(), item.getHandle(), getReturnAction());
-	app.setAreaLayout(userLayout.getAreaLayout());
+	app.setAreaLayout(userLayout);
 	return true;
     }
 

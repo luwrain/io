@@ -64,7 +64,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 		    p.appearance = new UserFollowingsAppearance(getControlContext());
 		    p.clickHandler = (area, index, f) -> {
 			final var ul = new UserLayout(app, f.getDid(), f.getHandle(), getReturnAction());
-			app.setAreaLayout(ul.getAreaLayout());
+			app.setAreaLayout(ul);
 			return true;
 		    };
 		}));
@@ -76,7 +76,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 					      if (sel != null)
 					      {
 						  final var ul = new UserLayout(app, sel.getDid(), sel.getHandle(), getReturnAction());
-						  app.setAreaLayout(ul.getAreaLayout());
+						  app.setAreaLayout(ul);
 					      }
 					      return true;
 					  })
@@ -88,7 +88,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 		    p.appearance = new UserFollowersAppearance(getControlContext());
 		    p.clickHandler = (area, index, f) -> {
 			final var ul = new UserLayout(app, f.getDid(), f.getHandle(), getReturnAction());
-			app.setAreaLayout(ul.getAreaLayout());
+			app.setAreaLayout(ul);
 			return true;
 		    };
 		}));
@@ -100,13 +100,13 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 					     if (sel != null)
 					     {
 						 final var ul = new UserLayout(app, sel.getDid(), sel.getHandle(), getReturnAction());
-						 app.setAreaLayout(ul.getAreaLayout());
+						 app.setAreaLayout(ul);
 					     }
 					     return true;
 					 })
 				  );
 
-	setAreaLayout(AreaLayout.TOP_BOTTOM_LEFT_RIGHT,
+	setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM,
 		      recordsArea, recordsActions,
 		      followingsArea, followingsActions,
 		      followersArea, followersActions);
@@ -124,10 +124,10 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
     @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
     {
-	if (obj instanceof Record r && r.getAuthorDid() != null)
+	if (obj instanceof org.luwrain.app.bs.model.Record r && r.getAuthorDid() != null)
 	{
 	    final var ul = new UserLayout(app, r.getAuthorDid(), r.getAuthorHandle(), getReturnAction());
-	    app.setAreaLayout(ul.getAreaLayout());
+	    app.setAreaLayout(ul);
 	    return true;
 	}
 	return false;
@@ -156,7 +156,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	    });
     }
 
-    List<Record> fetchUserRecords()
+    List<org.luwrain.app.bs.model.Record> fetchUserRecords()
     {
 	// FIXME: call BlueSky API getAuthorFeed
 	return List.of();
@@ -182,7 +182,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public void announceNonSection(Object item)
 	{
-	    if (item instanceof Record r)
+	    if (item instanceof org.luwrain.app.bs.model.Record r)
 	    {
 		final var text = requireNonNullElse(r.getText(), "");
 		app.setEventResponse(listItem(text));
@@ -193,7 +193,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public String getNonSectionScreenAppearance(Object item)
 	{
-	    if (item instanceof Record r)
+	    if (item instanceof org.luwrain.app.bs.model.Record r)
 		return requireNonNullElse(r.getText(), "");
 	    return item.toString();
 	}
