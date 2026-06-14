@@ -6,6 +6,7 @@ plugins {
 dependencies {
   implementation libraries.base
   implementation libraries.apacheBase
+  implementation libraries.graalvm
   implementation 'com.google.code.gson:gson:2.12.1'
   annotationProcessor libraries.autoService
   implementation project(':luwrain-base')

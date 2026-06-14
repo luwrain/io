@@ -51,4 +51,14 @@ public interface Strings
     String repost();
     String like();
     String quote();
+
+    //Greeting wizard
+    String wizardTitle();
+    String wizardIntro();
+    String wizardHandle();
+    String wizardAppPassword();
+    String wizardContinue();
+    String wizardSkip();
+    String wizardSaved();
+    String wizardLoginError();
 }

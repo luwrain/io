@@ -27,12 +27,13 @@ public final class App extends AppBase<Strings>
     static public final String ENDPOINT = "https://bsky.social";
 
     public Config conf = null;
-    private MainLayout mainLayout = null;
+    MainLayout mainLayout = null;
+    private GreetingLayout greetingLayout = null;
     private FollowingsLayout followingsLayout = null;
 
     public App() { super(Strings.class, "luwrain.bs"); }
 
-    @Override public AreaLayout onAppInit()
+    @Override public AreaLayout onAppInit() throws Exception
     {
 	conf = getLuwrain().loadConf(Config.class);
 	if (conf == null)
@@ -42,9 +43,13 @@ public final class App extends AppBase<Strings>
 	}
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
-	if (!requireNonNullElse(conf.getHandle(), "").trim().isEmpty()
-	    && !requireNonNullElse(conf.getAppPassword(), "").trim().isEmpty())
-	    mainLayout.updateRecords();
+	if (requireNonNullElse(conf.getHandle(), "").trim().isEmpty()
+	    || requireNonNullElse(conf.getAppPassword(), "").trim().isEmpty())
+	{
+	    greetingLayout = new GreetingLayout(this);
+	    return greetingLayout.getAreaLayout();
+	}
+	mainLayout.updateRecords();
 	return mainLayout.getAreaLayout();
     }
 
