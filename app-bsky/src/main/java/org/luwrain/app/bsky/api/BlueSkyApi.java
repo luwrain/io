@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.bs.api;
+package org.luwrain.app.bsky.api;
 
 import java.util.*;
 import java.io.*;
@@ -13,9 +13,11 @@ import java.net.http.HttpResponse.*;
 import com.google.gson.*;
 import com.google.gson.reflect.*;
 
-import org.luwrain.app.bs.model.*;
+import org.luwrain.app.bsky.model.*;
 
 import static java.util.Objects.*;
+
+import org.luwrain.app.bsky.model.Record;
 
 public final class BlueSkyApi
 {
@@ -469,7 +471,7 @@ public final class BlueSkyApi
 	return new FollowsResponse(followings, cursor);
     }
 
-    Record convertPostToRecord(JsonObject post)
+    org.luwrain.app.bsky.model.Record convertPostToRecord(JsonObject post)
     {
 	final var record = new Record();
 	record.setUri(getString(post, "uri"));

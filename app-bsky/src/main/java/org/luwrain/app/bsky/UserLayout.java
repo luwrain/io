@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.bs;
+package org.luwrain.app.bsky;
 
 import java.util.*;
 import java.io.*;
@@ -12,7 +12,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
-import org.luwrain.app.bs.model.*;
+import org.luwrain.app.bsky.model.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;
@@ -124,7 +124,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
     @Override public boolean onListClick(ListArea<Object> area, int index, Object obj)
     {
-	if (obj instanceof org.luwrain.app.bs.model.Record r && r.getAuthorDid() != null)
+	if (obj instanceof org.luwrain.app.bsky.model.Record r && r.getAuthorDid() != null)
 	{
 	    final var ul = new UserLayout(app, r.getAuthorDid(), r.getAuthorHandle(), getReturnAction());
 	    app.setAreaLayout(ul);
@@ -156,7 +156,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 	    });
     }
 
-    List<org.luwrain.app.bs.model.Record> fetchUserRecords()
+    List<org.luwrain.app.bsky.model.Record> fetchUserRecords()
     {
 	// FIXME: call BlueSky API getAuthorFeed
 	return List.of();
@@ -182,7 +182,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public void announceNonSection(Object item)
 	{
-	    if (item instanceof org.luwrain.app.bs.model.Record r)
+	    if (item instanceof org.luwrain.app.bsky.model.Record r)
 	    {
 		final var text = requireNonNullElse(r.getText(), "");
 		app.setEventResponse(listItem(text));
@@ -193,7 +193,7 @@ public class UserLayout extends LayoutBase implements ListArea.ClickHandler<Obje
 
 	@Override public String getNonSectionScreenAppearance(Object item)
 	{
-	    if (item instanceof org.luwrain.app.bs.model.Record r)
+	    if (item instanceof org.luwrain.app.bsky.model.Record r)
 		return requireNonNullElse(r.getText(), "");
 	    return item.toString();
 	}

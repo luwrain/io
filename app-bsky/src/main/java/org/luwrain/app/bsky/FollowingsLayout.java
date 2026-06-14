@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.bs;
+package org.luwrain.app.bsky;
 
 import java.util.*;
 import java.io.*;
@@ -12,7 +12,7 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
-import org.luwrain.app.bs.model.*;
+import org.luwrain.app.bsky.model.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;

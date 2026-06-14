@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.app.bs;
+package org.luwrain.app.bsky;
 
 import java.util.*;
 import java.io.*;
@@ -13,9 +13,9 @@ import org.luwrain.app.base.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.edit.*;
 import org.luwrain.controls.list.*;
-import org.luwrain.app.bs.model.*;
+import org.luwrain.app.bsky.model.*;
 
-import org.luwrain.app.bs.model.Record;
+import org.luwrain.app.bsky.model.Record;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -154,7 +154,7 @@ public class MainLayout extends LayoutBase implements ListArea.ClickHandler<Reco
 	    });
     }
 
-    List<org.luwrain.app.bs.model.Record> fetchRecords()
+    List<org.luwrain.app.bsky.model.Record> fetchRecords()
     {
 	// FIXME: call BlueSky API getTimeline
 	return List.of();
