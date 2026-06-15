@@ -9,6 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 public final class Config
 {
-    private String handle;
-    private String appPassword;
+    private String handle, appPassword;
+    private AuthData authData;
 }

@@ -19,7 +19,7 @@ import static java.util.Objects.*;
 import static org.luwrain.util.TextUtils.*;
 
 @AppNoArgs(
-	   name = "bs",
+	   name = "bsky",
 	   title = { "en=BlueSky", "ru=BlueSky" },
 	   category = StarterCategory.COMMUNICATIONS)
 public final class App extends AppBase<Strings>

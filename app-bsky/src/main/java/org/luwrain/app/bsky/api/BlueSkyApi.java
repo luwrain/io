@@ -9,10 +9,12 @@ import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.net.http.HttpResponse.*;
+import org.apache.logging.log4j.*;
 
 import com.google.gson.*;
 import com.google.gson.reflect.*;
 
+import org.luwrain.app.bsky.*;
 import org.luwrain.app.bsky.model.*;
 
 import static java.util.Objects.*;
@@ -21,6 +23,7 @@ import org.luwrain.app.bsky.model.Record;
 
 public final class BlueSkyApi
 {
+    static private final Logger log = LogManager.getLogger();
     static private final Gson GSON = new Gson();
 
     static public final String DEFAULT_ENDPOINT = "https://bsky.social";
@@ -52,32 +55,33 @@ public final class BlueSkyApi
 	return endpoint;
     }
 
-    // ---- Регистрация ----
-
     public AuthData createAccount(String email, String handle, String password,
 				  String inviteCode) throws ApiException
     {
+	requireNonNull(email, "email can't be null");
+	requireNonNull(handle, "handle can't be null");
+	requireNonNull(password, "password can't be null");
+	log.trace("Register: email={}, handle={}, password={}, inviteCode={}", email, handle, String.valueOf(password.length()), inviteCode);
 	final var body = new JsonObject();
 	body.addProperty("email", email);
 	body.addProperty("handle", handle);
 	body.addProperty("password", password);
 	if (inviteCode != null && !inviteCode.trim().isEmpty())
 	    body.addProperty("inviteCode", inviteCode.trim());
-
 	final var request = HttpRequest.newBuilder()
 	    .uri(URI.create(endpoint + "/xrpc/com.atproto.server.createAccount"))
 	    .header("Content-Type", "application/json")
 	    .POST(BodyPublishers.ofString(body.toString()))
 	    .build();
-
 	final HttpResponse<String> response;
 	try {
 	    response = httpClient.send(request, BodyHandlers.ofString());
 	}
-	catch (IOException | InterruptedException e) {
-	    throw new ApiException("Ошибка сети при регистрации: " + e.getMessage(), e);
+	catch (IOException | InterruptedException e)
+	{
+	    log.error("Registration failed", e);
+	    throw new ApiException("Registration failed due to network errors: " + e.getMessage(), e);
 	}
-
 	if (response.statusCode() == 200)
 	{
 	    final var json = GSON.fromJson(response.body(), JsonObject.class);
@@ -89,14 +93,14 @@ public final class BlueSkyApi
 	    authData.setEmail(getString(json, "email"));
 	    if (json.has("emailConfirmed"))
 		authData.setEmailConfirmed(json.get("emailConfirmed").getAsBoolean());
+	    log.trace("Registration response: {}", response.body());
+	    log.trace("Auth data: {}", authData.toString());
 	    return authData;
 	}
-
+	log.error("Registration failed: status code {}", response.statusCode());
 	throw new ApiException(response.statusCode(),
-			       "Ошибка регистрации: " + extractErrorMessage(response.body()));
+			       "Registration failed: " + extractErrorMessage(response.body()));
     }
-
-    // ---- Авторизация (создание сессии) ----
 
     public AuthData createSession(String identifier, String password) throws ApiException
     {
