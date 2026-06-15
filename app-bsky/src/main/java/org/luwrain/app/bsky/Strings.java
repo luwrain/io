@@ -61,4 +61,16 @@ public interface Strings
     String wizardSkip();
     String wizardSaved();
     String wizardLoginError();
+
+    //Greeting wizard (groovy binding)
+    String greetingIntro();
+    String greetingHandle();
+    String greetingPasswd();
+    String greetingSignUp();
+    String greetingSkip();
+    String greetingMail();
+    String signUpIntro();
+    String signUpMailCannotBeEmpty();
+    String signUpHandleCannotBeEmpty();
+    String signUpPasswdCannotBeEmpty();
 }
