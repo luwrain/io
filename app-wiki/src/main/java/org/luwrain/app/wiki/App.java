@@ -1,18 +1,5 @@
-/*
-   Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.wiki;
 
@@ -29,16 +16,12 @@ import org.luwrain.core.annotations.*;
 @AppNoArgs(name = "wiki", title = { "en=Wiki", "ru=Вики" })
 public final class App extends AppBase<Strings> implements MonoApp
 {
-    static private final String
-	LOG_COMPONENT = "wiki",
-	SETTINGS_PATH = "/org/luwrain/app/wiki";
-
     private final Gson gson = new Gson();
     private Config conf = null;
     private final String arg;
     final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
-    private Conversations conv = null;
+    Conv conv = null;
     private MainLayout mainLayout = null;
 
     public App()
@@ -74,7 +57,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 	    s.searchUrl = s.searchUrl.trim();
 	    s.pagesUrl = s.pagesUrl.trim();
 	}
-	this.conv = new Conversations(this);
+	this.conv = new Conv(this);
 	this.mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return this.mainLayout.getAreaLayout();
@@ -94,7 +77,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 		    }
 		    catch(Exception e)
 		    {
-			Log.error(LOG_COMPONENT, "unable to fetch wiki pages from " + s.searchUrl);
+			crash(e);
 		    }
 		}
 		finishedTask(taskId, ()->{
@@ -125,6 +108,4 @@ public final class App extends AppBase<Strings> implements MonoApp
 	mainLayout.area.moveHotPointToInput();
 		return MonoApp.Result.BRING_FOREGROUND;
     }
-
-    Conversations getConv() { return this.conv; }
 }
