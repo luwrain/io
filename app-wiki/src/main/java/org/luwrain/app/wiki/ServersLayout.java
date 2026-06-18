@@ -58,10 +58,12 @@ static private final String
 	if (name == null)
 	    return true;
 	final Server s = new Server();
-	s.name = name.trim();
-	s.searchUrl = "";
-	s.pagesUrl = "";
+	s.setName(name.trim());
+	s.setSearchUrl("");
+	s.setPagesUrl("");
 	servers.add(s);
+	app.conf.servers.add(s);
+	app.getLuwrain().saveConf(app.conf);
 	serversArea.refresh();
 	serversArea.select(s, false);
 	return true;

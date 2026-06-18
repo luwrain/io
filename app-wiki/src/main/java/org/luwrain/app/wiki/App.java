@@ -17,7 +17,7 @@ import org.luwrain.core.annotations.*;
 public final class App extends AppBase<Strings> implements MonoApp
 {
     private final Gson gson = new Gson();
-    private Config conf = null;
+    Config conf = null;
     private final String arg;
     final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
@@ -47,15 +47,15 @@ public final class App extends AppBase<Strings> implements MonoApp
 	    servers.addAll(conf.servers);
 	for(Server s: this.servers)
 	{
-	    if (s.name == null || s.name.trim().isEmpty())
-		s.name = getStrings().defaultServerName();
-	    if (s.searchUrl == null || s.searchUrl.trim().isEmpty())
-		s.searchUrl = "https://en.wikipedia.org/w";
-	    if (s.pagesUrl == null || s.pagesUrl.trim().isEmpty())
-		s.pagesUrl = s.searchUrl;
-	    s.name = s.name.trim();
-	    s.searchUrl = s.searchUrl.trim();
-	    s.pagesUrl = s.pagesUrl.trim();
+	    if (s.getName() == null || s.getName().trim().isEmpty())
+		s.setName(getStrings().defaultServerName());
+	    if (s.getSearchUrl() == null)
+		s.setSearchUrl("");
+	    if (s.getPagesUrl() ==  null)
+		s.setPagesUrl("");
+	    s.setName(s.getName().trim());
+	    s.setSearchUrl(s.getSearchUrl().trim());
+	    s.setPagesUrl(s.getPagesUrl().trim());
 	}
 	this.conv = new Conv(this);
 	this.mainLayout = new MainLayout(this);
@@ -71,7 +71,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 		final List<Page> res = new ArrayList<>();
 		for(Server s: servers)
 		{
-		    final Mediawiki m = new Mediawiki(s.searchUrl);
+		    final Mediawiki m = new Mediawiki(s.getSearchUrl());
 		    try {
 		    res.addAll(Arrays.asList(m.search(query)));
 		    }

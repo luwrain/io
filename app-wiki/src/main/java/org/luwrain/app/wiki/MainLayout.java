@@ -52,15 +52,15 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 	final Page page = (Page)obj;
 	Server serv = null;
 	for(Server s: app.servers)
-	    if (page.baseUrl.equals(s.searchUrl))
+	    if (page.baseUrl.equals(s.getSearchUrl()))
 	    {
 		serv = s;
 		break;
 	    }
-	if (serv == null || serv.pagesUrl == null || serv.pagesUrl.trim().isEmpty())
+	if (serv == null || serv.getPagesUrl() == null || serv.getPagesUrl().trim().isEmpty())
 	    return false;
 	try {
-	    String url = serv.pagesUrl;
+	    String url = serv.getPagesUrl();
 	    if (!url.endsWith("/"))
 		url += "/";
 	    url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign

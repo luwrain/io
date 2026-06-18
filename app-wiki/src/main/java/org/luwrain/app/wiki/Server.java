@@ -3,24 +3,14 @@
 
 package org.luwrain.app.wiki;
 
-import java.lang.reflect.*;
-import java.util.*;
+import lombok.*;
 
-import com.google.gson.annotations.*;
-import com.google.gson.reflect.*;
-
-final class Server
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public final class Server
 {
-    static final Type LIST_TYPE = new TypeToken<List<Server>>(){}.getType();
-
-    @SerializedName("name")
-    String name = null;
-
-    @SerializedName("searchUrl")
-    String searchUrl = null;
-
-    @SerializedName("pagesUrl")
-    String pagesUrl = null;
+    private String name, searchUrl, pagesUrl;
 
     @Override public String toString()
     {
