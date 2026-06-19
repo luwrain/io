@@ -18,42 +18,33 @@ import static org.luwrain.controls.ListUtils.*;
 
 final class ServersLayout extends LayoutBase
 {
-static private final String
-    NAME = "name",
-    SEARCH__URL = "search-url",
-    PAGES_URL = "pages-url";
-
     private final App app;
+        private final List<Server> servers = new ArrayList<>();
     final ListArea<Server> serversArea;
-    final FormArea paramsArea;
-    private final List<Server> servers = new ArrayList<>();
+
 
     ServersLayout(App app, ActionHandler closing)
     {
 	super(app);
 	this.app = app;
-	this.servers.addAll(app.servers);
-	this.serversArea = new ListArea<>(listParams((params)->{
-		    params.model = new ListModel<>(servers);
-		    params.name = app.getStrings().serversAreaName();
+	this.servers.addAll(app.conf.servers);
+	this.serversArea = new ListArea<>(listParams(p -> {
+		    p.model = new ListModel<>(servers);
+		    p.name = app.getStrings().serversAreaName();
 		})) ;
-	final Actions serversActions = actions(
-					       action("new-server", app.getStrings().actionNewServer(), new InputEvent(InputEvent.Special.INSERT), this ::actNewServer)
-					       );
-	this.paramsArea = new FormArea(getControlContext(), app.getStrings().serverParamsAreaName());
-	final Actions paramsActions = actions();
-	setAreaLayout(AreaLayout.TOP_BOTTOM, serversArea, serversActions, paramsArea, paramsActions);
+	setAreaLayout(serversArea, actions(actNewServer()));
 	setOkHandler(()->{
-		app.servers.clear();
-		app.servers.addAll(this.servers);
-		app.saveServers();
+		app.conf.servers.clear();
+		app.conf.servers.addAll(this.servers);
+		app.getLuwrain().saveConf(app.conf);
 		return closing.onAction();
 	    });
 	setCloseHandler(closing);
     }
 
-    private boolean actNewServer()
+    private ActionInfo actNewServer()
     {
+	return action("new-server", app.getStrings().actionNewServer(), new InputEvent(InputEvent.Special.INSERT), () -> {
 	final String name = app.conv.newServerName();
 	if (name == null)
 	    return true;
@@ -67,5 +58,6 @@ static private final String
 	serversArea.refresh();
 	serversArea.select(s, false);
 	return true;
+	    });
     }
 }

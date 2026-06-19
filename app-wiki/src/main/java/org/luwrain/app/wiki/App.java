@@ -19,7 +19,6 @@ public final class App extends AppBase<Strings> implements MonoApp
     private final Gson gson = new Gson();
     Config conf = null;
     private final String arg;
-    final List<Server> servers = new ArrayList<>();
     final List<Page> pages = new ArrayList<>();
     Conv conv = null;
     private MainLayout mainLayout = null;
@@ -43,9 +42,9 @@ public final class App extends AppBase<Strings> implements MonoApp
 	    conf = new Config();
 	    getLuwrain().saveConf(conf);
 	}
-	if (conf.servers != null)
-	    servers.addAll(conf.servers);
-	for(Server s: this.servers)
+	if (conf.servers == null)
+	    conf.servers = new ArrayList<>();
+	for(Server s: this.conf.servers)
 	{
 	    if (s.getName() == null || s.getName().trim().isEmpty())
 		s.setName(getStrings().defaultServerName());
@@ -69,7 +68,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 	final TaskId taskId = newTaskId();
 	return runTask(taskId, ()->{
 		final List<Page> res = new ArrayList<>();
-		for(Server s: servers)
+		for(Server s: this.conf.servers)
 		{
 		    final Mediawiki m = new Mediawiki(s.getSearchUrl());
 		    try {
@@ -88,12 +87,6 @@ public final class App extends AppBase<Strings> implements MonoApp
 			    mainLayout.area.refresh();
 		    });
 	    });
-    }
-
-    void saveServers()
-    {
-	conf.servers = servers;
-	getLuwrain().saveConf(conf);
     }
 
     @Override public boolean onEscape()

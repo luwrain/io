@@ -25,7 +25,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
     {
 	super(app);
 	this.app = app;
-	this.area = new ConsoleArea<Page>(consoleParams((params)->{
+	this.area = new ConsoleArea<Page>(consoleParams(params -> {
 		    params.model = new ListModel<Page>(app.pages);
 		    params.appearance = new Appearance();
 		    params.name = app.getStrings().appName();
@@ -36,7 +36,6 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 					action("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
 					);
 	area.setConsoleInputHandler((area,text)->{
-		NullCheck.notNull(text, "text");
 		if (text.trim().isEmpty())
 		    return ConsoleArea.InputHandler.Result.REJECTED;
 		return app.search(text.trim())?ConsoleArea.InputHandler.Result.OK:ConsoleArea.InputHandler.Result.REJECTED;
@@ -51,7 +50,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 	    return false;
 	final Page page = (Page)obj;
 	Server serv = null;
-	for(Server s: app.servers)
+	for(Server s: app.conf.servers)
 	    if (page.baseUrl.equals(s.getSearchUrl()))
 	    {
 		serv = s;
@@ -75,11 +74,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 
     private boolean actServers()
     {
-	final ServersLayout serversLayout = new ServersLayout(app, ()->{
-		app.setAreaLayout(this);
-		app.getLuwrain().announceActiveArea();
-		return true;
-	    });
+	final ServersLayout serversLayout = new ServersLayout(app, getReturnAction());
 	app.setAreaLayout(serversLayout);
 	app.getLuwrain().announceActiveArea();
 	return true;
@@ -89,7 +84,6 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
     {
 	@Override public void announceItem(Page page)
 	{
-	    NullCheck.notNull(page, "page");
 	    app.setEventResponse(listItem(app.getLuwrain().getSpeakableText(page.toString(), Luwrain.SpeakableTextType.NATURAL)));
 	}
 	@Override public String getTextAppearance(Page page)
