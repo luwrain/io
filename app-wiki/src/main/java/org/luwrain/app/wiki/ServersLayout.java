@@ -16,12 +16,11 @@ import org.luwrain.io.api.mediawiki.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.controls.ListUtils.*;
 
-final class ServersLayout extends LayoutBase
+final class ServersLayout extends LayoutBase implements ListArea.ClickHandler<Server>
 {
     private final App app;
-        private final List<Server> servers = new ArrayList<>();
+    private final List<Server> servers = new ArrayList<>();
     final ListArea<Server> serversArea;
-
 
     ServersLayout(App app, ActionHandler closing)
     {
@@ -31,7 +30,8 @@ final class ServersLayout extends LayoutBase
 	this.serversArea = new ListArea<>(listParams(p -> {
 		    p.model = new ListModel<>(servers);
 		    p.name = app.getStrings().serversAreaName();
-		})) ;
+		    p.clickHandler = this;
+		}));
 	setAreaLayout(serversArea, actions(actNewServer()));
 	setOkHandler(()->{
 		app.conf.servers.clear();
@@ -42,22 +42,37 @@ final class ServersLayout extends LayoutBase
 	setCloseHandler(closing);
     }
 
+    @Override public boolean onListClick(ListArea<Server> area, int index, Server server)
+    {
+	if (server == null)
+	    return false;
+	final var editLayout = new ServerEditLayout(app, server, () -> {
+		serversArea.refresh();
+		app.setAreaLayout(this);
+		app.getLuwrain().announceActiveArea();
+		return true;
+	    });
+	app.setAreaLayout(editLayout);
+	app.getLuwrain().announceActiveArea();
+	return true;
+    }
+
     private ActionInfo actNewServer()
     {
 	return action("new-server", app.getStrings().actionNewServer(), new InputEvent(InputEvent.Special.INSERT), () -> {
-	final String name = app.conv.newServerName();
-	if (name == null)
-	    return true;
-	final Server s = new Server();
-	s.setName(name.trim());
-	s.setSearchUrl("");
-	s.setPagesUrl("");
-	servers.add(s);
-	app.conf.servers.add(s);
-	app.getLuwrain().saveConf(app.conf);
-	serversArea.refresh();
-	serversArea.select(s, false);
-	return true;
+		final String name = app.conv.newServerName();
+		if (name == null)
+		    return true;
+		final Server s = new Server();
+		s.setName(name.trim());
+		s.setSearchUrl("");
+		s.setPagesUrl("");
+		servers.add(s);
+		app.conf.servers.add(s);
+		app.getLuwrain().saveConf(app.conf);
+		serversArea.refresh();
+		serversArea.select(s, false);
+		return true;
 	    });
     }
 }

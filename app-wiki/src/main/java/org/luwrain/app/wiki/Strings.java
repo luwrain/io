@@ -16,4 +16,7 @@ public interface Strings
     String newServerPopupPrefix();
     String serverParamsAreaName();
     String serversAreaName();
+    String nameEdit();
+    String searchUrlEdit();
+    String pagesUrlEdit();
 }
