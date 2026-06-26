@@ -8,10 +8,13 @@ import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
+import static java.util.Objects.*;
+
 @AppNoArgs(name = "github",
 	   title = {"en=GitHub", "ru=GitHub"})
 public final class App extends AppBase<Strings>
 {
+    public Config conf;
     Conv conv = null;
     MainLayout mainLayout = null;
 
@@ -22,8 +25,9 @@ public final class App extends AppBase<Strings>
 
     @Override public AreaLayout onAppInit()
     {
-conv = new Conv(this);
-mainLayout = new MainLayout(this);
+	conf = requireNonNullElse(getLuwrain().loadConf(Config.class), new Config());
+	conv = new Conv(this);
+	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());
 	return mainLayout.getAreaLayout();
     }
@@ -32,5 +36,10 @@ mainLayout = new MainLayout(this);
     {
 	closeApp();
 	return true;
+    }
+
+    public Conv getConv()
+    {
+	return conv;
     }
 }

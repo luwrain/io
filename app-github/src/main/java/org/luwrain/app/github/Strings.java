@@ -12,4 +12,11 @@ import org.luwrain.core.annotations.*;
 public interface Strings
 {
     String appName();
+
+    String accountsAreaName();
+    String actionAccounts();
+    String actionNewAccount();
+    String newAccountName();
+    String newAccountNamePopupName();
+    String newAccountNamePopupPrefix();
     }

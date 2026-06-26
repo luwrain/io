@@ -16,27 +16,47 @@ public class GitHubClientTest
 
     @Test void myRepos()
     {
-	if (!allowApiTests())
-	    return;
-	assertNotNull(TOKEN);
-	assertFalse(TOKEN.isEmpty());
-	final var c = new GitHubClient(TOKEN);
-	assertTrue(c.connect());
-	final var 	r = c.getMyRepos();
-	assertNotNull(r);
-	assertFalse(r.isEmpty());
+        if (!allowApiTests())
+            return;
+        assertNotNull(TOKEN);
+        assertFalse(TOKEN.isEmpty());
+        final var c = new GitHubClient(TOKEN);
+        assertTrue(c.connect());
+        final var r = c.getMyRepos();
+        assertNotNull(r);
+        assertFalse(r.isEmpty());
     }
 
     @Test void search()
     {
-	if (!allowApiTests())
-	    return;
-	assertNotNull(TOKEN);
-	assertFalse(TOKEN.isEmpty());
-	final var c = new GitHubClient(TOKEN);
-	assertTrue(c.connect());
-	final var r = c.search("luwrain");
-	assertNotNull(r);
-	assertFalse(r.isEmpty());
+        if (!allowApiTests())
+            return;
+        assertNotNull(TOKEN);
+        assertFalse(TOKEN.isEmpty());
+        final var c = new GitHubClient(TOKEN);
+        assertTrue(c.connect());
+        final var r = c.search("luwrain");
+        assertNotNull(r);
+        assertFalse(r.isEmpty());
+    }
+
+    @Test void commits()
+    {
+        if (!allowApiTests())
+            return;
+        assertNotNull(TOKEN);
+        assertFalse(TOKEN.isEmpty());
+        final var c = new GitHubClient(TOKEN);
+        assertTrue(c.connect());
+        final var r = c.getCommits("luwrain/luwrain");
+        assertNotNull(r);
+        assertFalse(r.isEmpty());
+        for (final var commit : r)
+        {
+            assertNotNull(commit.getSha());
+            assertFalse(commit.getSha().isEmpty());
+            assertNotNull(commit.getMessage());
+            assertNotNull(commit.getAuthorName());
+        }
     }
 }

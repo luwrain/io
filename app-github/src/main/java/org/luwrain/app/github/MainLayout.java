@@ -17,6 +17,8 @@ import org.luwrain.app.base.*;
 
 import org.luwrain.io.api.github.models.*;
 
+import org.luwrain.app.github.layouts.*;
+
 final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Repo>
 {
     private final App app;
@@ -33,7 +35,14 @@ final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Repo
 		    p.inputHandler = (area, text) -> onInput(text);
 		    p.appearance = this;
 		}));
-	setAreaLayout(searchArea, null);
+	setAreaLayout(searchArea, actions(
+					  action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F11),
+						 () -> {
+						     app.setAreaLayout(new AccountsLayout(app, getReturnAction()));
+						     getLuwrain().announceActiveArea();
+						     return true;
+						 })
+					  ));
     }
 
     boolean onClick(Repo repo)

@@ -10,7 +10,9 @@ import java.nio.file.*;
 import org.luwrain.core.*;
 import org.luwrain.popups.*;
 
-final class Conv
+import static org.luwrain.popups.Popups.*;
+
+public final class Conv
 {
     private final Luwrain luwrain;
     private final Strings strings;
@@ -22,4 +24,8 @@ final class Conv
 	this.strings = app.getStrings();
     }
 
+    public String newAccountName()
+    {
+	return textNotEmpty(luwrain, strings.newAccountNamePopupName(), strings.newAccountNamePopupPrefix(), "");
+    }
 }
