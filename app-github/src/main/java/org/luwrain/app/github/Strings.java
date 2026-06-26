@@ -19,4 +19,13 @@ public interface Strings
     String newAccountName();
     String newAccountNamePopupName();
     String newAccountNamePopupPrefix();
+
+    String reposAreaName();
+    String pullRequestsAreaName();
+    String actionRefresh();
+
+    String accountPropName();
+    String accountPropAccessToken();
+    String accountPropDefault();
+    String accountPropNameCannotBeEmpty();
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
+// Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.github.layouts;
 
@@ -10,75 +10,79 @@ import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
 import org.luwrain.controls.list.*;
 import org.luwrain.app.base.*;
+
 import org.luwrain.app.github.*;
 
 import static org.luwrain.core.DefaultEventResponse.*;
-import static org.luwrain.core.events.InputEvent.*;
 
-public final class AccountsLayout extends LayoutBase
+public final class AccountsLayout extends LayoutBase implements ListArea.ClickHandler<Account>
 {
     final App app;
-    final List<Account> accounts;
-    final ListArea<Account> accountsArea;
+        final List<Account> accounts = new ArrayList<>();
+    final ListArea<Account> area;
 
-    public AccountsLayout(App app, ActionHandler closing)
+    public AccountsLayout(App app, ActionHandler returnAction)
     {
 	super(app);
 	this.app = app;
-	final var s = app.getStrings();
-	this.accounts = new ArrayList<>();
+	this.area = new ListArea<>(listParams(p -> {
+		    p.name = app.getStrings().accountsAreaName();
+		    p.model = new ListModel<Account>(accounts);
+		    p.appearance = new Appearance();
+		    		    p.clickHandler = this;
+		}));
+	setAreaLayout(area,
+		      actions(
+			      action("new-account", app.getStrings().actionNewAccount(), new InputEvent(InputEvent.Special.INSERT),
+				     () -> {
+					 final var conv = app.getConv();
+					 final var name = conv.newAccountName();
+					 if (name == null || name.trim().isEmpty())
+					     return true;
+					 final var account = new Account(name.trim(), "", false);
+					 if (app.conf.getAccounts() == null)
+					     app.conf.setAccounts(new ArrayList<>());
+					 app.conf.getAccounts().add(account);
+					 app.getLuwrain().saveConf(app.conf);
+					 updateAccounts();
+					 return true;
+				     })
+			      ));
+	setCloseHandler(returnAction);
+	updateAccounts();
+    }
+
+    void updateAccounts()
+    {
+	accounts.clear();
 	if (app.conf.getAccounts() != null)
 	    accounts.addAll(app.conf.getAccounts());
-
-	this.accountsArea = new ListArea<Account>(listParams(p -> {
-		    p.name = s.accountsAreaName();
-		    p.model = new ListUtils.ListModel(accounts);
-		    p.appearance = new Appearance();
-		    p.clickHandler = (area, index, account) -> onClick(account);
-		}));
-	setCloseHandler(closing);
-	setOkHandler(() -> {
-		app.conf.setAccounts(accounts);
-		getLuwrain().saveConf(app.conf);
-		return closing.onAction();
-		});
-	setAreaLayout(accountsArea, actions(
-					    
-					    actNewAccount()
-					    ));
+	//	model.clear();
+	for (final var a : accounts)
+	    //	    model.add(a.getName());
+	area.refresh();
     }
 
-    boolean onClick(Account account)
+    @Override public boolean onListClick(ListArea<Account> area, int index, Account account)
     {
-	// TODO: Open account properties layout
-	return false;
+		return true;
     }
 
-    boolean AccountInfo actNewAccount()
-    {
-	return action("insert", s.actionNewAccount(), new InputEvent(Special.INSERT), () -> {
-	final String name = app.getConv().newAccountName();
-	if (name == null)
-	    return true;
-	final Account a = new Account();
-	a.setName(name);
-	accounts.add(a);
-	accountsArea.refresh();
-	accountsArea.select(a, false);
-	return true;
-	    });
-    }
-
-    final class Appearance extends AbstractAppearance<Account>
+        final class Appearance extends AbstractAppearance<Account>
     {
 	@Override public void announceItem(Account account, Set<Flags> flags)
 	{
 	    app.setEventResponse(listItem(account.getName()));
 	}
 
+ 
 	@Override public String getScreenAppearance(Account account, Set<Flags> flags)
 	{
 	    return account.getName();
 	}
     }
+
+
+    
+
 }

@@ -5,65 +5,131 @@ package org.luwrain.app.github;
 
 import java.util.*;
 import java.io.*;
-import java.net.*;
+//import java.net.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
 import org.luwrain.controls.*;
-import org.luwrain.controls.console.*;
-import org.luwrain.popups.*;
-
+import org.luwrain.controls.list.*;
 import org.luwrain.app.base.*;
+import org.luwrain.app.github.layouts.*;
 
 import org.luwrain.io.api.github.models.*;
 
 import org.luwrain.app.github.layouts.*;
 
-final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Repo>
+import static org.luwrain.core.DefaultEventResponse.*;
+
+final class MainLayout extends LayoutBase
 {
     private final App app;
-    final List<Repo> searchRepos = new ArrayList<>();
-    final ConsoleArea<Repo> searchArea;
+    final List<Repo>
+	repos = new ArrayList<>(),
+	searchResult = new ArrayList<>();;
+    final List<Issue> pullRequests = new ArrayList<>();
     
+    final ListArea<Repo> reposArea;
+    final ListArea<Issue> pullRequestsArea;
+    final ConsoleArea<Repo> searchArea;
+
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	searchArea = new ConsoleArea<Repo>(consoleParams(p -> {
-		    p.model = new ListModel<>(searchRepos);
-		    p.clickHandler = (area, index, repo) -> onClick(repo);
-		    p.inputHandler = (area, text) -> onInput(text);
-		    p.appearance = this;
+	final var s = app.getStrings();
+
+	this.reposArea = new ListArea<Repo>(listParams(p -> {
+		    p.name = s.reposAreaName();
+		    p.model = new ListModel<>(repos);
+		    p.appearance = new RepoAppearance(app);
+		    p.clickHandler = this::onRepoClick;
 		}));
-	setAreaLayout(searchArea, actions(
-					  
-					  action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F11),
-						 () -> {
-						     app.setAreaLayout(new AccountsLayout(app, getReturnAction()));
-						     getLuwrain().announceActiveArea();
-						     return true;
-						 })
-					  
-					  ));
+
+	this.pullRequestsArea = new ListArea<Issue>(listParams(p -> {
+		    p.name = s.pullRequestsAreaName();
+		    p.model = new ListModel<>(pullRequests);
+		    p.appearance = new PullRequestAppearance(app);
+		    p.clickHandler = this::onPullRequestClick;
+		}));
+
+		searchArea = new ConsoleArea<Repo>(consoleParams(p -> {
+			    p.model = new org.luwrain.controls.console.ListModel<Repo>(searchResult);
+			    //		    p.clickHandler = (area, index, repo) -> onClick(repo);
+			    //		    p.inputHandler = (area, text) -> onInput(text);
+		    //		    p.appearance = this;
+			}));
+
+
+	setAreaLayout(AreaLayout.LEFT_RIGHT_BOTTOM, reposArea, actions(
+			      action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F11),
+				     () -> {
+					 app.setAreaLayout(new AccountsLayout(app, getReturnAction()));
+					 getLuwrain().announceActiveArea();
+					 return true;
+				     })),
+
+		      pullRequestsArea, actions(
+
+		      action("refresh", app.getStrings().actionRefresh(), new InputEvent(InputEvent.Special.F5), () -> {
+			      //				     this::onRefresh)
+			      return true;
+			  })),
+
+	searchArea, actions());
     }
 
-    boolean onClick(Repo repo)
+    boolean onRepoClick(ListArea<Repo> area, int index, Repo repo)
     {
+	if (repo == null)
+	    return false;
+	// TODO: Open repo details or issues
 	return false;
     }
 
-    ConsoleArea.InputHandler.Result onInput(String text)
+    boolean onPullRequestClick(ListArea<Issue> area, int index, Issue issue)
     {
-	return null;
+	if (issue == null)
+	    return false;
+	// TODO: Open pull request details
+	return false;
     }
 
-        @Override public void announceItem(Repo repo)
+    boolean onRefresh()
     {
+	refreshRepos();
+	refreshPullRequests();
+	return true;
     }
 
-    @Override public String getTextAppearance(Repo repo)
+    void refreshRepos()
     {
-	return "";
-	    }
+	/*
+	final var taskId = app.newTaskId();
+	app.runTask(taskId, () -> {
+		try {
+		    final var client = app.createGitHubClient();
+		    if (client == null)
+		    {
+			app.finishedTask(taskId, () -> app.message(app.getStrings().actionAccounts(), Luwrain.MessageType.ERROR));
+			return;
+		    }
+		    final var fetched = client.getMyRepos();
+		    app.finishedTask(taskId, () -> {
+			    repos.clear();
+			    repos.addAll(fetched);
+			    reposArea.refresh();
+			});
+		}
+		catch (Exception e)
+		{
+		    app.finishedTask(taskId, () -> app.crash(e));
+		}
+	    });
+	*/
+    }
 
+    void refreshPullRequests()
+    {
+	// TODO: Fetch pull requests
+    }
 }
