@@ -22,14 +22,14 @@ public final class AccountPropertiesLayout extends LayoutBase
     final App app;
     final FormArea form;
     final Account account;
-
+    
     public AccountPropertiesLayout(App app, Account account, ActionHandler close)
     {
 	super(app);
 	this.app = app;
 	this.account = account;
 	final var s = app.getStrings();
-	form = new FormArea(getControlContext(), s.accountPropName());
+	form = new FormArea(getControlContext(), requireNonNullElse(account.getName(), ""));
 	form.addEdit(NAME, s.accountPropName(), requireNonNullElse(account.getName(), ""));
 	form.addEdit(ACCESS_TOKEN, s.accountPropAccessToken(), requireNonNullElse(account.getAccessToken(), ""));
 	form.addCheckbox(DEFAULT, s.accountPropDefault(), account.isDefaultAccount());
@@ -39,12 +39,11 @@ public final class AccountPropertiesLayout extends LayoutBase
 		if (newName.isEmpty())
 		{
 		    app.message(s.accountPropNameCannotBeEmpty(), Luwrain.MessageType.ERROR);
-		    return false;
+		    return true;
 		}
 		account.setName(newName);
 		account.setAccessToken(form.getEnteredText(ACCESS_TOKEN).trim());
 		account.setDefaultAccount(form.getCheckboxState(DEFAULT));
-		app.getLuwrain().saveConf(app.conf);
 		close.onAction();
 		return true;
 	    });

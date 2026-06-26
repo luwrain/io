@@ -26,6 +26,7 @@ public final class App extends AppBase<Strings>
     @Override public AreaLayout onAppInit()
     {
 	conf = requireNonNullElse(getLuwrain().loadConf(Config.class), new Config());
+	conf.setAccounts(requireNonNullElse(conf.getAccounts(), new ArrayList<>()));
 	conv = new Conv(this);
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());

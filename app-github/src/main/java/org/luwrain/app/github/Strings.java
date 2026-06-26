@@ -22,7 +22,8 @@ public interface Strings
 
     String reposAreaName();
     String pullRequestsAreaName();
-    String actionRefresh();
+    String searchAreaName();
+    //    String actionRefresh();
 
     String accountPropName();
     String accountPropAccessToken();

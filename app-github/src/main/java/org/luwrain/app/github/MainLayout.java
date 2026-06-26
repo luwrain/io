@@ -5,7 +5,6 @@ package org.luwrain.app.github;
 
 import java.util.*;
 import java.io.*;
-//import java.net.*;
 
 import org.luwrain.core.*;
 import org.luwrain.core.events.*;
@@ -22,7 +21,7 @@ import static org.luwrain.core.DefaultEventResponse.*;
 
 final class MainLayout extends LayoutBase
 {
-    private final App app;
+    final App app;
     final List<Repo>
 	repos = new ArrayList<>(),
 	searchResult = new ArrayList<>();;
@@ -52,30 +51,34 @@ final class MainLayout extends LayoutBase
 		    p.clickHandler = this::onPullRequestClick;
 		}));
 
-		searchArea = new ConsoleArea<Repo>(consoleParams(p -> {
-			    p.model = new org.luwrain.controls.console.ListModel<Repo>(searchResult);
+	searchArea = new ConsoleArea<Repo>(consoleParams(p -> {
+		    p.model = new org.luwrain.controls.console.ListModel<Repo>(searchResult);
 			    //		    p.clickHandler = (area, index, repo) -> onClick(repo);
 			    //		    p.inputHandler = (area, text) -> onInput(text);
-		    //		    p.appearance = this;
+		    p.appearance = new SearchAppearance();
 			}));
 
-
 	setAreaLayout(AreaLayout.LEFT_RIGHT_BOTTOM, reposArea, actions(
-			      action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F11),
+								       actAccounts()
+								       ),
+
+		      pullRequestsArea, actions(
+						actAccounts()
+),
+
+	searchArea, actions(
+		      actAccounts()
+		      ));
+    }
+
+    ActionInfo actAccounts()
+    {
+				      return action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F10),
 				     () -> {
 					 app.setAreaLayout(new AccountsLayout(app, getReturnAction()));
 					 getLuwrain().announceActiveArea();
 					 return true;
-				     })),
-
-		      pullRequestsArea, actions(
-
-		      action("refresh", app.getStrings().actionRefresh(), new InputEvent(InputEvent.Special.F5), () -> {
-			      //				     this::onRefresh)
-			      return true;
-			  })),
-
-	searchArea, actions());
+					     });
     }
 
     boolean onRepoClick(ListArea<Repo> area, int index, Repo repo)
@@ -131,5 +134,19 @@ final class MainLayout extends LayoutBase
     void refreshPullRequests()
     {
 	// TODO: Fetch pull requests
+    }
+
+
+    final class SearchAppearance implements ConsoleArea.Appearance<Repo>
+    {
+	    @Override public void announceItem(Repo repo)
+    {
+    }
+
+    @Override public String getTextAppearance(Repo repo)
+    {
+	return "";
+	    }
+	
     }
 }
