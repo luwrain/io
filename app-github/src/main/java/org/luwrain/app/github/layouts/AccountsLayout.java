@@ -37,9 +37,14 @@ public final class AccountsLayout extends LayoutBase
 		    p.clickHandler = (area, index, account) -> onClick(account);
 		}));
 	setCloseHandler(closing);
-	setOkHandler(closing);
+	setOkHandler(() -> {
+		app.conf.setAccounts(accounts);
+		getLuwrain().saveConf(app.conf);
+		return closing.onAction();
+		});
 	setAreaLayout(accountsArea, actions(
-					    action("insert", s.actionNewAccount(), new InputEvent(Special.INSERT), this::newAccount)
+					    
+					    actNewAccount()
 					    ));
     }
 
@@ -49,21 +54,19 @@ public final class AccountsLayout extends LayoutBase
 	return false;
     }
 
-    boolean newAccount()
+    boolean AccountInfo actNewAccount()
     {
+	return action("insert", s.actionNewAccount(), new InputEvent(Special.INSERT), () -> {
 	final String name = app.getConv().newAccountName();
 	if (name == null)
 	    return true;
 	final Account a = new Account();
 	a.setName(name);
-	if (app.conf.getAccounts() == null)
-	    app.conf.setAccounts(new ArrayList<>());
-	app.conf.getAccounts().add(a);
-	accounts.clear();
-	accounts.addAll(app.conf.getAccounts());
+	accounts.add(a);
 	accountsArea.refresh();
 	accountsArea.select(a, false);
 	return true;
+	    });
     }
 
     final class Appearance extends AbstractAppearance<Account>

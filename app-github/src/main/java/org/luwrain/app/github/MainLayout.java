@@ -36,12 +36,14 @@ final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Repo
 		    p.appearance = this;
 		}));
 	setAreaLayout(searchArea, actions(
+					  
 					  action("accounts", app.getStrings().actionAccounts(), new InputEvent(InputEvent.Special.F11),
 						 () -> {
 						     app.setAreaLayout(new AccountsLayout(app, getReturnAction()));
 						     getLuwrain().announceActiveArea();
 						     return true;
 						 })
+					  
 					  ));
     }
 
