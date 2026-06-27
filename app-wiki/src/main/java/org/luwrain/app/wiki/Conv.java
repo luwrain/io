@@ -32,4 +32,9 @@ final class Conv
     {
 	return Popups.textNotEmpty(luwrain, strings.newServerPopupName(), strings.newServerPopupPrefix(), "");
     }
+
+    boolean confirmServerDeleting(Server server)
+    {
+	return Popups.confirmDefaultNo(luwrain, strings.serverDeletingPopupName(), strings.serverDeletingPopupText(server.getName()));
+    }
 }

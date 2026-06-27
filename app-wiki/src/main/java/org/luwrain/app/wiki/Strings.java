@@ -9,6 +9,7 @@ import org.luwrain.core.annotations.*;
 public interface Strings
 {
     String actionNewServer();
+    String actionDeleteServer();
     String actionServers();
     String appName();
     String defaultServerName();
@@ -19,4 +20,7 @@ public interface Strings
     String nameEdit();
     String searchUrlEdit();
     String pagesUrlEdit();
+    String serverDeletingPopupName();
+    String serverDeletingPopupText(String serverName);
+    String serverPropNameCannotBeEmpty();
 }

@@ -35,7 +35,13 @@ public final class ServerEditLayout extends LayoutBase
 	form.addEdit(PAGES_URL, s.pagesUrlEdit(), requireNonNullElse(server.getPagesUrl(), ""));
 	setAreaLayout(form, null);
 	setOkHandler(() -> {
-		server.setName(form.getEnteredText(NAME).trim());
+		final var newName = form.getEnteredText(NAME).trim();
+		if (newName.isEmpty())
+		{
+		    app.message(app.getStrings().serverPropNameCannotBeEmpty(), Luwrain.MessageType.ERROR);
+		    return true;
+		}
+		server.setName(newName);
 		server.setSearchUrl(form.getEnteredText(SEARCH_URL).trim());
 		server.setPagesUrl(form.getEnteredText(PAGES_URL).trim());
 		app.getLuwrain().saveConf(app.conf);

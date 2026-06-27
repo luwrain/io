@@ -32,7 +32,7 @@ final class ServersLayout extends LayoutBase implements ListArea.ClickHandler<Se
 		    p.name = app.getStrings().serversAreaName();
 		    p.clickHandler = this;
 		}));
-	setAreaLayout(serversArea, actions(actNewServer()));
+	setAreaLayout(serversArea, actions(actNewServer(), actDeleteServer()));
 	setOkHandler(()->{
 		app.conf.servers.clear();
 		app.conf.servers.addAll(this.servers);
@@ -72,6 +72,22 @@ final class ServersLayout extends LayoutBase implements ListArea.ClickHandler<Se
 		app.getLuwrain().saveConf(app.conf);
 		serversArea.refresh();
 		serversArea.select(s, false);
+		return true;
+	    });
+    }
+
+    private ActionInfo actDeleteServer()
+    {
+	return action("delete-server", app.getStrings().actionDeleteServer(), new InputEvent(InputEvent.Special.DELETE), () -> {
+		final Server server = serversArea.selected();
+		if (server == null)
+		    return false;
+		if (!app.conv.confirmServerDeleting(server))
+		    return true;
+		servers.remove(server);
+		app.conf.servers.remove(server);
+		app.getLuwrain().saveConf(app.conf);
+		serversArea.refresh();
 		return true;
 	    });
     }
