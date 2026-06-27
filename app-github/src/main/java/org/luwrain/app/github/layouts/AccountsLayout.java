@@ -51,6 +51,20 @@ public final class AccountsLayout extends LayoutBase implements ListArea.ClickHa
 					 area.refresh();
 					 area.select(account, false);
 					 return true;
+				     }),
+			      
+			      action("delete-account", app.getStrings().actionDeleteAccount(), new InputEvent(InputEvent.Special.DELETE),
+				     () -> {
+					 final Account account = area.selected();
+					 if (account == null)
+					     return false;
+					 if (!app.getConv().confirmAccountDeleting(account))
+					     return true;
+					 accounts.remove(account);
+					 app.conf.setAccounts(accounts);
+					 app.getLuwrain().saveConf(app.conf);
+					 area.refresh();
+					 return true;
 				     })
 			      
 			      ));

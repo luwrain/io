@@ -28,4 +28,9 @@ public final class Conv
     {
 	return textNotEmpty(luwrain, strings.newAccountNamePopupName(), strings.newAccountNamePopupPrefix(), "");
     }
+
+    boolean confirmAccountDeleting(Account account)
+    {
+	return Popups.confirmDefaultNo(luwrain, strings.accountDeletingPopupName(), strings.accountDeletingPopupText(account.getName()));
+    }
 }

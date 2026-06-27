@@ -16,9 +16,12 @@ public interface Strings
     String accountsAreaName();
     String actionAccounts();
     String actionNewAccount();
+    String actionDeleteAccount();
     String newAccountName();
     String newAccountNamePopupName();
     String newAccountNamePopupPrefix();
+    String accountDeletingPopupName();
+    String accountDeletingPopupText(String accountName);
 
     String reposAreaName();
     String pullRequestsAreaName();
