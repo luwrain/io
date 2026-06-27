@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-// Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.osm;
 
@@ -15,22 +15,22 @@ import org.luwrain.popups.*;
 
 import org.luwrain.app.base.*;
 
-import org.luwrain.io.api.osm.model.*;
+import org.luwrain.io.api.osm.nominatim.*;
 
 import static java.util.Objects.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 
-final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Element>
+final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<NominatimPlace>
 {
     private final App app;
-    final List<Element> elements = new ArrayList<>();
-    final ConsoleArea<Element> consoleArea;
-    
+    final List<NominatimPlace> elements = new ArrayList<>();
+    final ConsoleArea<NominatimPlace> consoleArea;
+
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
-	consoleArea = new ConsoleArea<Element>(consoleParams(p -> {
+	consoleArea = new ConsoleArea<NominatimPlace>(consoleParams(p -> {
 		    p.model = new ListModel<>(elements);
 		    p.clickHandler = (area, index, el) -> onClick(el);
 		    p.inputHandler = (area, text) -> onInput(text);
@@ -39,7 +39,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Elem
 	setAreaLayout(consoleArea, null);
     }
 
-    boolean onClick(Element el)
+    boolean onClick(NominatimPlace place)
     {
 	return false;
     }
@@ -50,39 +50,43 @@ final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Elem
 	    return ConsoleArea.InputHandler.Result.REJECTED;
 	final var taskId = app.newTaskId();
 	if (app.runTask(taskId, () -> {
-		    final var n = app.osm.findByName("node", text);
+		    final List<NominatimPlace> results;
+		    try
+		    {
+			results = app.nominatim.search(text);
+		    }
+		    catch (IOException e)
+		    {
+			app.finishedTask(taskId, () -> {
+				app.setEventResponse(text(Sounds.DONE, app.getStrings().nothingFound()));
+				consoleArea.refresh();
+			    });
+			return;
+		    }
 		    app.finishedTask(taskId, () -> {
 			    elements.clear();
-			    if (n != null)
+			    if (!results.isEmpty())
 			    {
-			    elements.addAll(n);
-			    getLuwrain().playSound(Sounds.DONE);
-			    }			     else
-							    app.setEventResponse(text(Sounds.DONE, app.getStrings().nothingFound()));
+				elements.addAll(results);
+				getLuwrain().playSound(Sounds.DONE);
+			    } else
+				app.setEventResponse(text(Sounds.DONE, app.getStrings().nothingFound()));
 			    consoleArea.refresh();
 			});
 		}))
 	    return ConsoleArea.InputHandler.Result.OK;
-	    	    return ConsoleArea.InputHandler.Result.REJECTED;
+	return ConsoleArea.InputHandler.Result.REJECTED;
     }
 
-        @Override public void announceItem(Element el)
+    @Override public void announceItem(NominatimPlace place)
     {
-	final var tags = el.getTags();
-	if (tags != null)
-	{
-	    final var name = tags.get("name");
-	    if (name != null && !name.trim().isEmpty())
+	final var name = place.getDisplayName();
+	if (name != null && !name.trim().isEmpty())
 	    app.setEventResponse(listItem(name));
-	}
     }
 
-    @Override public String getTextAppearance(Element el)
+    @Override public String getTextAppearance(NominatimPlace place)
     {
-		final var tags = el.getTags();
-	if (tags != null)
-	    return requireNonNullElse(tags.get("name"), "");
-	return "";
-	    }
-
+	return requireNonNullElse(place.getDisplayName(), "");
+    }
 }
