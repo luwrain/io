@@ -72,7 +72,7 @@ public final class App extends AppBase<Strings> implements MonoApp
 		{
 		    final Mediawiki m = new Mediawiki(s.getSearchUrl());
 		    try {
-		    res.addAll(Arrays.asList(m.search(query)));
+		    res.addAll(m.search(query));
 		    }
 		    catch(Exception e)
 		    {

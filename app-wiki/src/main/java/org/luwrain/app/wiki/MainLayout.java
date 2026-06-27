@@ -33,7 +33,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 		    params.inputPos = ConsoleArea.InputPos.TOP;
 		}));
 	final Actions actions = actions(
-					action("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F5), this::actServers)
+					action("servers", app.getStrings().actionServers(), new InputEvent(InputEvent.Special.F10), this::actServers)
 					);
 	area.setConsoleInputHandler((area,text)->{
 		if (text.trim().isEmpty())
@@ -51,7 +51,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 	final Page page = (Page)obj;
 	Server serv = null;
 	for(Server s: app.conf.servers)
-	    if (page.baseUrl.equals(s.getSearchUrl()))
+	    if (page.getBaseUrl().equals(s.getSearchUrl()))
 	    {
 		serv = s;
 		break;
@@ -62,7 +62,7 @@ final class MainLayout extends LayoutBase implements  ConsoleArea.ClickHandler<P
 	    String url = serv.getPagesUrl();
 	    if (!url.endsWith("/"))
 		url += "/";
-	    url += URLEncoder.encode(page.title, "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
+	    url += URLEncoder.encode(page.getTitle(), "UTF-8").replaceAll("\\+", "%20");//Completely unclear why wikipedia doesn't recognize '+' sign
 	    app.getLuwrain().launchApp("reader", new String[]{url});
 	}
 	catch (UnsupportedEncodingException e)

@@ -18,6 +18,10 @@ import static org.luwrain.controls.ListUtils.*;
 
 final class ServersLayout extends LayoutBase implements ListArea.ClickHandler<Server>
 {
+    static private final String
+	DEFAULT_SEARCH_URL = "https://en.wikipedia.org/w/",
+	DEFAULT_PAGES_URL = "https://en.wikipedia.org/wiki/";
+
     private final App app;
     private final List<Server> servers = new ArrayList<>();
     final ListArea<Server> serversArea;
@@ -65,8 +69,8 @@ final class ServersLayout extends LayoutBase implements ListArea.ClickHandler<Se
 		    return true;
 		final Server s = new Server();
 		s.setName(name.trim());
-		s.setSearchUrl("");
-		s.setPagesUrl("");
+		s.setSearchUrl(DEFAULT_SEARCH_URL);
+		s.setPagesUrl(DEFAULT_PAGES_URL);
 		servers.add(s);
 		app.conf.servers.add(s);
 		app.getLuwrain().saveConf(app.conf);
