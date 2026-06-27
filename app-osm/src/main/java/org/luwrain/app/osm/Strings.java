@@ -13,4 +13,6 @@ public interface Strings
 {
     String appName();
     String nothingFound();
-    }
+    String searchAreaName();
+    String detailsAreaName();
+}
