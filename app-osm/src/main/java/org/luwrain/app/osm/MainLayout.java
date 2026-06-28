@@ -153,6 +153,7 @@ final class MainLayout extends LayoutBase implements ConsoleArea.Appearance<Nomi
 	    lines.add("Importance: " + importance);
 
 	detailsArea.setLines(lines.toArray(new String[lines.size()]));
+	detailsArea.setHotPoint(0, 0);
 	setActiveArea(detailsArea);
 	return true;
     }
