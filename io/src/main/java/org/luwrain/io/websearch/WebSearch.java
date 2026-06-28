@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.io.websearch;
 
@@ -37,7 +39,7 @@ public final class WebSearch
 	luwrain.executeBkg(()->{
 		log.trace("Using search engine " + eng.getClass().getName());
 		try {
-		    final Response res = eng.search(q);
+		    final Response res = eng.search(luwrain, q);
 		    luwrain.runUiSafely(()->resultHandler.accept(res));
 		}
 		catch(IOException ex)
