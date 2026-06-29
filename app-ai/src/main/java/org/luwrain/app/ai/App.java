@@ -12,6 +12,8 @@ import org.luwrain.core.events.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
 
+import static java.util.Objects.*;
+
 @AppNoArgs(
 	   name = "ai",
 	   title = { "en=GPT", "ru=GPT"}, 
@@ -20,24 +22,23 @@ public final class App extends AppBase<Strings>
 {
     public Conv conv = null;
     public Config conf = null;
-    org.luwrain.settings.yandex.Config yandexConf;
+    //    org.luwrain.settings.yandex.Config yandexConf;
     private MainLayout mainLayout = null;
     public App() { super(Strings.class, "luwrain.commander"); }
 
     @Override public AreaLayout onAppInit()
     {
-	conf = getLuwrain().loadConf(Config.class);
-	if (conf == null)
-	{
-	    conf = new Config();
-	    getLuwrain().saveConf(conf);
-	}
+	conf = requireNonNullElse(getLuwrain().loadConf(Config.class), new Config());
+	if (conf.getProfiles() == null)
+	    conf.setProfiles(new ArrayList<>());
+	/*
 	        yandexConf = getLuwrain().loadConf(org.luwrain.settings.yandex.Config.class);
 	if (yandexConf == null)
 	{
 	    yandexConf = new org.luwrain.settings.yandex.Config();
 	    getLuwrain().saveConf(conf);
 	}
+	*/
 	conv = new Conv(this);
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());

@@ -19,4 +19,13 @@ final class Conv
 	this.strings = app.getStrings();
     }
 
+    String newProfileName()
+    {
+	return Popups.textNotEmpty(luwrain, strings.newProfilePopupName(), strings.newProfilePopupPrefix(), "");
+    }
+
+    boolean confirmProfileDeleting(Profile profile)
+    {
+	return Popups.confirmDefaultNo(luwrain, strings.profileDeletingPopupName(), strings.profileDeletingPopupText(profile.getName()));
+    }
 }

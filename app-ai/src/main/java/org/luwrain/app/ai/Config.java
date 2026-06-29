@@ -3,10 +3,12 @@
 
 package org.luwrain.app.ai;
 
+import java.util.*;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 public final class Config
 {
+    private List<Profile> profiles;
 }
