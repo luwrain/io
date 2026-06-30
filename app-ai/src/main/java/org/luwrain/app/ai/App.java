@@ -29,16 +29,9 @@ public final class App extends AppBase<Strings>
     @Override public AreaLayout onAppInit()
     {
 	conf = requireNonNullElse(getLuwrain().loadConf(Config.class), new Config());
-	if (conf.getProfiles() == null)
+	if (conf.getProfiles() != null)
+	    conf.setProfiles(new ArrayList<>(conf.getProfiles())); else
 	    conf.setProfiles(new ArrayList<>());
-	/*
-	        yandexConf = getLuwrain().loadConf(org.luwrain.settings.yandex.Config.class);
-	if (yandexConf == null)
-	{
-	    yandexConf = new org.luwrain.settings.yandex.Config();
-	    getLuwrain().saveConf(conf);
-	}
-	*/
 	conv = new Conv(this);
 	mainLayout = new MainLayout(this);
 	setAppName(getStrings().appName());

@@ -29,24 +29,23 @@ final class MainLayout extends LayoutBase  implements
     static private final Logger log = LogManager.getLogger();
 
     final App app;
-    final List<Profile> profiles = new ArrayList<>();
+    final List<Profile> profiles;
     final List<Entry> entries = new ArrayList<>();
     final ListArea<Profile> profilesArea;
     final ConsoleArea<Entry> consoleArea;
     final SimpleArea messageArea;
 
-
     MainLayout(App app)
     {
 	super(app);
 	this.app = app;
+	this.profiles = app.conf.getProfiles();
 
-		this.profilesArea = new ListArea<>(listParams(p -> {
+	this.profilesArea = new ListArea<>(listParams(p -> {
 		    p.model = new org.luwrain.controls.list.ListModel<Profile>(profiles);
 		    p.name = app.getStrings().profilesAreaName();
 		    p.clickHandler = this;
 		}));
-
 
 	this.consoleArea = new ConsoleArea<Entry>(consoleParams(p ->{
 		    p.name = app.getStrings().appName();
@@ -57,17 +56,12 @@ final class MainLayout extends LayoutBase  implements
 		    p.inputPos = ConsoleArea.InputPos.TOP;
 		    p.inputPrefix = app.getStrings().inputPrefix();
 		}));
-		this.messageArea = new SimpleArea(getControlContext(), app.getStrings().appName());
-		//	setPropertiesHandler(area, a -> new OptionsLayout(app, getReturnAction()));
-	/*
-	final Actions actions = actions(
-	    action("profiles", app.getStrings().actionProfiles(), new InputEvent(InputEvent.Special.F9), () -> actProfiles())
-	);
-	*/
-		setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM,
-			      profilesArea, actions(actNewProfile(), actDeleteProfile()),
-			      consoleArea, null,
-			      messageArea, null);
+	this.messageArea = new SimpleArea(getControlContext(), app.getStrings().appName());
+	//	setPropertiesHandler(area, a -> new OptionsLayout(app, getReturnAction()));
+	setAreaLayout(AreaLayout.LEFT_TOP_BOTTOM,
+		      profilesArea, actions(actNewProfile(), actDeleteProfile()),
+		      consoleArea, null,
+		      messageArea, null);
     }
 
 
@@ -76,18 +70,18 @@ final class MainLayout extends LayoutBase  implements
 	if (text.endsWith("..."))
 	{
 	    entries.add(new Entry(Entry.Type.USER, text.substring(0, text.length() - 3).trim(), null));
-	return InputHandler.Result.CLEAR_INPUT;
+	    return InputHandler.Result.CLEAR_INPUT;
 	}
 	if (text.startsWith("f "))
 	{
 	    entries.add(new Entry(Entry.Type.FILE, null, text.substring(2).trim()));
-	return InputHandler.Result.CLEAR_INPUT;
+	    return InputHandler.Result.CLEAR_INPUT;
 	}
 	entries.add(new Entry(Entry.Type.USER, text.trim(), null));
 	try {
-	for(var e: entries)
-	    if (e.getType() == Entry.Type.FILE)
-		e.setText(readTextFile(new File(e.getPath())));
+	    for(var e: entries)
+		if (e.getType() == Entry.Type.FILE)
+		    e.setText(readTextFile(new File(e.getPath())));
 	}
 	catch(IOException ex)
 	{
@@ -109,25 +103,23 @@ final class MainLayout extends LayoutBase  implements
 		}
 	    });
 	final var taskId = app.newTaskId();
-	final var res = completion.querySincSingle();
 	app.runTask(taskId, ()-> {
+		final var res = completion.querySincSingle();
 		app.finishedTask(taskId, () -> {
 			if (res != null)
 			{
 			    entries.add(new Entry(Entry.Type.MODEL, res, null));
-			    messageArea.clear();
-			    messageArea.add(res);
+			    area.refresh();
+			    messageArea.setLines(res.split("\n"));
+			    app.setEventResponse(text(Sounds.DONE, res));
 			}
-			area.refresh();
-			app.setEventResponse(text(Sounds.DONE, res));
 		    });
 	    });
 	return InputHandler.Result.CLEAR_INPUT;
     }
-
+    
     @Override public void announceItem(Entry entry)
     {
-
 		switch(entry.getType())
 	{
 	    case USER:
@@ -155,6 +147,7 @@ break;
 
         @Override public boolean onConsoleClick(ConsoleArea area, int index, Entry entry)
     {
+	messageArea.setLines(entry.getText().split("\n"));
 	return true;
     }
 
@@ -162,6 +155,8 @@ break;
     {
 	if (profile == null)
 	    return false;
+	consoleArea.setInputPrefix(profile.getName().trim() + ">");
+	/*
 	final var editLayout = new ProfileEditLayout(app, profile, () -> {
 		profilesArea.refresh();
 		app.setAreaLayout(this);
@@ -170,6 +165,7 @@ break;
 	    });
 	app.setAreaLayout(editLayout);
 	app.getLuwrain().announceActiveArea();
+	*/
 	return true;
     }
 
@@ -179,9 +175,17 @@ break;
 		final String name = app.conv.newProfileName();
 		if (name == null)
 		    return true;
+		final var conf = requireNonNullElse(getLuwrain().loadConf(org.luwrain.settings.ai.Config.class), new org.luwrain.settings.ai.Config());
 		final Profile p = new Profile();
 		p.setName(name.trim());
-		p.setTemperature(Profile.DEFAULT_TEMPERATURE);
+		p.setOpenAiEndpoint(conf.getOpenAiEndpoint());
+		p.setOpenAiApiKey(conf.getOpenAiApiKey());
+		p.setOpenAiModel(conf.getOpenAiModel());
+		p.setOpenAiProject(conf.getOpenAiProject());
+		p.setSystemPrompt(conf.getSystemPrompt());
+		p.setTemperature(conf.getTemperature());
+		p.setTimeout(conf.getTimeout());
+		p.setOutputLenLimit(conf.getOutputLenLimit());
 		profiles.add(p);
 		app.getLuwrain().saveConf(app.conf);
 		profilesArea.refresh();
