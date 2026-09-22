@@ -11,7 +11,7 @@ dependencies {
   implementation libraries.graalvm
   annotationProcessor libraries.autoService
   implementation project(':luwrain-base')
-  annotationProcessor (project(':luwrain-base'))
+  annotationProcessor project(':luwrain-base')
   implementation project(':luwrain')
   implementation 'com.openai:openai-java:4.9.0'
     implementation 'com.openai:openai-java-core:4.9.0'

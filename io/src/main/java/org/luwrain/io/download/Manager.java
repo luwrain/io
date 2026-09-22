@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.io.download;
 
@@ -8,7 +10,7 @@ import java.net.*;
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
-public final class Manager implements Task.Callback
+public final class Manager implements Task.Callback, AutoCloseable
 {
     static private final String LOG_COMPONENT = "download";
 
@@ -40,7 +42,7 @@ public final class Manager implements Task.Callback
 		e.task.startAsync();
     }
 
-    public void close()
+    @Override public void close()
     {
 	changesListeners.clear();
 	final EntryImpl[] ee = this.entries.toArray(new EntryImpl[this.entries.size()]);
