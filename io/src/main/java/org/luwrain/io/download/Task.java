@@ -6,6 +6,9 @@ package org.luwrain.io.download;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.concurrent.*;
+
+import okhttp3.*;
 
 import org.luwrain.core.*;
 import org.luwrain.util.*;
@@ -22,12 +25,14 @@ public final class Task implements Runnable
 	void onProgress(Task task, long bytesFetched);
 	void onSuccess(Task task);
 	void onFailure(Task task, Throwable throwable);
-	    }
+    }
 
     public final Callback callback;
     public final URL srcUrl;
     public File destFile;
-    private URLConnection con = null;
+
+    private final OkHttpClient httpClient;
+    private volatile Call currentCall = null;
 
     //For asynchronous launching
     private Thread thread = null;
@@ -41,6 +46,12 @@ public final class Task implements Runnable
 	this.callback = callback;
 	this.srcUrl = srcUrl;
 	this.destFile = destFile;
+	this.httpClient = new OkHttpClient.Builder()
+	    .followRedirects(true)
+	    .followSslRedirects(true)
+	    .connectTimeout(15, TimeUnit.SECONDS)
+	    .readTimeout(15, TimeUnit.SECONDS)
+	    .build();
     }
 
     public void startSync()
@@ -48,40 +59,40 @@ public final class Task implements Runnable
 	this.interrupting = false;
 	try {
 	    for(int i = 0;i < MAX_ATTEMPT_COUNT;++i)
-	{
+	    {
 		if (this.interrupting)
 		    return;
-	    try {
-		attempt();
-		if (!this.interrupting)
-		callback.onSuccess(this);
-		return;
+		try {
+		    attempt();
+		    if (!this.interrupting)
+			callback.onSuccess(this);
+		    return;
+		}
+		catch(org.luwrain.util.Connections.InvalidHttpResponseCodeException e)
+		{
+		    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		    callback.onFailure(this, e);
+		    return;
+		}
+		catch(java.net.UnknownHostException e)
+		{
+		    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		    callback.onFailure(this, e);
+		    return;
+		}
+		catch(IOException e)
+		{
+		    Log.debug(LOG_COMPONENT, "downloading attempt failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		}
 	    }
-	    	    catch(org.luwrain.util.Connections.InvalidHttpResponseCodeException e)
-	    {
-	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
-			callback.onFailure(this, e);
-			return;
-	}
-	    catch(java.net.UnknownHostException e)
-	    {
-	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
-			callback.onFailure(this, e);
-			return;
-	}
-	    catch(IOException e)
-	    {
-		Log.debug(LOG_COMPONENT, "downloading attempt failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
-	    }
-	}
 	    callback.onFailure(this, new IOException("Reached the limit of attempts"));
 	    return;
 	}
 	catch(Throwable e)
 	{
-	    		Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
-			if (!interrupting)
-			callback.onFailure(this, e);
+	    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+	    if (!interrupting)
+		callback.onFailure(this, e);
 	}
     }
 
@@ -95,7 +106,7 @@ public final class Task implements Runnable
 
     @Override public void run()
     {
-	    startSync();
+	startSync();
     }
 
     synchronized public void stop()
@@ -103,16 +114,9 @@ public final class Task implements Runnable
 	if (thread == null)
 	    return;
 	this.interrupting = true;
-	final URLConnection cur = this.con;
+	final Call cur = this.currentCall;
 	if (cur != null)
-	{
-	    try {
-		cur.getInputStream().close();
-	    } catch(IOException e) {}
-	    try {
-		cur.getOutputStream().close();
-	    } catch(IOException e) {}
-	}
+	    cur.cancel();
 	try {
 	    this.thread.join();
 	}
@@ -141,49 +145,66 @@ public final class Task implements Runnable
 	    os = new BufferedOutputStream(new FileOutputStream(destFile));
 	}
 	if (interrupting)
-	    return;
-	try {
-	this.con = Connections.connect(srcUrl.toURI(), pos);
-	}
-	catch(URISyntaxException e)
 	{
-	    throw new IOException(e);
+	    os.close();
+	    return;
 	}
-	if (interrupting)
-	    return;
-	final long len = con.getContentLength();
-	if (len >= 0)
-	    callback.setFileSize(this, pos + len);
-	if (interrupting)
-	    return;
-	final InputStream is = con.getInputStream();
-	try {
-	    final byte[] buf = new byte[512];
-	    int numRead = 0;
-	    int totalRead = 0;
+	final Request.Builder requestBuilder = new Request.Builder()
+	    .url(srcUrl)
+	    .header("User-Agent", Connections.DEFAULT_USER_AGENT);
+	if (pos > 0)
+	    requestBuilder.header("Range", "bytes=" + pos + "-");
+	final Request request = requestBuilder.build();
+	this.currentCall = httpClient.newCall(request);
+	try (final Response response = this.currentCall.execute())
+	{
 	    if (interrupting)
 		return;
-	    while ( (numRead = is.read(buf)) >= 0)
-	    {
-		if (this.interrupting)
-		    return;
-		os.write(buf, 0, numRead);
-		totalRead += numRead;
-		callback.onProgress(this, pos + totalRead);
+	    final int code = response.code();
+	    if (pos == 0 && code != 200)
+		throw new Connections.InvalidHttpResponseCodeException(code, srcUrl.toString());
+	    if (pos > 0 && code != 206)
+		throw new Connections.InvalidHttpResponseCodeException(code, srcUrl.toString());
+	    final ResponseBody body = response.body();
+	    if (body == null)
+		throw new IOException("Empty response body for " + srcUrl.toString());
+	    final long contentLength = body.contentLength();
+	    if (contentLength >= 0)
+		callback.setFileSize(this, pos + contentLength);
+	    if (interrupting)
+		return;
+	    final InputStream is = body.byteStream();
+	    try {
+		final byte[] buf = new byte[512];
+		int numRead = 0;
+		int totalRead = 0;
 		if (interrupting)
 		    return;
+		while ( (numRead = is.read(buf)) >= 0)
+		{
+		    if (this.interrupting)
+			return;
+		    os.write(buf, 0, numRead);
+		    totalRead += numRead;
+		    callback.onProgress(this, pos + totalRead);
+		    if (interrupting)
+			return;
+		}
+		if (interrupting)
+		    return;
+		os.flush();
 	    }
-	    if (interrupting)
-		return;
-	    os.flush();
+	    finally {
+		try {
+		    is.close();
+		    os.close();
+		}
+		catch(IOException e) {}
+		this.currentCall = null;
+	    }
 	}
 	finally {
-	    try {
-		is.close();
-		os.close();
-	    }
-	    catch(IOException e) {}
-	    this.con = null;
+	    this.currentCall = null;
 	}
     }
 
@@ -191,11 +212,10 @@ public final class Task implements Runnable
     {
 	final RandomAccessFile file = new RandomAccessFile(destFile, "rws");
 	try {
-	file.setLength(pos);
+	    file.setLength(pos);
 	}
 	finally {
 	    file.close();
 	}
-	
     }
 }
