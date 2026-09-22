@@ -15,17 +15,61 @@ import okhttp3.*;
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
+import static java.util.Objects.*;
+
+/**
+ * Downloads a file from a URL into a destination file.
+ *
+ * <p>The task may be run synchronously in the current thread through
+ * {@link #startSync()} or asynchronously through {@link #startAsync()}.
+ * Transient failures represented by {@link IOException} are retried
+ * several times. Failures caused by an invalid HTTP response code or by an
+ * unknown host are reported immediately.</p>
+ *
+ * <p>An asynchronous task may be cancelled with {@link #stop()}. A manual
+ * HTTP client can be supplied via the package-private constructor, which is
+ * mostly useful for tests.</p>
+ */
 public final class Task implements Runnable
 {
     static private final Logger log = LogManager.getLogger();
     static private final int MAX_ATTEMPT_COUNT = 32;
     static private final long BACKSTEP = 2048;
 
+    /**
+     * Receives notifications about download progress and result.
+     */
     public interface Callback
     {
+	/**
+	 * Notifies that the total size of the downloaded file is known.
+	 *
+	 * @param task the task which reported the event, never null
+	 * @param size the total file size in bytes, or {@code 0} if unknown
+	 */
 	void setFileSize(Task task, long size);
+
+	/**
+	 * Notifies that the next portion of the file has been fetched.
+	 *
+	 * @param task the task which reported the event, never null
+	 * @param bytesFetched the total number of fetched bytes up to this moment
+	 */
 	void onProgress(Task task, long bytesFetched);
+
+	/**
+	 * Notifies that the file has been downloaded successfully.
+	 *
+	 * @param task the task which reported the event, never null
+	 */
 	void onSuccess(Task task);
+
+	/**
+	 * Notifies that the file could not be downloaded.
+	 *
+	 * @param task the task which reported the event, never null
+	 * @param throwable the failure reason, never null
+	 */
 	void onFailure(Task task, Throwable throwable);
     }
 
@@ -40,22 +84,42 @@ public final class Task implements Runnable
     private Thread thread = null;
     private volatile boolean interrupting = false;
 
+    /**
+     * Creates a new download task.
+     *
+     * @param callback the callback used to report download events, must not be null
+     * @param srcUrl the source URL, must not be null
+     * @param destFile the destination file, must not be null
+     */
     public Task(Callback callback, URL srcUrl, File destFile)
     {
-	NullCheck.notNull(callback, "callback");
-	NullCheck.notNull(srcUrl, "srcUrl");
-	NullCheck.notNull(destFile, "destFile");
+	this(callback, srcUrl, destFile, newHttpClient());
+    }
+
+    /**
+     * Creates a new download task with an explicitly provided HTTP client.
+     * This constructor is intended primarily for testing.
+     *
+     * @param callback the callback used to report download events, must not be null
+     * @param srcUrl the source URL, must not be null
+     * @param destFile the destination file, must not be null
+     * @param httpClient the HTTP client used for requests, must not be null
+     */
+    Task(Callback callback, URL srcUrl, File destFile, OkHttpClient httpClient)
+    {
+	requireNonNull(callback, "callback can't be null");
+	requireNonNull(srcUrl, "srcUrl can't be null");
+	requireNonNull(destFile, "destFile can't be null");
+	requireNonNull(httpClient, "httpClient can't be null");
 	this.callback = callback;
 	this.srcUrl = srcUrl;
 	this.destFile = destFile;
-	this.httpClient = new OkHttpClient.Builder()
-	    .followRedirects(true)
-	    .followSslRedirects(true)
-	    .connectTimeout(15, TimeUnit.SECONDS)
-	    .readTimeout(15, TimeUnit.SECONDS)
-	    .build();
+	this.httpClient = httpClient;
     }
 
+    /**
+     * Runs the download synchronously in the current thread.
+     */
     public void startSync()
     {
 	this.interrupting = false;
@@ -98,6 +162,11 @@ public final class Task implements Runnable
 	}
     }
 
+    /**
+     * Starts the download in a dedicated worker thread.
+     *
+     * @throws RuntimeException if the task has already been started
+     */
     synchronized public void startAsync()
     {
 	if (thread != null)
@@ -106,11 +175,10 @@ public final class Task implements Runnable
 	thread.start();
     }
 
-    @Override public void run()
-    {
-	startSync();
-    }
-
+    /**
+     * Stops this task. Does nothing for tasks that were not started
+     * asynchronously.
+     */
     synchronized public void stop()
     {
 	if (thread == null)
@@ -127,6 +195,11 @@ public final class Task implements Runnable
 	    Thread.currentThread().interrupt();
 	}
 	this.thread = null;
+    }
+
+    @Override public void run()
+    {
+	startSync();
     }
 
     private void attempt() throws IOException
@@ -219,5 +292,15 @@ public final class Task implements Runnable
 	finally {
 	    file.close();
 	}
+    }
+
+    static private OkHttpClient newHttpClient()
+    {
+	return new OkHttpClient.Builder()
+	    .followRedirects(true)
+	    .followSslRedirects(true)
+	    .connectTimeout(15, TimeUnit.SECONDS)
+	    .readTimeout(15, TimeUnit.SECONDS)
+	    .build();
     }
 }

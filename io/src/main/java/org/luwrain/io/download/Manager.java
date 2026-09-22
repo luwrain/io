@@ -11,6 +11,8 @@ import org.apache.logging.log4j.*;
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
+import static java.util.Objects.*;
+
 public final class Manager implements Task.Callback, AutoCloseable
 {
     static private final Logger log = LogManager.getLogger();
@@ -21,7 +23,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     public Manager(Luwrain luwrain)
     {
-	NullCheck.notNull(luwrain, "luwrain");
+	requireNonNull(luwrain, "luwrain can't be null");
 	this.luwrain = luwrain;
     }
 
@@ -63,8 +65,8 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     synchronized public void addDownload(URL srcUrl, File destFile) throws IOException
     {
-	NullCheck.notNull(srcUrl, "srcUrl");
-	NullCheck.notNull(destFile, "destFile");
+	requireNonNull(srcUrl, "srcUrl can't be null");
+	requireNonNull(destFile, "destFile can't be null");
 	log.trace("New download: {} -> {}", srcUrl.toString(), destFile.getAbsolutePath());
 	final Config.Item item = new Config.Item();
 	item.setUrl(srcUrl.toString());
@@ -83,7 +85,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     synchronized public void addChangesListener(Runnable runnable)
     {
-	NullCheck.notNull(runnable, "runnable");
+	requireNonNull(runnable, "runnable can't be null");
 	for(Runnable r: changesListeners)
 	    if (r == runnable)
 		return;
@@ -92,7 +94,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     synchronized public void removeChangesListener(Runnable runnable)
     {
-	NullCheck.notNull(runnable, "runnable");
+	requireNonNull(runnable, "runnable can't be null");
 	for(int i = 0;i < changesListeners.size();i++)
 	    if (changesListeners.get(i) == runnable)
 	    {
@@ -109,7 +111,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     @Override synchronized public void setFileSize(Task task, long size)
     {
-	NullCheck.notNull(task, "task");
+	requireNonNull(task, "task can't be null");
 	for(EntryImpl e: entries)
 	    if (e.task == task)
 	    {
@@ -121,7 +123,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     @Override synchronized public void onProgress(Task task, long bytesFetched)
     {
-	NullCheck.notNull(task, "task");
+	requireNonNull(task, "task can't be null");
 	for(EntryImpl e: entries)
 	    if (e.task == task)
 	    {
@@ -138,7 +140,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     @Override synchronized public void onSuccess(Task task)
     {
-	NullCheck.notNull(task, "task");
+	requireNonNull(task, "task can't be null");
 	for(EntryImpl e: entries)
 	    if (e.task == task)
 	    {
@@ -151,8 +153,8 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     @Override synchronized public void onFailure(Task task, Throwable throwable)
     {
-	NullCheck.notNull(task, "task");
-	NullCheck.notNull(throwable, "throwable");
+	requireNonNull(task, "task can't be null");
+	requireNonNull(throwable, "throwable can't be null");
 	for(EntryImpl e: entries)
 	    if (e.task == task)
 	    {
@@ -195,8 +197,8 @@ public final class Manager implements Task.Callback, AutoCloseable
 
 	EntryImpl(Config.Item item, Task.Callback callback) throws IOException
 	{
-	    NullCheck.notNull(item, "item");
-	    NullCheck.notNull(callback, "callback");
+	    requireNonNull(item, "item can't be null");
+	    requireNonNull(callback, "callback can't be null");
 	    this.item = item;
 	    final String url = item.getUrl();
 	    final String destFile = item.getDestFile();

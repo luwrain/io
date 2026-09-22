@@ -1,61 +1,126 @@
-/*
-   Copyright 2012-2024 Michael Pozhidaev <msp@luwrain.org>
-
-   This file is part of LUWRAIN.
-
-   LUWRAIN is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
-
-   LUWRAIN is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-*/
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.io.download;
 
 import java.io.*;
-import java.net.*;
+import java.nio.charset.*;
+import java.nio.file.*;
+import java.util.*;
+
+import okhttp3.mockwebserver.*;
 
 import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.io.*;
 
-import org.luwrain.core.*;
+import org.luwrain.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class TaskTest
 {
-    static private final String url = "http://download.luwrain.org/pdf/presentation-HongKongOSConference-en-2015-06-27.pdf";
-        static private final String noSuchFileUrl = "http://download.luwrain.org/pdf/no-such-file.pdf";
-            static private final String noSuchHostUrl = "http://no.such.host/presentation.pdf";
+    private MockWebServer server;
 
-    @Disabled @Test public void fetch() throws Exception
+    @BeforeEach public void startServer() throws IOException
     {
-	final TestingTaskCallback callback = new TestingTaskCallback();
-	final File destFile = File.createTempFile("lwriotest", ".pdf");
-	final Task task = new Task(callback, new URL(url), destFile);
-	task.startSync();
-	assertTrue(callback.success);
-	assertTrue(callback.fileSize == 77249);
+	server = new MockWebServer();
+	server.start();
     }
 
-        @Disabled @Test public void noSuchFile() throws Exception
+    @AfterEach public void stopServer() throws IOException
     {
-	final TestingTaskCallback callback = new TestingTaskCallback();
-	final File destFile = File.createTempFile("lwriotest", ".pdf");
-	final Task task = new Task(callback, new URL(noSuchFileUrl), destFile);
-	task.startSync();
+	server.shutdown();
     }
 
-            @Disabled @Test public void noSuchHost() throws Exception
+    @Test public void downloadsFile(@TempDir Path tmpDir) throws Exception
     {
-	final TestingTaskCallback callback = new TestingTaskCallback();
-	final File destFile = File.createTempFile("lwriotest", ".pdf");
-	final Task task = new Task(callback, new URL(noSuchHostUrl), destFile);
+	final Task.Callback callback = mock(Task.Callback.class);
+	server.enqueue(new MockResponse()
+		       .setResponseCode(200)
+		       .setHeader("Content-Length", "11")
+		       .setBody("hello world"));
+	final File destFile = tmpDir.resolve("download.bin").toFile();
+	final Task task = new Task(callback, server.url("/file").url(), destFile);
 	task.startSync();
-	assertFalse(callback.success);
-	assertTrue(callback.throwable != null);
-	assertTrue(callback.throwable instanceof java.net.UnknownHostException);
+	assertEquals("hello world", Files.readString(destFile.toPath(), StandardCharsets.ISO_8859_1));
+	verify(callback).setFileSize(task, 11L);
+	verify(callback, atLeastOnce()).onProgress(eq(task), anyLong());
+	verify(callback).onSuccess(task);
+	verify(callback, never()).onFailure(eq(task), any());
+    }
+
+    @Test public void doesNotReportSizeWhenContentLengthIsUnknown(@TempDir Path tmpDir) throws Exception
+    {
+	final Task.Callback callback = mock(Task.Callback.class);
+	server.enqueue(new MockResponse()
+		       .setResponseCode(200)
+		       .setChunkedBody("abc", 2));
+	final File destFile = tmpDir.resolve("download.bin").toFile();
+	final Task task = new Task(callback, server.url("/file").url(), destFile);
+	task.startSync();
+	assertEquals("abc", Files.readString(destFile.toPath(), StandardCharsets.ISO_8859_1));
+	verify(callback, never()).setFileSize(any(), anyLong());
+	verify(callback).onSuccess(task);
+	verify(callback, never()).onFailure(eq(task), any());
+    }
+
+    @Test public void resumesExistingFileWithRangeHeader(@TempDir Path tmpDir) throws Exception
+    {
+	final Task.Callback callback = mock(Task.Callback.class);
+	final File destFile = tmpDir.resolve("download.bin").toFile();
+	final byte[] prefix = new byte[3000];
+	Arrays.fill(prefix, (byte)'a');
+	Files.write(destFile.toPath(), prefix);
+	server.enqueue(new MockResponse()
+		       .setResponseCode(206)
+		       .setHeader("Content-Length", "3")
+		       .setBody("XYZ"));
+	final Task task = new Task(callback, server.url("/file").url(), destFile);
+	task.startSync();
+	final RecordedRequest request = server.takeRequest();
+	assertEquals("bytes=952-", request.getHeader("Range"));
+	final byte[] result = Files.readAllBytes(destFile.toPath());
+	assertEquals(955, result.length);
+	assertEquals((byte)'X', result[952]);
+	assertEquals((byte)'Y', result[953]);
+	assertEquals((byte)'Z', result[954]);
+	verify(callback).setFileSize(task, 955L);
+	verify(callback, atLeastOnce()).onProgress(eq(task), anyLong());
+	verify(callback).onSuccess(task);
+	verify(callback, never()).onFailure(eq(task), any());
+    }
+
+    @Test public void reportsInvalidResponseCodeFailure(@TempDir Path tmpDir) throws Exception
+    {
+	final Task.Callback callback = mock(Task.Callback.class);
+	server.enqueue(new MockResponse()
+		       .setResponseCode(404)
+		       .setBody("not found"));
+	final File destFile = tmpDir.resolve("download.bin").toFile();
+	final Task task = new Task(callback, server.url("/file").url(), destFile);
+	task.startSync();
+	verify(callback, never()).onSuccess(any());
+	final ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+	verify(callback).onFailure(eq(task), captor.capture());
+	assertInstanceOf(Connections.InvalidHttpResponseCodeException.class, captor.getValue());
+    }
+
+    @Test public void retriesTransientIOException(@TempDir Path tmpDir) throws Exception
+    {
+	final Task.Callback callback = mock(Task.Callback.class);
+	server.enqueue(new MockResponse()
+		       .setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+	server.enqueue(new MockResponse()
+		       .setResponseCode(200)
+		       .setHeader("Content-Length", "2")
+		       .setBody("ok"));
+	final File destFile = tmpDir.resolve("download.bin").toFile();
+	final Task task = new Task(callback, server.url("/file").url(), destFile);
+	task.startSync();
+	assertEquals("ok", Files.readString(destFile.toPath(), StandardCharsets.ISO_8859_1));
+	verify(callback).onSuccess(task);
+	verify(callback, never()).onFailure(eq(task), any());
     }
 }
