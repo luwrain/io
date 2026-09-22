@@ -12,8 +12,9 @@ import okhttp3.mockwebserver.*;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.*;
+import org.mockito.*;
 
-import org.luwrain.util.*;
+import org.luwrain.util.Connections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
