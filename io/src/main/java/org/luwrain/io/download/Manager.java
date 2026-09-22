@@ -15,7 +15,7 @@ public final class Manager implements Task.Callback, AutoCloseable
     static private final String LOG_COMPONENT = "download";
 
     private final Luwrain luwrain;
-        private final List<EntryImpl> entries = new ArrayList<>();
+    private final List<EntryImpl> entries = new ArrayList<>();
     private final List<Runnable> changesListeners = new ArrayList<>();
 
     public Manager(Luwrain luwrain)
@@ -26,17 +26,21 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     synchronized public void load()
     {
-	//FIXME:newreg 	final Registry registry = luwrain.getRegistry();
 	entries.clear();
-	final int[] ids = null;//FIXME:newreg Settings.getIds(luwrain.getRegistry());
-	for(int i = 0;i < ids.length;++i)
+	final DownloadConfig conf = luwrain.loadConf(DownloadConfig.class);
+	if (conf == null || conf.getItems() == null)
+	    return;
+	for(DownloadConfig.Item item: conf.getItems())
+	{
 	    try {
-		//FIXME:newreg 		entries.add(new EntryImpl(registry, ids[i], this));
+		final EntryImpl entry = new EntryImpl(item, this);
+		entries.add(entry);
 	    }
 	    catch(Exception ee)
 	    {
 		Log.error(LOG_COMPONENT, "unable to load an entry:" + ee.getClass().getName() + ":" + ee.getMessage());
 	    }
+	}
 	for(EntryImpl e: entries)
 	    if (e.isActive())
 		e.task.startAsync();
@@ -60,10 +64,13 @@ public final class Manager implements Task.Callback, AutoCloseable
     {
 	NullCheck.notNull(srcUrl, "srcUrl");
 	NullCheck.notNull(destFile, "destFile");
-		Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
-		final int id = 0;//FIXME:newreg Settings.addEntry(luwrain.getRegistry(), srcUrl.toString(), destFile.getAbsolutePath());
-		final EntryImpl entry = null;//FIXME:newreg new EntryImpl(luwrain.getRegistry(), id, this);
+	Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
+	final DownloadConfig.Item item = new DownloadConfig.Item();
+	item.setUrl(srcUrl.toString());
+	item.setDestFile(destFile.getAbsolutePath());
+	final EntryImpl entry = new EntryImpl(item, this);
 	this.entries.add(entry);
+	saveConf();
 	entry.task.startAsync();
 	notifyChangesListeners();
     }
@@ -79,7 +86,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 	for(Runnable r: changesListeners)
 	    if (r == runnable)
 		return;
-		changesListeners.add(runnable);
+	changesListeners.add(runnable);
     }
 
     synchronized public void removeChangesListener(Runnable runnable)
@@ -111,7 +118,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 	    }
     }
 
-	@Override synchronized public void onProgress(Task task, long bytesFetched)
+    @Override synchronized public void onProgress(Task task, long bytesFetched)
     {
 	NullCheck.notNull(task, "task");
 	for(EntryImpl e: entries)
@@ -121,26 +128,27 @@ public final class Manager implements Task.Callback, AutoCloseable
 		final int percent = e.getPercent();
 		if (percent != e.prevNotificationPercent)
 		{
-		notifyChangesListeners();
-		e.prevNotificationPercent = percent;
+		    notifyChangesListeners();
+		    e.prevNotificationPercent = percent;
 		}
 		return;
 	    }
     }
 
-	@Override synchronized public void onSuccess(Task task)
+    @Override synchronized public void onSuccess(Task task)
     {
 	NullCheck.notNull(task, "task");
 	for(EntryImpl e: entries)
 	    if (e.task == task)
 	    {
 		e.onSuccess();
+		saveConf();
 		notifyChangesListeners();
 		return;
 	    }
     }
 
-	@Override synchronized public void onFailure(Task task, Throwable throwable)
+    @Override synchronized public void onFailure(Task task, Throwable throwable)
     {
 	NullCheck.notNull(task, "task");
 	NullCheck.notNull(throwable, "throwable");
@@ -148,9 +156,20 @@ public final class Manager implements Task.Callback, AutoCloseable
 	    if (e.task == task)
 	    {
 		e.onFailure(throwable);
+		saveConf();
 		notifyChangesListeners();
 		return;
 	    }
+    }
+
+    private void saveConf()
+    {
+	final DownloadConfig conf = new DownloadConfig();
+	final List<DownloadConfig.Item> items = new ArrayList<>();
+	for(EntryImpl e: entries)
+	    items.add(e.item);
+	conf.setItems(items);
+	luwrain.saveConf(conf);
     }
 
     public interface Entry
@@ -166,69 +185,81 @@ public final class Manager implements Task.Callback, AutoCloseable
     static private final class EntryImpl implements Entry
     {
 	final Task task;
-	final Settings.Entry sett;
+	final DownloadConfig.Item item;
 	long fileSize = 0;
 	long bytesFetched = 0;
 	int prevNotificationPercent = -1;
-	//To reduce the number of queries to the registry
 	private Entry.Status statusCache = null;
 	private String errorInfoCache = null;
-	EntryImpl(Registry registry, int id, Task.Callback callback) throws IOException
+
+	EntryImpl(DownloadConfig.Item item, Task.Callback callback) throws IOException
 	{
-	    NullCheck.notNull(registry, "registry");
+	    NullCheck.notNull(item, "item");
 	    NullCheck.notNull(callback, "callback");
-	    this.sett = Settings.createEntry(registry, id);
-	    final String url = sett.getUrl("");
-	    final String destFile = sett.getDestFile("");
+	    this.item = item;
+	    final String url = item.getUrl();
+	    final String destFile = item.getDestFile();
 	    NullCheck.notEmpty(url, "url");
 	    NullCheck.notEmpty(destFile, "destFile");
 	    this.task = new Task(callback, new URL(url), new File(destFile));
 	}
+
 	boolean isActive()
 	{
-	    final String status = sett.getStatus("");
-	    return !status.equals(Settings.COMPLETED) && !status.equals(Settings.FAILED);
+	    final String status = item.getStatus();
+	    return status == null || (!status.equals(DownloadConfig.COMPLETED) && !status.equals(DownloadConfig.FAILED));
 	}
+
 	void onSuccess()
 	{
-	    this.sett.setStatus(Settings.COMPLETED);
+	    this.item.setStatus(DownloadConfig.COMPLETED);
+	    this.statusCache = Status.SUCCESS;
 	}
-		void onFailure(Throwable e)
+
+	void onFailure(Throwable e)
 	{
-	    this.sett.setStatus(Settings.FAILED);
-	    this.sett.setErrorInfo(e.getClass().getName() + ":" + e.getMessage());
+	    this.item.setStatus(DownloadConfig.FAILED);
+	    this.item.setErrorInfo(e.getClass().getName() + ":" + e.getMessage());
+	    this.statusCache = Status.FAILED;
+	    this.errorInfoCache = e.getClass().getName() + ":" + e.getMessage();
 	}
-		@Override public URL getUrl()
+
+	@Override public URL getUrl()
 	{
 	    return this.task.srcUrl;
 	}
+
 	@Override public Status getStatus()
 	{
 	    if (statusCache != null)
 		return statusCache;
-	    final String statusStr = sett.getStatus("");
+	    final String statusStr = item.getStatus();
+	    if (statusStr == null)
+		return Status.RUNNING;
 	    switch(statusStr)
 	    {
-	    case Settings.COMPLETED:
+	    case DownloadConfig.COMPLETED:
 		this.statusCache = Status.SUCCESS;
 		return Status.SUCCESS;
-	    case Settings.FAILED:
+	    case DownloadConfig.FAILED:
 		this.statusCache = Status.FAILED;
 		return Status.FAILED;
 	    default:
 		return Status.RUNNING;
 	    }
 	}
+
 	@Override public String getErrorInfo()
 	{
 	    if (errorInfoCache != null)
 		return errorInfoCache;
-	    final String value = sett.getErrorInfo("");
-	    if (value.isEmpty())
+	    final String value = item.getErrorInfo();
+	    if (value == null || value.isEmpty())
 		return "";
 	    errorInfoCache = value;
 	    return value;
 	}
+
 	@Override public int getPercent()
 	{
 	    if (fileSize <= 0 || bytesFetched <= 0)
