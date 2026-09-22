@@ -50,6 +50,13 @@ public interface GitHubService {
     List<Issue> getIssues(String repoFullName);
 
     /**
+     * Returns the list of open pull requests for a repository.
+     * @param repoFullName repository name in "owner/repo" format
+     * @return list of open pull requests
+     */
+    List<Issue> getPullRequests(String repoFullName);
+
+    /**
      * Creates a new issue in the specified repository.
      * @param repoFullName repository name in "owner/repo" format
      * @param title the issue title
