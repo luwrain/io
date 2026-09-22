@@ -6,13 +6,14 @@ package org.luwrain.io.download;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import org.apache.logging.log4j.*;
 
 import org.luwrain.core.*;
 import org.luwrain.util.*;
 
 public final class Manager implements Task.Callback, AutoCloseable
 {
-    static private final String LOG_COMPONENT = "download";
+    static private final Logger log = LogManager.getLogger();
 
     private final Luwrain luwrain;
     private final List<EntryImpl> entries = new ArrayList<>();
@@ -38,7 +39,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 	    }
 	    catch(Exception ee)
 	    {
-		Log.error(LOG_COMPONENT, "unable to load an entry:" + ee.getClass().getName() + ":" + ee.getMessage());
+		log.error("Unable to load an entry", ee);
 	    }
 	}
 	for(EntryImpl e: entries)
@@ -55,7 +56,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 	{
 	    if (!e.isActive())
 		continue;
-	    Log.debug(LOG_COMPONENT, "stopping download of " + e.task.srcUrl.toString() + " at " + e.bytesFetched + "/" + e.fileSize);
+	    log.trace("Stopping download of {} at {}/{}",  e.task.srcUrl.toString(), e.bytesFetched, e.fileSize);
 	    e.task.stop();
 	}
     }
@@ -64,7 +65,7 @@ public final class Manager implements Task.Callback, AutoCloseable
     {
 	NullCheck.notNull(srcUrl, "srcUrl");
 	NullCheck.notNull(destFile, "destFile");
-	Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
+	log.trace("New download: {} -> {}", srcUrl.toString(), destFile.getAbsolutePath());
 	final Config.Item item = new Config.Item();
 	item.setUrl(srcUrl.toString());
 	item.setDestFile(destFile.getAbsolutePath());

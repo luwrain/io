@@ -3,10 +3,12 @@
 
 package org.luwrain.io.download;
 
-import java.io.*;
+
 import java.util.*;
-import java.net.*;
 import java.util.concurrent.*;
+import java.io.*;
+import java.net.*;
+import org.apache.logging.log4j.*;
 
 import okhttp3.*;
 
@@ -15,7 +17,7 @@ import org.luwrain.util.*;
 
 public final class Task implements Runnable
 {
-    static private final String LOG_COMPONENT = "download";
+    static private final Logger log = LogManager.getLogger();
     static private final int MAX_ATTEMPT_COUNT = 32;
     static private final long BACKSTEP = 2048;
 
@@ -70,19 +72,19 @@ public final class Task implements Runnable
 		}
 		catch(org.luwrain.util.Connections.InvalidHttpResponseCodeException e)
 		{
-		    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		    log.error("Downloading failed: {}", srcUrl.toString() + ")", e);
 		    callback.onFailure(this, e);
 		    return;
 		}
 		catch(java.net.UnknownHostException e)
 		{
-		    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		    log.error("Downloading failed: {}", srcUrl.toString() + ")", e);
 		    callback.onFailure(this, e);
 		    return;
 		}
 		catch(IOException e)
 		{
-		    Log.debug(LOG_COMPONENT, "downloading attempt failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+		    log.trace("Downloading attempt failed: {}", srcUrl.toString(), e);
 		}
 	    }
 	    callback.onFailure(this, new IOException("Reached the limit of attempts"));
@@ -90,7 +92,7 @@ public final class Task implements Runnable
 	}
 	catch(Throwable e)
 	{
-	    Log.error(LOG_COMPONENT, "downloading failed:" + e.getClass().getName() + ":" + e.getMessage() + " (" + srcUrl.toString() + ")");
+	    log.error("Downloading failed: {}", srcUrl.toString(), e);
 	    if (!interrupting)
 		callback.onFailure(this, e);
 	}
