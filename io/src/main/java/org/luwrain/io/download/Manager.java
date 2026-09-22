@@ -27,10 +27,10 @@ public final class Manager implements Task.Callback, AutoCloseable
     synchronized public void load()
     {
 	entries.clear();
-	final DownloadConfig conf = luwrain.loadConf(DownloadConfig.class);
+	final Config conf = luwrain.loadConf(Config.class);
 	if (conf == null || conf.getItems() == null)
 	    return;
-	for(DownloadConfig.Item item: conf.getItems())
+	for(Config.Item item: conf.getItems())
 	{
 	    try {
 		final EntryImpl entry = new EntryImpl(item, this);
@@ -65,7 +65,7 @@ public final class Manager implements Task.Callback, AutoCloseable
 	NullCheck.notNull(srcUrl, "srcUrl");
 	NullCheck.notNull(destFile, "destFile");
 	Log.debug(LOG_COMPONENT, "new download: " + srcUrl.toString() + " -> " + destFile.getAbsolutePath());
-	final DownloadConfig.Item item = new DownloadConfig.Item();
+	final Config.Item item = new Config.Item();
 	item.setUrl(srcUrl.toString());
 	item.setDestFile(destFile.getAbsolutePath());
 	final EntryImpl entry = new EntryImpl(item, this);
@@ -164,8 +164,8 @@ public final class Manager implements Task.Callback, AutoCloseable
 
     private void saveConf()
     {
-	final DownloadConfig conf = new DownloadConfig();
-	final List<DownloadConfig.Item> items = new ArrayList<>();
+	final Config conf = new Config();
+	final List<Config.Item> items = new ArrayList<>();
 	for(EntryImpl e: entries)
 	    items.add(e.item);
 	conf.setItems(items);
@@ -185,14 +185,14 @@ public final class Manager implements Task.Callback, AutoCloseable
     static private final class EntryImpl implements Entry
     {
 	final Task task;
-	final DownloadConfig.Item item;
+	final Config.Item item;
 	long fileSize = 0;
 	long bytesFetched = 0;
 	int prevNotificationPercent = -1;
 	private Entry.Status statusCache = null;
 	private String errorInfoCache = null;
 
-	EntryImpl(DownloadConfig.Item item, Task.Callback callback) throws IOException
+	EntryImpl(Config.Item item, Task.Callback callback) throws IOException
 	{
 	    NullCheck.notNull(item, "item");
 	    NullCheck.notNull(callback, "callback");
@@ -207,18 +207,18 @@ public final class Manager implements Task.Callback, AutoCloseable
 	boolean isActive()
 	{
 	    final String status = item.getStatus();
-	    return status == null || (!status.equals(DownloadConfig.COMPLETED) && !status.equals(DownloadConfig.FAILED));
+	    return status == null || (!status.equals(Config.COMPLETED) && !status.equals(Config.FAILED));
 	}
 
 	void onSuccess()
 	{
-	    this.item.setStatus(DownloadConfig.COMPLETED);
+	    this.item.setStatus(Config.COMPLETED);
 	    this.statusCache = Status.SUCCESS;
 	}
 
 	void onFailure(Throwable e)
 	{
-	    this.item.setStatus(DownloadConfig.FAILED);
+	    this.item.setStatus(Config.FAILED);
 	    this.item.setErrorInfo(e.getClass().getName() + ":" + e.getMessage());
 	    this.statusCache = Status.FAILED;
 	    this.errorInfoCache = e.getClass().getName() + ":" + e.getMessage();
@@ -238,10 +238,10 @@ public final class Manager implements Task.Callback, AutoCloseable
 		return Status.RUNNING;
 	    switch(statusStr)
 	    {
-	    case DownloadConfig.COMPLETED:
+	    case Config.COMPLETED:
 		this.statusCache = Status.SUCCESS;
 		return Status.SUCCESS;
-	    case DownloadConfig.FAILED:
+	    case Config.FAILED:
 		this.statusCache = Status.FAILED;
 		return Status.FAILED;
 	    default:

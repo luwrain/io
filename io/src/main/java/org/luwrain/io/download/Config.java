@@ -8,7 +8,7 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
-public final class DownloadConfig
+public final class Config
 {
     static public final String COMPLETED = "completed";
     static public final String FAILED = "failed";
