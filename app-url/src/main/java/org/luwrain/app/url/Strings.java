@@ -5,8 +5,6 @@ package org.luwrain.app.url;
 
 public interface Strings
 {
-    static final String NAME = "luwrain.url";
-
     String appName();
     String fetching();
     String fetched(String url);

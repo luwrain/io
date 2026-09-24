@@ -9,12 +9,17 @@ import java.io.*;
 
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
+import org.luwrain.core.annotations.*;
 import static org.luwrain.util.TextUtils.*;
 
+@AppSingleArg(
+	      name = "url",
+	      title = { "en=URL", "ru=URL" }
+	      )
 public final class App extends AppBase<Strings>
 {
     private final String argText;
-    private Conversations conv = null;
+    private Conv conv = null;
     private MainLayout mainLayout = null;
     String[] text = new String[0];
 
@@ -25,13 +30,13 @@ public final class App extends AppBase<Strings>
 
     public App(String arg)
     {
-	super(Strings.NAME, Strings.class, "luwrain.url");
+	super(Strings.class, "luwrain.url");
 	this.argText = arg;
     }
 
     @Override protected AreaLayout onAppInit()
     {
-	this.conv = new Conversations(this);
+	this.conv = new Conv(this);
 	if (argText != null)
 	    this.text = splitLines(argText);
 	this.mainLayout = new MainLayout(this);
@@ -45,7 +50,7 @@ public final class App extends AppBase<Strings>
 	return true;
     }
 
-    Conversations getConv()
+    Conv getConv()
     {
 	return this.conv;
     }

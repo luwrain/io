@@ -18,14 +18,14 @@ import org.luwrain.popups.*;
 import static org.luwrain.core.DefaultEventResponse.*;
 import static org.luwrain.util.TextUtils.*;
 
-final class Conversations
+final class Conv
 {
     private final App app;
     private final Luwrain luwrain;
     private final Strings strings;
     private final OkHttpClient httpClient;
 
-    Conversations(App app)
+    Conv(App app)
     {
 	this.app = app;
 	this.luwrain = app.getLuwrain();
