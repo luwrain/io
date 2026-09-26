@@ -117,7 +117,7 @@ public abstract class AbstractTokenizer
 
     private void onPuncToken(char ch)
     {
-	output.add(new Token(Token.Type.PUNC, new Character(ch).toString()));
+	output.add(new Token(Token.Type.PUNC, Character.valueOf(ch).toString()));
     }
 
     public Token[] getOutput()

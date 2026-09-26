@@ -4,6 +4,7 @@ import java.util.Map;
 import lombok.*;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public final class Node extends Element
 {
     private final double lat;

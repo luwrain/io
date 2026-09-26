@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-// Copyright 2012-2025 Michael Pozhidaev <msp@luwrain.org>
+// Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
 package org.luwrain.app.github;
 
@@ -24,7 +24,7 @@ final class MainLayout extends LayoutBase
     final App app;
     final List<Repo>
 	repos = new ArrayList<>(),
-	searchResult = new ArrayList<>();;
+	searchResult = new ArrayList<>();
     final List<Issue> pullRequests = new ArrayList<>();
     
     final ListArea<Repo> reposArea;
@@ -106,10 +106,9 @@ final class MainLayout extends LayoutBase
 
     void refreshRepos()
     {
-	/*
 	final var taskId = app.newTaskId();
 	app.runTask(taskId, () -> {
-		try {
+		//		try {
 		    final var client = app.createGitHubClient();
 		    if (client == null)
 		    {
@@ -122,13 +121,14 @@ final class MainLayout extends LayoutBase
 			    repos.addAll(fetched);
 			    reposArea.refresh();
 			});
+		    /*
 		}
 		catch (Exception e)
 		{
 		    app.finishedTask(taskId, () -> app.crash(e));
 		}
+		    */
 	    });
-	*/
     }
 
     void refreshPullRequests()

@@ -7,6 +7,7 @@ import java.util.*;
 import org.luwrain.core.*;
 import org.luwrain.app.base.*;
 import org.luwrain.core.annotations.*;
+import org.luwrain.io.api.github.*;
 
 import static java.util.Objects.*;
 
@@ -37,6 +38,11 @@ public final class App extends AppBase<Strings>
     {
 	closeApp();
 	return true;
+    }
+
+    GitHubService createGitHubClient()
+    {
+	return null;
     }
 
     public Conv getConv()

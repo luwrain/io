@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Main interface for interacting with the GitHub API.
  */
-public interface GitHubService {
-
+public interface GitHubService
+{
     /**
      * Checks the connection and validates the token.
      * @return true if the authentication is successful

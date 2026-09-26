@@ -51,9 +51,8 @@ public class GitHubClient implements GitHubService
      */
     public GitHubClient(String token)
     {
-	if (token == null || token.trim().isEmpty()) {
+	if (token == null || token.isBlank()) 
 	    throw new IllegalArgumentException("Token cannot be empty");
-	}
 	this.token = token;
 	this.httpClient = new OkHttpClient.Builder()
 	        .connectTimeout(10, TimeUnit.SECONDS)
