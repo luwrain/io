@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Copyright 2012-2026 Michael Pozhidaev <msp@luwrain.org>
 
-package org.luwrain.io;
+package org.luwrain.io.websearch;
 
 import java.util.*;
 
 import org.luwrain.core.*;
-import static org.luwrain.script.ScriptUtils.*;
 
-public final class WebSearchResult
+import static java.util.Objects.*;
+//import static org.luwrain.script.ScriptUtils.*;
+
+public final class Result
 {
     private final String title;
     private final Item[] items;
 
-    public WebSearchResult(String title, Item[] items)
+    public Result(String title, Item[] items)
     {
-	NullCheck.notNull(title, "title");
+	requireNonNull(title, "title can't be null");
 	NullCheck.notNullItems(items, "items");
 	this.title = title;
 	this.items = items;
@@ -54,10 +56,10 @@ public final class WebSearchResult
 	private final String clickUrl;
 	public Item(String title, String snippet, String displayUrl, String clickUrl)
 	{
-	    NullCheck.notNull(title, "title");
-	    NullCheck.notNull(snippet, "snippet");
-	    NullCheck.notNull(displayUrl, "displayUrl");
-	    NullCheck.notNull(clickUrl, "clickUrl");
+	    requireNonNull(title, "title can't be null");
+	    requireNonNull(snippet, "snippet can't be null");
+	    requireNonNull(displayUrl, "displayUrl can't be null");
+	    requireNonNull(clickUrl, "clickUrl can't be null");
 	    this.title = title;
 	    this.snippet = snippet;
 	    this.displayUrl = displayUrl;
@@ -85,6 +87,7 @@ public final class WebSearchResult
 	}
     }
 
+    /*
     static public Item[] getItemsFromHookObj(Object itemsObj)
     {
 	if (itemsObj == null)
@@ -110,4 +113,5 @@ public final class WebSearchResult
 	    }
 	return res.toArray(new WebSearchResult.Item[res.size()]);
     }
+    */
 }

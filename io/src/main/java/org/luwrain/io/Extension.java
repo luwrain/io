@@ -26,11 +26,4 @@ public final class Extension extends EmptyExtension
 	download.close();
 	download = null;
     }
-    
-    @Override public Command[] getCommands(Luwrain luwrain)
-    {
-	return new Command[]{
-	    new WebCommand()
-	};
-    }
 }
