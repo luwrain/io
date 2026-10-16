@@ -77,6 +77,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 								action("set-user-name", app.getStrings().actionSetUserName(), this::actSetUserName),
 																action("delete-chat", app.getStrings().actionDeleteChat(), this::actDeleteChat),
 								action("new-channel", app.getStrings().actionNewChannel(), this::actNewChannel),
+								actAddProxy(),
 								searchChatsAction, contactsAction),
 		      consoleArea, actions(
 					   action("edit-message-text", app.getStrings().actionEditMessageText(), new InputEvent(InputEvent.Special.F5, EnumSet.of(InputEvent.Modifiers.SHIFT)), MainLayout.this::actEditMessageText),
@@ -413,6 +414,30 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	return true;
 	*/
     }
+
+        ActionInfo actAddProxy()
+    {
+	return action("add-proxy", app.getStrings().authAddProxy(), () -> {
+	String url = app.conv.addProxy();
+	if (url == null)
+	    return true;
+	final var addr = new ProxyAddr(url.trim());
+	if (!addr.valid)
+	{
+	    getLuwrain().playSound(Sounds.ERROR);
+	    return true;
+	}
+	log.trace("Adding proxy {}", url);
+	app.getOperations().getClient().send(new AddProxy(new Proxy(addr.host, addr.port, new ProxyTypeMtproto(addr.secret)), true), new Client.ResultHandler() {
+		@Override public void onResult(TdApi.Object object)
+		{
+		    log.trace("Setting proxy result is {}", object.getClass().getName());
+		    app.message(object.getClass().getName());
+		}});
+	return true;
+	    });
+}
+
 
 
     @Override public void onNewMessage(Chat chat, Message message)
