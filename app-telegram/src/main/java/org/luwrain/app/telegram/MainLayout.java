@@ -1,4 +1,3 @@
-
 package org.luwrain.app.telegram;
 
 import java.util.*;
@@ -76,6 +75,7 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 																action("chat-members", app.getStrings().actionChatMembers(), this::actChatMembers),
 								action("set-user-name", app.getStrings().actionSetUserName(), this::actSetUserName),
 																action("delete-chat", app.getStrings().actionDeleteChat(), this::actDeleteChat),
+								action("add-contact", app.getStrings().actionAddContact(), new InputEvent(InputEvent.Special.INSERT, EnumSet.of(InputEvent.Modifiers.SHIFT)), this::actAddContact),
 								action("new-channel", app.getStrings().actionNewChannel(), this::actNewChannel),
 								actAddProxy(),
 								searchChatsAction, contactsAction),
@@ -341,6 +341,33 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	return true;
     }
 
+    private boolean actAddContact()
+    {
+	final Chat chat = chatsArea.selected();
+	if (chat == null)
+	    return false;
+	if (!(chat.type instanceof ChatTypePrivate))
+	{
+	    app.message(app.getStrings().chatIsNotPrivate(), Luwrain.MessageType.ERROR);
+	    return true;
+	}
+	final long userId = ((ChatTypePrivate)chat.type).userId;
+	final User user = app.getObjects().users.get(userId);
+	final String firstName = user != null && user.firstName != null?user.firstName:"";
+	final String lastName = user != null && user.lastName != null?user.lastName:"";
+	final String newFirstName = app.getConv().addContactFirstName(firstName);
+	if (newFirstName == null)
+	    return true;
+	final String newLastName = app.getConv().addContactLastName(lastName);
+	if (newLastName == null)
+	    return true;
+	app.getOperations().addContact(userId, newFirstName, newLastName, ()->{
+		app.message(app.getStrings().actionAddContact(), Luwrain.MessageType.OK);
+		getLuwrain().playSound(Sounds.DONE);
+	    });
+	return true;
+    }
+
     private boolean actSetUserName()
     {
 	final String userName = app.getConv().userName();
@@ -488,3 +515,4 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	    });
     }
 }
+

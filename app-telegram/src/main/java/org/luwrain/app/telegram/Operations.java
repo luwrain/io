@@ -1,4 +1,3 @@
-
 package org.luwrain.app.telegram;
 
 import java.util.*;
@@ -45,6 +44,15 @@ public abstract class Operations
 	final var contact = new ImportedContact(phone, firstName, lastName, new TdApi.FormattedText("", new TdApi.TextEntity[0]));
 	getClient().send(new ImportContacts(new TdApi.ImportedContact[]{contact}),
 			 new DefaultHandler(TdApi.ImportedContacts.CONSTRUCTOR, (obj)->{
+				 luwrain.runUiSafely(onSuccess);
+			 }));
+    }
+
+    void addContact(long userId, String firstName, String lastName, Runnable onSuccess)
+    {
+	NullCheck.notNull(onSuccess, "onSuccess");
+	getClient().send(new TdApi.AddContact(userId, firstName, lastName),
+			 new DefaultHandler(TdApi.Ok.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
 			 }));
     }
@@ -393,3 +401,4 @@ onSuccess.accept((Chat)obj);
 
     
 }
+

@@ -1,4 +1,3 @@
-
 package org.luwrain.app.telegram;
 
 import org.drinkless.tdlib.TdApi;
@@ -31,6 +30,18 @@ final class Conv
     String newContactFirstName() { return Popups.textNotEmpty(luwrain, "Новый контакт", "Имя человека:", ""); }
     String newContactLastName() { return Popups.textNotEmpty(luwrain, "Новый контакт", "Фамилия:", ""); }
 
+    String addContactFirstName(String defaultName)
+    {
+	NullCheck.notNull(defaultName, "defaultName");
+	return Popups.text(luwrain, strings.addContactPopupName(), strings.addContactFirstNamePrefix(), defaultName);
+    }
+
+    String addContactLastName(String defaultName)
+    {
+	NullCheck.notNull(defaultName, "defaultName");
+	return Popups.text(luwrain, strings.addContactPopupName(), strings.addContactLastNamePrefix(), defaultName);
+    }
+
     String newContactPhone()
     {
 	final String res = Popups.text(luwrain, "Новый контакт", "Телефон нового контакта::", "", (text)->{
@@ -62,3 +73,4 @@ final class Conv
 	return textNotEmpty(luwrain, strings.addProxyPopupName(), strings.addProxyPopupPrefix(), "");
     }
 }
+

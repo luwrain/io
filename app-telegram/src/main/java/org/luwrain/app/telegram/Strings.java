@@ -1,4 +1,3 @@
-
 package org.luwrain.app.telegram;
 
 import org.luwrain.core.annotations.*;
@@ -16,10 +15,16 @@ public interface Strings
     String actionCloseChat();
     String actionDeleteMessage();
     String actionNewContact();
+    String actionAddContact();
 
     String chatsAreaName();
     String chatPropsAreaName();
     String contactsAreaName();
+
+    String addContactPopupName();
+    String addContactFirstNamePrefix();
+    String addContactLastNamePrefix();
+    String chatIsNotPrivate();
 
     String authPhoneNumberIntro();
     String authPhoneNumberInput();
@@ -76,3 +81,4 @@ public interface Strings
     String lastName();
     String phoneNumber();
 }
+
