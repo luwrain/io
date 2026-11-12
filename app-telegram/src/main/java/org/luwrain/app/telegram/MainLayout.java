@@ -361,7 +361,10 @@ final class MainLayout extends LayoutBase implements ListArea.ClickHandler<Chat>
 	final String newLastName = app.getConv().addContactLastName(lastName);
 	if (newLastName == null)
 	    return true;
-	app.getOperations().addContact(userId, newFirstName, newLastName, ()->{
+	final var c = new ImportedContact();
+	c.firstName = newFirstName;
+	c.lastName = newLastName;
+	app.getOperations().addContact(userId, c, ()->{
 		app.message(app.getStrings().actionAddContact(), Luwrain.MessageType.OK);
 		getLuwrain().playSound(Sounds.DONE);
 	    });

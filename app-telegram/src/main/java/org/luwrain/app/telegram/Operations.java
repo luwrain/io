@@ -48,11 +48,10 @@ public abstract class Operations
 			 }));
     }
 
-    void addContact(long userId, String firstName, String lastName, Runnable onSuccess)
+    void addContact(long userId, ImportedContact contact, Runnable onSuccess)
     {
-	NullCheck.notNull(onSuccess, "onSuccess");
-	getClient().send(new TdApi.AddContact(userId, firstName, lastName),
-			 new DefaultHandler(TdApi.Ok.CONSTRUCTOR, (obj)->{
+	getClient().send(new AddContact(userId, contact, false),
+			 new DefaultHandler(Ok.CONSTRUCTOR, (obj)->{
 				 luwrain.runUiSafely(onSuccess);
 			 }));
     }
